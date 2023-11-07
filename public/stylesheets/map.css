@@ -1,0 +1,58 @@
+body {
+  padding: 0px !important;
+  margin: 0px !important;
+}
+
+#current {
+  position: absolute;
+  bottom: 40px;
+  left: 30px;
+  z-index: 1;
+  background-color: white;
+  padding: 15px;
+  border: 3px solid gray;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bolder;
+  cursor: pointer;
+}
+
+.pulse {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 0 rgb(255, 0, 0);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(204, 49, 44, 0.4);
+    -moz-box-shadow: 0 0 0 0 rgba(204, 49, 44, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(204, 49, 44, 0);
+    -moz-box-shadow: 0 0 0 20px rgba(204, 49, 44, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(204, 49, 44, 0);
+    -moz-box-shadow: 0 0 0 0 rgba(204, 49, 44, 0);
+  }
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(204, 49, 44, 0.4);
+    -moz-box-shadow: 0 0 0 0 rgba(204, 49, 44, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(204, 49, 44, 0);
+    -moz-box-shadow: 0 0 0 20px rgba(204, 49, 44, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(204, 49, 44, 0);
+    -moz-box-shadow: 0 0 0 0 rgba(204, 49, 44, 0);
+  }
+}

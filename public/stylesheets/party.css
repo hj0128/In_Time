@@ -1,0 +1,22 @@
+.party_item {
+  display: flex;
+  flex-direction: column;
+}
+
+.party_list_info {
+  border-top: 1px solid black;
+  cursor: pointer;
+}
+
+.party_list_info_name {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.party_list_info_members {
+  font-size: 12px;
+}
+
+.party_list_info_point {
+  font-size: 12px;
+}
