@@ -1,0 +1,32 @@
+<html lang='ko'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+    />
+    <title>Plan</title>
+    <link rel='stylesheet' href='/stylesheets/plan.css' />
+    <script
+      type="text/javascript"
+      src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=p5qojt9ckc"></script>
+    </script>
+    <script
+      src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'
+    ></script>
+  </head>
+
+  <body>
+    <a href='/' id='home'>Home</a>
+    <div id='plan_info'>
+      <div id='name'>약속 이름</div>
+      <div id="map" style="width: 500px; height: 500px"></div>
+      <div id='place'>장소</div>
+      <div id='date'>날짜</div>
+      <div id='fine'>벌금</div>
+      <div id='fineType'>벌금 종류</div>
+    </div>
+    <script type='text/javascript' src='/javascripts/plan.js'></script>
+  </body>
+</html>

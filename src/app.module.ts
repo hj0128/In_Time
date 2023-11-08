@@ -4,10 +4,14 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PartyModule } from './apis/party/party.module';
+import { PlanModule } from './apis/plan/plan.module';
+import { MapModule } from './apis/map/map.module';
 
 @Module({
   imports: [
+    MapModule,
     PartyModule,
+    PlanModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: process.env.DATABASE_TYPE as 'mysql',
@@ -21,7 +25,9 @@ import { PartyModule } from './apis/party/party.module';
       logging: true,
     }),
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController, //
+  ],
   providers: [
     AppService, //
   ],

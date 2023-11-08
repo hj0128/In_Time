@@ -1,0 +1,46 @@
+<html lang='ko'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta
+      name='viewport'
+      content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'
+    />
+    <title>Plan_Create</title>
+    <link rel='stylesheet' href='/stylesheets/plan_create.css' />
+    <script
+      src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'
+    ></script>
+    <script
+      type='text/javascript'
+      src='//dapi.kakao.com/v2/maps/sdk.js?appkey=d5717ed5141c2a7bc7e865bf06c5e912&libraries=services'
+    ></script>
+  </head>
+
+  <body>
+    <a href='/' id='home'>Home</a>
+    <br />
+    약속 이름 :
+    <input type='text' id='name' />
+    <br />
+    <form onsubmit='searchPlaces(); return false;'>
+      <input type='text' id='keyword' size='15' placeholder='서울역' />
+      <button type='submit'>검색하기</button>
+    </form>
+    <div id='map' style='width: 300px; height: 300px;'></div>
+    장소 :
+    <input type='text' id='place' readonly />
+    <br />
+    날짜 :
+    <input type='datetime-local' id='date' />
+    <br />
+    벌금 :
+    <input type='number' id='fine' />
+    <br />
+    벌금 종류 :
+    <input type='radio' id='fineType' name='fineType' value='1회' />1회
+    <input type='radio' id='fineType' name='fineType' value='반복' />반복
+    <br />
+    <button id='plan_create'>약속 만들기</button>
+    <script type='text/javascript' src='/javascripts/plan_create.js'></script>
+  </body>
+</html>

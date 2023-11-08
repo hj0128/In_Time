@@ -1,0 +1,12 @@
+.infoWindow_info {
+  padding: 20px;
+}
+
+.infoWindow_info_title {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.infoWindow_info_address {
+  font-size: 13px;
+}

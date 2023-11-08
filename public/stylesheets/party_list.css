@@ -1,21 +1,17 @@
-.plan_list_info {
+.party_list_info {
   border-top: 1px solid black;
   cursor: pointer;
 }
 
-.plan_list_info_name {
+.party_list_info_name {
   font-size: 15px;
   font-weight: 500;
 }
 
-.plan_list_info_place {
+.party_list_info_members {
   font-size: 12px;
 }
 
-.plan_list_info_date {
-  font-size: 12px;
-}
-
-.plan_list_info_time {
+.party_list_info_point {
   font-size: 12px;
 }
