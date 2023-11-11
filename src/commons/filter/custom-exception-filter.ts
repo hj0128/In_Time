@@ -1,10 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { AxiosError } from 'axios';
 
 @Catch()
@@ -15,7 +9,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
 
     const error = {
-      message: '예외 발생!!',
+      message: 'Internal Server Error',
       status: HttpStatus.INTERNAL_SERVER_ERROR,
     };
 
@@ -23,9 +17,8 @@ export class CustomExceptionFilter implements ExceptionFilter {
       error.message = exception.message;
       error.status = exception.getStatus();
     } else if (exception instanceof AxiosError) {
-      error.message = exception.response?.data?.message || 'Axios 예외 발생';
-      error.status =
-        exception.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+      error.message = exception.response?.data?.message || 'Axios Internal Server Error';
+      error.status = exception.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
     }
     console.log(exception);
 

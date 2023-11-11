@@ -12,7 +12,7 @@ const getPlanList = async () => {
 
   const listel = document.querySelector('#plan_list');
   for (let i = 0; i < plans.data.length; i++) {
-    const { id, name, place, date, time } = plans.data[i];
+    const { id, name, place, date, fine } = plans.data[i];
 
     const el = document.createElement('div');
     el.className = 'plan_list_info';
@@ -20,7 +20,7 @@ const getPlanList = async () => {
       <div class="plan_list_info_name">${name}</div>
       <div class="plan_list_info_place">${place}</div>
       <div class="plan_list_info_date">${date}</div>
-      <div class="plan_list_info_time">${time}</div>
+      <div class="plan_list_info_fine">${fine}</div>
     `;
     el.innerHTML = itemStr;
     el.setAttribute('onclick', `location.href="/plan?id=${id}"`);

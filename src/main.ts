@@ -15,6 +15,9 @@ async function bootstrap() {
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('hbs');
   setupSwagger(app);
+  // process.on('unhandledRejection', (reason, promise) => {
+  //   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // });
   await app.listen(3001);
 }
 bootstrap();

@@ -1,0 +1,59 @@
+<html lang='ko'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>SignUp</title>
+    <link rel='stylesheet' href='/stylesheets/signUp.css' />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'></script>
+  </head>
+
+  <body>
+    <a href='/' id='home'>Home</a>
+    <div class='wrapper'>
+      <h3>회원가입</h3>
+      <div class='file_wrapper'>
+        <input type='text' id='file_box' placeholder='프로필 사진을 업로드해 주세요.' readonly />
+        <label for='file_search'>파일 찾기</label>
+        <input type='file' id='file_search' accept='image/*' style='display: none;' />
+      </div>
+      <div class='error' id='error_file'></div>
+      <input type='text' class='inputBox' id='email' placeholder='이메일을 입력해 주세요.' />
+      <div class='error' id='error_email'></div>
+      <input type='text' class='inputBox' id='name' placeholder='별명을 입력해 주세요.' />
+      <div class='error' id='error_name'></div>
+      <input
+        type='password'
+        class='inputBox'
+        id='password'
+        placeholder='비밀번호를 입력해 주세요.'
+      />
+      <div class='error' id='error_password'></div>
+      <input
+        type='password'
+        class='inputBox'
+        id='rePassword'
+        placeholder='비밀번호를 다시 입력해 주세요.'
+      />
+      <div class='error' id='error_rePassword'></div>
+      <div class='phone_wrapper'>
+        <input type='text' class='phone_number' id='phone1' maxlength='3' />_
+        <input type='text' class='phone_number' id='phone2' maxlength='4' />_
+        <input type='text' class='phone_number' id='phone3' maxlength='4' />
+        <button id='token_send' disabled='true'>인증번호 요청</button>
+      </div>
+      <div class='token_wrapper'>
+        <input
+          type='text'
+          id='token_input'
+          placeholder='인증 번호를 입력해 주세요.'
+          maxlength='6'
+        />
+        <div id='time_timer'>1:00</div>
+        <button id='token_check' disabled='true'>인증하기</button>
+      </div>
+      <div class='dividing_line'></div>
+      <button type='submit' id='sign_up' disabled='true'>가입하기</button>
+    </div>
+    <script type='text/javascript' src='/javascripts/signUp.js'></script>
+  </body>
+</html>

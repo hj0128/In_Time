@@ -6,7 +6,7 @@ const mapOptions = {
 
 const map = new kakao.maps.Map(mapContainer, mapOptions);
 
-const onSubmit = (placeName) => {
+const placeChoice = (placeName) => {
   const place = document.querySelector('#place');
   place.value = placeName;
 };
@@ -25,7 +25,7 @@ const displayInfoWindow = (marker, place_name, address_name, lat, lng) => {
     <div class='infoWindow_info'>
       <div class='infoWindow_info_title'>${place_name}</div>
       <div class='infoWindow_info_address'>${address_name}</div>
-      <button onClick='onSubmit("${place_name}");'>선택</button>
+      <button onClick='placeChoice("${place_name}");'>선택</button>
     </div>`;
 
   map.panTo(marker.getPosition());
@@ -98,7 +98,7 @@ const create = async () => {
   const place = document.querySelector('#place').value;
   const date = document.querySelector('#date').value;
   const fine = document.querySelector('#fine').value;
-  const fineType = document.querySelector('#fineType').value;
+  const fineType = document.querySelector('input[name="fineType"]:checked').value;
 
   if (!name || !place || !date || !fine || !fineType) {
     return alert('모든 항목을 입력해 주세요.');

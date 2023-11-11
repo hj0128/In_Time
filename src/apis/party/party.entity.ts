@@ -1,5 +1,12 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Plan } from '../plan/plan.entity';
+import { User } from '../user/user.entity';
 
 @Entity()
 export class Party {
@@ -17,4 +24,7 @@ export class Party {
 
   @OneToMany(() => Plan, (plans) => plans.party)
   plans: Plan[];
+
+  @ManyToOne(() => User)
+  user: User;
 }

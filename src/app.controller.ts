@@ -39,14 +39,24 @@ export class AppController {
   createPlan() {}
 
   @ApiExcludeEndpoint()
-  @Get('/friend')
-  @Render('friend')
+  @Get('/friend/list')
+  @Render('friend_list')
   friend() {}
 
   @ApiExcludeEndpoint()
   @Get('/friend/create')
   @Render('friend_create')
   createFriend() {}
+
+  @ApiExcludeEndpoint()
+  @Get('/signIn')
+  @Render('signIn')
+  signIn() {}
+
+  @ApiExcludeEndpoint()
+  @Get('/signUp')
+  @Render('signUp')
+  signUp() {}
 
   @ApiExcludeEndpoint()
   @Get('/map')
