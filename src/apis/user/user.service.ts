@@ -6,6 +6,7 @@ import {
   IUserServiceCreate,
   IUserServiceFindOneWithEmail,
   IUserServiceFindOneWithName,
+  IUserServiceFindOneWithUserID,
 } from './user.interface';
 import * as bcrypt from 'bcrypt';
 
@@ -15,6 +16,10 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>, //
   ) {}
+
+  findOneWithUserId({ id }: IUserServiceFindOneWithUserID): Promise<User> {
+    return this.userRepository.findOne({ where: { id } });
+  }
 
   findOneWithName({ name }: IUserServiceFindOneWithName): Promise<User> {
     return this.userRepository.findOne({ where: { name } });
@@ -28,11 +33,15 @@ export class UserService {
     const { name, email, password, profileUrl } = userCreateDto;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    return this.userRepository.save({
+    const create = await this.userRepository.save({
       name,
       email,
       password: hashedPassword,
       profileUrl,
     });
+
+    if (!create) throw new Error('회원 생성에 실패하였습니다.');
+
+    return create;
   }
 }

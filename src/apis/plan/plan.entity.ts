@@ -1,12 +1,7 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Party } from '../party/party.entity';
 import { Map } from '../map/map.entity';
+import { Min } from 'class-validator';
 
 @Entity()
 export class Plan {
@@ -22,6 +17,7 @@ export class Plan {
   @Column()
   date: string;
 
+  @Min(0)
   @Column()
   fine: number;
 

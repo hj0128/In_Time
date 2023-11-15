@@ -1,26 +1,4 @@
-import {
-  BadGatewayException,
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  GatewayTimeoutException,
-  GoneException,
-  HttpVersionNotSupportedException,
-  ImATeapotException,
-  Injectable,
-  InternalServerErrorException,
-  MethodNotAllowedException,
-  NotAcceptableException,
-  NotFoundException,
-  NotImplementedException,
-  PayloadTooLargeException,
-  PreconditionFailedException,
-  RequestTimeoutException,
-  ServiceUnavailableException,
-  UnauthorizedException,
-  UnprocessableEntityException,
-  UnsupportedMediaTypeException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   IAuthServiceGetAccessToken,
   IAuthServiceLogin,
@@ -58,7 +36,6 @@ export class AuthService {
     const { email, password } = authLoginDto;
 
     const user = await this.userService.findOneWithEmail({ email });
-
     if (!user) throw new UnauthorizedException('회원 가입 되지 않은 이메일입니다.');
 
     const isAuth = await bcrypt.compare(password, user.password);

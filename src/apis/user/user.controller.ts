@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Redirect, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { User } from './user.entity';
@@ -13,7 +13,12 @@ export class UserController {
     private readonly userService: UserService, //
   ) {}
 
+  // 지우기
   @UseGuards(AuthGuard('access'))
+  @ApiOperation({
+    summary: 'TEST',
+    description: 'test',
+  })
   @Get('/test')
   test(
     @Req() req: Request, //

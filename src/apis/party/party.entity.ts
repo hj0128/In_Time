@@ -1,12 +1,7 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Plan } from '../plan/plan.entity';
-import { User } from '../user/user.entity';
+import { Min } from 'class-validator';
+import { Party_User } from '../party-user/party-user.entity';
 
 @Entity()
 export class Party {
@@ -16,15 +11,13 @@ export class Party {
   @Column()
   name: string;
 
-  @Column()
-  members: string;
-
+  @Min(0)
   @Column({ default: 0 })
   point: number;
 
   @OneToMany(() => Plan, (plans) => plans.party)
   plans: Plan[];
 
-  @ManyToOne(() => User)
-  user: User;
+  @OneToMany(() => Party_User, (partyUsers) => partyUsers.party)
+  partyUsers: Party_User[];
 }

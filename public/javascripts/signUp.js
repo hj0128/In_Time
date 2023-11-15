@@ -210,7 +210,7 @@ const signUpSubmit = async () => {
       if (err.response.status === 400) {
         alert('회원 가입 중 오류가 발생했습니다. \n입력하신 정보를 다시 확인해 주세요.')
       } else {
-        alert('회원 가입 중 오류가 발생했습니다. 나중에 다시 시도해주세요.');
+        alert('회원 가입 중 오류가 발생했습니다. \n나중에 다시 시도해주세요.');
       }
     }
   } else {

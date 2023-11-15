@@ -9,10 +9,11 @@ import { MapModule } from './apis/map/map.module';
 import { UserModule } from './apis/user/user.module';
 import { AuthModule } from './apis/auth/auth.module';
 import { APP_PIPE } from '@nestjs/core';
-
+import { FriendModule } from './apis/friend/friend.module';
 @Module({
   imports: [
     AuthModule,
+    FriendModule,
     UserModule,
     MapModule,
     PartyModule,

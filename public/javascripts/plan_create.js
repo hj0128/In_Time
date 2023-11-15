@@ -17,16 +17,16 @@ const infoWindow = new kakao.maps.InfoWindow({
 
 let placeAddress, placeLat, placeLng;
 const displayInfoWindow = (marker, place_name, address_name, lat, lng) => {
+  const content = `
+  <div class='infoWindow_info'>
+  <div class='infoWindow_info_title'>${place_name}</div>
+  <div class='infoWindow_info_address'>${address_name}</div>
+  <button onClick='placeChoice("${place_name}");'>선택</button>
+  </div>`;
+
   placeAddress = address_name;
   placeLat = lat;
   placeLng = lng;
-
-  const content = `
-    <div class='infoWindow_info'>
-      <div class='infoWindow_info_title'>${place_name}</div>
-      <div class='infoWindow_info_address'>${address_name}</div>
-      <button onClick='placeChoice("${place_name}");'>선택</button>
-    </div>`;
 
   map.panTo(marker.getPosition());
   infoWindow.setContent(content);
@@ -59,7 +59,11 @@ const displayPlaces = (data) => {
     markerList.push(marker);
 
     kakao.maps.event.addListener(marker, 'click', () => {
-      displayInfoWindow(marker, place_name, address_name, y, x);
+      if (infoWindow.getMap()) {
+        infoWindow.close();
+      } else {
+        displayInfoWindow(marker, place_name, address_name, y, x);
+      }
     });
 
     kakao.maps.event.addListener(map, 'click', () => {
@@ -98,23 +102,27 @@ const create = async () => {
   const place = document.querySelector('#place').value;
   const date = document.querySelector('#date').value;
   const fine = document.querySelector('#fine').value;
-  const fineType = document.querySelector('input[name="fineType"]:checked').value;
+  const fineType = document.querySelector('input[name="fineType"]:checked');
 
   if (!name || !place || !date || !fine || !fineType) {
     return alert('모든 항목을 입력해 주세요.');
   }
 
-  await axios.post('/plan/planCreate', {
-    partyID,
-    name,
-    place,
-    date,
-    fine,
-    fineType,
-    placeAddress,
-    placeLat,
-    placeLng,
-  });
+  try {
+    await axios.post('/plan/planCreate', {
+      partyID,
+      name,
+      place,
+      date,
+      fine: Number(fine),
+      fineType: fineType.value,
+      placeAddress,
+      placeLat: Number(placeLat),
+      placeLng: Number(placeLng),
+    });
+  } catch (err) {
+    alert('약속 생성 중 오류가 발생했습니다. \n나중에 다시 시도해주세요.');
+  }
 
   alert('약속이 생성되었습니다.');
 };

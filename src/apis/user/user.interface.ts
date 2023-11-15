@@ -1,5 +1,9 @@
 import { UserCreateDto } from './user.dto';
 
+export interface IUserServiceFindOneWithUserID {
+  id: string;
+}
+
 export interface IUserServiceFindOneWithName {
   name: string;
 }

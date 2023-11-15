@@ -1,6 +1,7 @@
-import { Controller, Get, Render } from '@nestjs/common';
+import { Controller, Get, Render, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
 export class AppController {
@@ -13,40 +14,47 @@ export class AppController {
   @Render('home')
   home() {}
 
+  @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
   @Get('/party')
   @Render('party')
   party() {}
 
+  @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
   @Get('/party/list')
   @Render('party_list')
   partyList() {}
 
+  @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
   @Get('/party/create')
   @Render('party_create')
-  createParty() {}
+  partyCreate() {}
 
+  @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
   @Get('/plan')
   @Render('plan')
   plan() {}
 
+  @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
   @Get('/plan/create')
   @Render('plan_create')
-  createPlan() {}
+  planCreate() {}
 
+  @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
   @Get('/friend/list')
   @Render('friend_list')
-  friend() {}
+  friendList() {}
 
+  @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
   @Get('/friend/create')
   @Render('friend_create')
-  createFriend() {}
+  friendCreate() {}
 
   @ApiExcludeEndpoint()
   @Get('/signIn')

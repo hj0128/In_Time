@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Friend } from '../friend/friend.entity';
+import { Party_User } from '../party-user/party-user.entity';
 
 @Entity()
 export class User {
@@ -19,4 +21,10 @@ export class User {
 
   @Column({ default: 'http://badgeUrl.jpg' })
   badgeUrl: string;
+
+  @OneToMany(() => Friend, (friend) => friend.user)
+  friends: Friend[];
+
+  @OneToMany(() => Party_User, (partyUsers) => partyUsers.user)
+  partyUsers: Party_User[];
 }

@@ -1,25 +1,92 @@
-// import { Test } from '@nestjs/testing';
+// import { Test, TestingModule } from '@nestjs/testing';
 // import { getRepositoryToken } from '@nestjs/typeorm';
-// import {} from '@nestjs/common';
 // import { PartyService } from '../party.service';
 // import { Party } from '../party.entity';
+// import { Party_UserService } from '../../party-user/party-user.service';
+// import { Party_User } from '../../party-user/party-user.entity';
+
+// class MockPartyUserRepository {}
 
 // class MockPartyRepository {
+//   mydb = [
+//     {
+//       id: 'P001',
+//       name: '맛집 탐방',
+//       point: 0,
+//     },
+//     {
+//       id: 'P002',
+//       name: '카페 탐방',
+//       point: 1000,
+//     },
+//   ];
 //   myDB = [
-//     { name: '동아리 모임', members: '["U001", "U002"]', point: 0 },
-//     { name: '돼지 파티', members: '["U002", "U003"]', point: 1000 },
+//     {
+//       id: 'P001',
+//       name: '맛집 탐방',
+//       point: 0,
+//       partyUsers: {
+//         id: 'PU001',
+//         party: {},
+//         user: {
+//           id: 'U001',
+//           name: '철수',
+//           email: 'a@a.com',
+//           password: '1234',
+//           profileUrl: 'https://철수.jpg',
+//           badgeUrl: 'https://배지.jpg',
+//         },
+//       },
+//     },
+//     {
+//       id: 'P002',
+//       name: '카페 탐방',
+//       point: 1000,
+//       partyUsers: {
+//         id: 'PU002',
+//         party: {},
+//         user: {
+//           id: 'U001',
+//           name: '철수',
+//           email: 'a@a.com',
+//           password: '1234',
+//           profileUrl: 'https://철수.jpg',
+//           badgeUrl: 'https://배지.jpg',
+//         },
+//       },
+//     },
 //   ];
 
-//   find() {
-//     if (this.myDB) return this.myDB;
-
+//   findOne({ where }) {
+//     const party = this.mydb.filter((el) => el.id === where.id);
+//     if (party) return party;
 //     return null;
 //   }
 
-//   save({ name, members, point = 0 }) {
-//     this.myDB.push({ name, members, point });
+//   find({ where }) {
+//     const parties = this.myDB.filter((el) => el.partyUsers.user.id === where.partyUsers.user.id);
+//     if (parties) return parties;
+//     return null;
+//   }
 
-//     return { name, members, point };
+//   save({ name }) {
+//     return this.myDB.push({
+//       id: 'P003',
+//       name,
+//       point: 0,
+//       partyUsers: {
+//         id: '',
+//         party: {},
+//         user: {
+//           id: '',
+//           name: '',
+//           email: '',
+//           password: '',
+//           profileUrl: '',
+//           badgeUrl: '',
+//         },
+//       },
+//     });
 //   }
 // }
 
@@ -27,12 +94,17 @@
 //   let partyService: PartyService;
 
 //   beforeEach(async () => {
-//     const partyModule = await Test.createTestingModule({
+//     const partyModule: TestingModule = await Test.createTestingModule({
 //       providers: [
 //         PartyService,
+//         Party_UserService,
 //         {
 //           provide: getRepositoryToken(Party),
 //           useClass: MockPartyRepository,
+//         },
+//         {
+//           provide: getRepositoryToken(Party_User),
+//           useClass: MockPartyUserRepository,
 //         },
 //       ],
 //     }).compile();
@@ -40,27 +112,70 @@
 //     partyService = partyModule.get<PartyService>(PartyService);
 //   });
 
-//   describe('findAll', () => {
-//     it('DB의 모든 party를 배열로 가져오는지', async () => {
-//       const result = await partyService.findAll();
+//   describe('findOneWithPartyID', () => {
+//     it('partyID에 해당하는 party를 가져온다.', () => {
+//       const result = partyService.findOneWithPartyID({ partyID: 'P001' });
+//       expect(result).toStrictEqual({
+//         id: 'P001',
+//         name: '맛집 탐방',
+//         point: 0,
+//       });
+//     });
+//   });
+
+//   describe('findAllWithUser', () => {
+//     it('userID에 해당하는 party를 모두 가져온다.', () => {
+//       const user = {
+//         id: 'U001',
+//         name: '철수',
+//         email: 'a@a.com',
+//         password: '1234',
+//         profileUrl: 'https://철수.png',
+//       };
+
+//       const result = partyService.findAllWithUser({ user });
 
 //       expect(result).toStrictEqual([
-//         { name: '동아리 모임', members: '["U001", "U002"]', point: 0 },
-//         { name: '돼지 파티', members: '["U002", "U003"]', point: 1000 },
+//         { id: 'P001', name: '맛집 탐방', point: 0 },
+//         { id: 'P002', name: '카페 탐방', point: 1000 },
 //       ]);
 //     });
 //   });
 
 //   describe('create', () => {
-//     it('DB에 party를 저장하는지', async () => {
-//       const partyCreateDto = { name: '공주들', members: '["U004", "U005"]' };
-//       const result = await partyService.create({ partyCreateDto });
+//     const partyCreateDto = { name: '영화 관람', friendsID: '["U002", "U003"]' };
+//     const user = {
+//       id: 'U001',
+//       name: '철수',
+//       email: 'a@a.com',
+//       password: '1234',
+//       profileUrl: 'https://철수.png',
+//     };
+
+//     it('party를 생성한다.', async () => {
+//       const result = await partyService.create({ partyCreateDto, user });
 
 //       expect(result).toStrictEqual({
-//         name: '공주들',
-//         members: '["U004", "U005"]',
+//         id: 'P003',
+//         name: '영화 관람',
 //         point: 0,
+//         partyUsers: {
+//           id: '',
+//           party: {},
+//           user: {
+//             id: '',
+//             name: '',
+//             email: '',
+//             password: '',
+//             profileUrl: '',
+//             badgeUrl: '',
+//           },
+//         },
 //       });
 //     });
+
+//     // it('party-user를 생성한다.', () => {
+//     //   const result = await partyService.create({ partyCreateDto, user });
+//     // });
 //   });
 // });
