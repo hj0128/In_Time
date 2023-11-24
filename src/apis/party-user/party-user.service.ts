@@ -4,6 +4,7 @@ import { Party_User } from './party-user.entity';
 import { InsertResult, Repository } from 'typeorm';
 import {
   IPartyUserServiceCreate,
+  IPartyUserServiceFindAllWithPartyID,
   IPartyUserServiceFindAllWithUserID,
 } from './party-user.interface';
 
@@ -14,10 +15,17 @@ export class Party_UserService {
     private readonly partyUserRepository: Repository<Party_User>, //
   ) {}
 
-  findAllWithUserID({ user }: IPartyUserServiceFindAllWithUserID): Promise<Party_User[]> {
+  findAllWithUserID({ userID }: IPartyUserServiceFindAllWithUserID): Promise<Party_User[]> {
     return this.partyUserRepository.find({
-      where: { user: { id: user.id } },
+      where: { user: { id: userID } },
       relations: ['party'],
+    });
+  }
+
+  findAllWithPartyID({ partyID }: IPartyUserServiceFindAllWithPartyID): Promise<Party_User[]> {
+    return this.partyUserRepository.find({
+      where: { party: { id: partyID } },
+      relations: ['user'],
     });
   }
 

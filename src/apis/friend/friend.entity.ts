@@ -17,6 +17,6 @@ export class Friend {
   @Column({ type: 'enum', enum: STATUS_ENUM })
   isAccepted: STATUS_ENUM;
 
-  @ManyToOne(() => User, (user) => user.friends)
+  @ManyToOne(() => User, (user) => user.friends, { onDelete: 'CASCADE' })
   user: User;
 }

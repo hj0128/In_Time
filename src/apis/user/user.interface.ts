@@ -4,6 +4,10 @@ export interface IUserServiceFindOneWithUserID {
   id: string;
 }
 
+export interface IUserServiceFindAllWithUserID {
+  usersID: string[];
+}
+
 export interface IUserServiceFindOneWithName {
   name: string;
 }

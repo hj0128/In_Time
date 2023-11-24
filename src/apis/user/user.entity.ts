@@ -22,9 +22,9 @@ export class User {
   @Column({ default: 'http://badgeUrl.jpg' })
   badgeUrl: string;
 
-  @OneToMany(() => Friend, (friend) => friend.user)
+  @OneToMany(() => Friend, (friend) => friend.user, { cascade: true })
   friends: Friend[];
 
-  @OneToMany(() => Party_User, (partyUsers) => partyUsers.user)
+  @OneToMany(() => Party_User, (partyUsers) => partyUsers.user, { cascade: true })
   partyUsers: Party_User[];
 }

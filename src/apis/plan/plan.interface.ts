@@ -1,4 +1,4 @@
-import { JwtReqUser } from '../auth/auth.interface';
+import { JwtReqUser } from 'src/commons/interface/req.interface';
 import { PlanCreateDto } from './plan.dto';
 
 export interface IPlanServiceFindOneWithPlanID {

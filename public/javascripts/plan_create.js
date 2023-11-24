@@ -1,6 +1,6 @@
 const mapContainer = document.querySelector('#map');
 const mapOptions = {
-  center: new kakao.maps.LatLng(37.554477, 126.970419),
+  center: new kakao.maps.LatLng(33.450701, 126.570667),
   level: 3,
 };
 
@@ -98,27 +98,27 @@ const partyID = urlParams.get('id');
 
 const planCreate = document.querySelector('#plan_create');
 const create = async () => {
-  const name = document.querySelector('#name').value;
-  const place = document.querySelector('#place').value;
+  const planName = document.querySelector('#name').value;
+  const placeName = document.querySelector('#place').value;
   const date = document.querySelector('#date').value;
   const fine = document.querySelector('#fine').value;
   const fineType = document.querySelector('input[name="fineType"]:checked');
 
-  if (!name || !place || !date || !fine || !fineType) {
+  if (!planName || !placeName || !date || !fine || !fineType) {
     return alert('모든 항목을 입력해 주세요.');
   }
 
   try {
     await axios.post('/plan/planCreate', {
-      partyID,
-      name,
-      place,
-      date,
-      fine: Number(fine),
-      fineType: fineType.value,
+      planName,
+      placeName,
       placeAddress,
       placeLat: Number(placeLat),
       placeLng: Number(placeLng),
+      date,
+      fine: Number(fine),
+      fineType: fineType.value,
+      partyID,
     });
   } catch (err) {
     alert('약속 생성 중 오류가 발생했습니다. \n나중에 다시 시도해주세요.');

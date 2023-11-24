@@ -1,22 +1,22 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PartyModule } from './apis/party/party.module';
 import { PlanModule } from './apis/plan/plan.module';
-import { MapModule } from './apis/map/map.module';
 import { UserModule } from './apis/user/user.module';
 import { AuthModule } from './apis/auth/auth.module';
 import { APP_PIPE } from '@nestjs/core';
 import { FriendModule } from './apis/friend/friend.module';
+import { Party_UserModule } from './apis/party-user/party-user.module';
+
 @Module({
   imports: [
     AuthModule,
     FriendModule,
     UserModule,
-    MapModule,
     PartyModule,
+    Party_UserModule,
     PlanModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
@@ -35,7 +35,6 @@ import { FriendModule } from './apis/friend/friend.module';
     AppController, //
   ],
   providers: [
-    AppService,
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,

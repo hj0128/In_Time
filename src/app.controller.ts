@@ -1,24 +1,23 @@
 import { Controller, Get, Render, UseGuards } from '@nestjs/common';
-import { AppService } from './app.service';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService, //
-  ) {}
-
   @ApiExcludeEndpoint()
   @Get('/')
   @Render('home')
-  home() {}
+  home() {
+    return { APP_KEY: process.env.APP_KEY };
+  }
 
   @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
   @Get('/party')
   @Render('party')
-  party() {}
+  party() {
+    return { APP_KEY: process.env.APP_KEY };
+  }
 
   @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
@@ -36,13 +35,17 @@ export class AppController {
   @ApiExcludeEndpoint()
   @Get('/plan')
   @Render('plan')
-  plan() {}
+  plan() {
+    return { APP_KEY: process.env.APP_KEY };
+  }
 
   @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
   @Get('/plan/create')
   @Render('plan_create')
-  planCreate() {}
+  planCreate() {
+    return { APP_KEY: process.env.APP_KEY };
+  }
 
   @UseGuards(AuthGuard('access'))
   @ApiExcludeEndpoint()
@@ -65,9 +68,4 @@ export class AppController {
   @Get('/signUp')
   @Render('signUp')
   signUp() {}
-
-  @ApiExcludeEndpoint()
-  @Get('/map')
-  @Render('map')
-  map() {}
 }

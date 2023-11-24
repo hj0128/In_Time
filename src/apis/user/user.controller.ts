@@ -55,7 +55,7 @@ export class UserController {
     description: '회원 가입에 성공하면 user를 DB에 생성한다.',
   })
   @Post('/userCreate')
-  async userCreate(
+  userCreate(
     @Body() userCreateDto: UserCreateDto, //
   ): Promise<User> {
     return this.userService.create({ userCreateDto });

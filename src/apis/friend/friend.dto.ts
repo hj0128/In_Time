@@ -14,7 +14,7 @@ export class FriendUpdateDto {
   @IsNotEmpty()
   friendID: string;
 
-  @ApiProperty({ example: 'Ft001', description: '나에게 요청을 보낸 user의 ID' })
+  @ApiProperty({ example: 'U001', description: '나에게 요청을 보낸 user의 ID' })
   @IsString()
   @IsNotEmpty()
   fromUserID: string;

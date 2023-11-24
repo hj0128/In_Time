@@ -1,35 +1,33 @@
 <html lang='ko'>
   <head>
     <meta charset='UTF-8' />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
     <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+      name='viewport'
+      content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'
     />
     <title>Plan</title>
     <link rel='stylesheet' href='/stylesheets/plan.css' />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'></script>
     <script
-      type="text/javascript"
-      src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=p5qojt9ckc"></script>
-    </script>
-    <script
-      src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'
+      type='text/javascript'
+      src='//dapi.kakao.com/v2/maps/sdk.js?appkey={{APP_KEY}}'
     ></script>
   </head>
 
   <body>
     <a href='/' id='home'>Home</a>
-    <div id='plan_info'>
-      <<span id='name'></span>>
-      <div id="map" style="width: 500px; height: 500px"></div>
-      장소: <span id='place'></span>
-      <br>
-      날짜: <span id='date'></span>
-      <br>
-      벌금: <span id='fine'></span>
-      <br>
-      벌금 타입: <span id='fineType'></span>
-    </div>
+    <br />
+    <span id='plan_name'></span>
+    <span id='date'></span>
+    <br />
+    <span id='place_name'></span>
+    <span id='fine'></span>
+    <span id='fine_type'></span>
+    <div id='my_location'>내 위치</div>
+    <div id='place_location'>도착지</div>
+    <div id='map' style='width: 500px; height: 500px'></div>
+    <div>채팅</div>
     <script type='text/javascript' src='/javascripts/plan.js'></script>
   </body>
 </html>

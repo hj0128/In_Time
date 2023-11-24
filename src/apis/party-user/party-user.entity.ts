@@ -7,9 +7,9 @@ export class Party_User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Party, (party) => party.partyUsers)
+  @ManyToOne(() => Party, (party) => party.partyUsers, { onDelete: 'CASCADE' })
   party: Party;
 
-  @ManyToOne(() => User, (user) => user.partyUsers)
+  @ManyToOne(() => User, (user) => user.partyUsers, { onDelete: 'CASCADE' })
   user: User;
 }

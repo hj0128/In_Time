@@ -5,7 +5,7 @@ import { AuthLoginDto, AuthSendTokenDto } from './auth.dto';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { DynamicAuthGuard } from './guards/social-auth.guard';
-import { JwtReqUser } from './auth.interface';
+import { JwtReqUser } from 'src/commons/interface/req.interface';
 
 @ApiTags('Auth')
 @Controller('/auth')
@@ -56,10 +56,10 @@ export class AuthController {
     description: 'RefreshToken을 사용하여 AccessToken을 재발급 받는다.',
   })
   @UseGuards(AuthGuard('refresh'))
-  @Post('/restoreAccessToken')
+  @Post('/authRestoreAccessToken')
   authRestoreAccessToken(
-    @Req() req: JwtReqUser, //
-  ) {
+    @Req() req: Request & JwtReqUser, //
+  ): string {
     return this.authService.restoreAccessToken({ user: req.user });
   }
 }

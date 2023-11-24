@@ -3,33 +3,24 @@ import { PlanController } from './plan.controller';
 import { PlanService } from './plan.service';
 import { Plan } from './plan.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MapService } from '../map/map.service';
-import { UserService } from '../user/user.service';
-import { Party } from '../party/party.entity';
-import { User } from '../user/user.entity';
-import { PartyService } from '../party/party.service';
-import { Party_UserService } from '../party-user/party-user.service';
-import { Party_User } from '../party-user/party-user.entity';
+import { UserModule } from '../user/user.module';
+import { Party_UserModule } from '../party-user/party-user.module';
+import { PartyModule } from '../party/party.module';
 
 @Module({
   imports: [
+    UserModule,
+    PartyModule,
+    Party_UserModule,
     TypeOrmModule.forFeature([
-      Map,
-      Plan,
-      Party,
-      User,
-      Party_User, //
+      Plan, //
     ]),
   ],
   controllers: [
     PlanController, //
   ],
   providers: [
-    MapService,
-    PlanService,
-    PartyService,
-    UserService,
-    Party_UserService, //
+    PlanService, //
   ],
 })
 export class PlanModule {}

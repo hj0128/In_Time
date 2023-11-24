@@ -3,29 +3,25 @@ import { PartyController } from './party.controller';
 import { PartyService } from './party.service';
 import { Party } from './party.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MapService } from '../map/map.service';
-import { UserService } from '../user/user.service';
-import { User } from '../user/user.entity';
-import { Party_UserService } from '../party-user/party-user.service';
-import { Party_User } from '../party-user/party-user.entity';
+import { UserModule } from '../user/user.module';
+import { Party_UserModule } from '../party-user/party-user.module';
 
 @Module({
   imports: [
+    UserModule,
+    Party_UserModule,
     TypeOrmModule.forFeature([
-      Map,
-      Party,
-      User,
-      Party_User, //
+      Party, //
     ]),
   ],
   controllers: [
     PartyController, //
   ],
   providers: [
-    MapService,
-    PartyService,
-    UserService,
-    Party_UserService, //
+    PartyService, //
+  ],
+  exports: [
+    PartyService, //
   ],
 })
 export class PartyModule {}

@@ -9,16 +9,20 @@ export class CustomExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
 
+    console.log('===========');
+    console.log(exception);
+    console.log('===========');
+
     const error = {
       message: 'Internal Server Error',
       status: HttpStatus.INTERNAL_SERVER_ERROR,
     };
 
     if (exception instanceof HttpException) {
-      if (exception.getStatus() === 401) {
-        response.redirect('/signIn');
-        return;
-      }
+      // if (exception.getStatus() === 401) {
+      //   response.redirect('/signIn');
+      //   return;
+      // }
       error.message = exception.message;
       error.status = exception.getStatus();
     } else if (exception instanceof AxiosError) {

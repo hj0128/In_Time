@@ -1,52 +1,68 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { PartyController } from '../party.controller';
-// import { PartyService } from '../party.service';
-// import { AuthController } from 'src/apis/auth/auth.controller';
+import { Test, TestingModule } from '@nestjs/testing';
+import { PartyController } from '../party.controller';
+import { PartyService } from '../party.service';
+import { Party } from '../party.entity';
+import { PartyCreateDto } from '../party.dto';
+import { Request } from 'express';
+import { JwtReqUser } from '../../../commons/interface/req.interface';
 
-// describe('PartyController', () => {
-//   let partyController: PartyController;
-//   let partyService: PartyService;
-//   let authController: AuthController;
-//   let authToken: string;
+describe('PartyController', () => {
+  let partyController: PartyController;
+  let partyService: PartyService;
 
-//   beforeAll(async () => {
-//     const email = 'a@a.com';
-//     const password: '1234';
+  beforeEach(async () => {
+    const mockPartyService = {
+      findAllWithUser: jest.fn(),
+      create: jest.fn(),
+    };
 
-//     authToken = await authController.authLogin(email, password)
-//   })
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [PartyController],
+      providers: [
+        {
+          provide: PartyService,
+          useValue: mockPartyService,
+        },
+      ],
+    }).compile();
 
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       controllers: [PartyController],
-//       providers: [
-//         {
-//           provide: PartyService,
-//           useClass: MockPartyService,
-//         },
-//       ],
-//     }).compile();
+    partyController = module.get<PartyController>(PartyController);
+    partyService = module.get<PartyService>(PartyService);
+  });
 
-//     partyController = module.get<PartyController>(PartyController);
-//   });
+  const mockReq: Request & JwtReqUser = {} as Request & JwtReqUser;
 
-//   describe('partyFindAll', () => {
-//     it('should return an array of parties', async () => {
-//       const result = await partyController.partyFindAll();
-//       expect(result).toEqual([
-//         {
-//           id: 'PT001',
-//           name: '동아리 모임',
-//           members: '["U001", "U002"]',
-//           point: 0,
-//         },
-//         {
-//           id: 'PT002',
-//           name: '돼지 파티',
-//           members: '["U002", "U003"]',
-//           point: 1000,
-//         },
-//       ]);
-//     });
-//   });
-// });
+  describe('partyFindAll', () => {
+    it('로그인 유저의 모든 party를 배열로 가져온다.', async () => {
+      const inputReq: Request & JwtReqUser = mockReq;
+
+      const expectedFindAllWithUser: Party[] = [];
+
+      jest.spyOn(partyService, 'findAllWithUser').mockResolvedValueOnce(expectedFindAllWithUser);
+
+      const result: Party[] = await partyController.partyFindAll(inputReq);
+
+      expect(result).toEqual(expectedFindAllWithUser);
+      expect(partyService.findAllWithUser).toHaveBeenCalledWith({ user: inputReq.user });
+    });
+  });
+
+  describe('partyCreate', () => {
+    it('party를 생성하여 생성한 party를 반환한다.', async () => {
+      const inputPartyCreateDto: PartyCreateDto = { friendsID: '', name: '' };
+      const inputReq: Request & JwtReqUser = mockReq;
+
+      const expectedCreate: Party = { id: '', name: '', point: 0, plans: [], partyUsers: [] };
+
+      jest.spyOn(partyService, 'create').mockResolvedValueOnce(expectedCreate);
+
+      const result: Party = await partyController.partyCreate(inputPartyCreateDto, inputReq);
+
+      expect(result).toEqual(expectedCreate);
+      expect(partyService.create).toHaveBeenCalledWith({
+        partyCreateDto: inputPartyCreateDto,
+        user: inputReq.user,
+      });
+    });
+  });
+});

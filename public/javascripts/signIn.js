@@ -1,11 +1,28 @@
 const email = document.querySelector('#email');
 const password = document.querySelector('#password');
+const JWT_EXPIRY_TIME = 10000 * 3600 * 1000;
+
 const nextPasswordBox = (e) => {
   if (e.key === 'Enter' || e.keyCode === 13) {
     password.focus();
   }
 };
 email.addEventListener('keydown', nextPasswordBox);
+
+
+// const restore = async () => {
+//   const response = await axios.post('/auth/restoreAccessToken');
+
+//   const accessToken = response.data;
+//   axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+// };
+
+const loginSuccess = (res) => {
+  const accessToken = res.data;
+  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+  // setTimeout(restore, JWT_EXPIRY_TIME - 15000);
+};
 
 const login = async () => {
   if (!email.value || !password.value) {
@@ -21,10 +38,11 @@ const login = async () => {
       email: email.value,
       password: password.value,
     });
-    const accessToken = res.data;
+
+    loginSuccess(res);
 
     alert('로그인 되었습니다.');
-    window.location.href = '/';
+    // window.location.href = '/';
   } catch (err) {
     if (err.response.status === 401) {
       alert('이메일 또는 비밀번호를 잘못 입력했습니다.');
@@ -33,6 +51,7 @@ const login = async () => {
     }
   }
 };
+
 
 const signIn = document.querySelector('#sign_in');
 const loginClick = async () => {
@@ -46,3 +65,14 @@ const loginKeydown = async (e) => {
   }
 };
 password.addEventListener('keydown', loginKeydown);
+
+const test2 = async () => {
+  try {
+    const a = await axios.get('/user/test')
+    // const a = await axios.post('/auth/authRestoreAccessToken');
+    console.log(axios.defaults.headers.common['Authorization'])
+    console.log(a.data);
+  } catch (err) {
+    console.log(err.response);
+  }
+};

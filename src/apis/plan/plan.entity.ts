@@ -1,6 +1,5 @@
-import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Party } from '../party/party.entity';
-import { Map } from '../map/map.entity';
 import { Min } from 'class-validator';
 
 @Entity()
@@ -9,10 +8,19 @@ export class Plan {
   id: string;
 
   @Column()
-  name: string;
+  planName: string;
 
   @Column()
-  place: string;
+  placeName: string;
+
+  @Column()
+  placeAddress: string;
+
+  @Column({ type: 'decimal', precision: 18, scale: 15 })
+  placeLat: number;
+
+  @Column({ type: 'decimal', precision: 18, scale: 15 })
+  placeLng: number;
 
   @Column()
   date: string;
@@ -24,9 +32,6 @@ export class Plan {
   @Column()
   fineType: string;
 
-  @ManyToOne(() => Party, (party) => party.plans)
+  @ManyToOne(() => Party, (party) => party.plans, { onDelete: 'CASCADE' })
   party: Party;
-
-  @OneToOne(() => Map)
-  map: Map;
 }

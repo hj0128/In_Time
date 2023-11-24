@@ -22,7 +22,7 @@ export class AuthService {
   async sendToken({ authSendTokenDto }: IAuthServiceSendToken): Promise<void> {
     const { tokenNumber, phone1, phone2, phone3 } = authSendTokenDto;
 
-    const messageService = new coolsms('NCS63N0TGAOWEGPI', 'JAB6TSDVZGPOCRGMMGLBXMAB1NRQ8ONO');
+    const messageService = new coolsms(process.env.COOLSMS_KEY, process.env.COOLSMS_SECRET);
 
     await messageService.sendOne({
       to: phone1 + phone2 + phone3,
@@ -53,17 +53,17 @@ export class AuthService {
   setRefreshToken({ user, res }: IAuthServiceSetRefreshToken): void {
     const refreshToken = this.jwtService.sign(
       {
-        sub: user.id,
+        id: user.id,
         email: user.email,
         name: user.name,
       },
-      { secret: process.env.JWT_REFRESH_KEY, expiresIn: '2w' },
+      { secret: process.env.JWT_REFRESH_KEY, expiresIn: '10s' },
     );
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'none', // 배포 전 한 번 더 보기
       domain: '.localhost',
       path: '/',
       expires: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -74,11 +74,11 @@ export class AuthService {
   getAccessToken({ user }: IAuthServiceGetAccessToken): string {
     return this.jwtService.sign(
       {
-        sub: user.id,
+        id: user.id,
         email: user.email,
         name: user.name,
       },
-      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '1h' },
+      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '5s' },
     );
   }
 

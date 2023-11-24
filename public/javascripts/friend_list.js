@@ -40,6 +40,14 @@ const refuse = async (id) => {
 
 const getFriendList = async () => {
   try {
+    // const response = await axios.post('/auth/restoreAccessToken')
+
+    // const accessToken = response.data;
+
+    // axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+    // console.log(accessToken)
+
+
     const friends = await axios.get('/friend/friendFindWithUserID');
 
     const listel = document.querySelector('#friend_list');

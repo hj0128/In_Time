@@ -36,12 +36,12 @@ const create = async () => {
 
   const friendsID = [];
   friends.forEach((el) => friendsID.push(el.value));
-  jsonFriendID = JSON.stringify(friendsID);
+  const stringFriendID = JSON.stringify(friendsID);
 
   try {
-    axios.post('/party/partyCreate', {
+    await axios.post('/party/partyCreate', {
       name,
-      friendsID: jsonFriendID,
+      friendsID: stringFriendID,
     });
     alert('파티가 생성되었습니다.');
   } catch (err) {

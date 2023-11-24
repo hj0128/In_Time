@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   IUserServiceCreate,
+  IUserServiceFindAllWithUserID,
   IUserServiceFindOneWithEmail,
   IUserServiceFindOneWithName,
   IUserServiceFindOneWithUserID,
@@ -19,6 +20,10 @@ export class UserService {
 
   findOneWithUserId({ id }: IUserServiceFindOneWithUserID): Promise<User> {
     return this.userRepository.findOne({ where: { id } });
+  }
+
+  findAllWithUserID({ usersID }: IUserServiceFindAllWithUserID): Promise<User[]> {
+    return this.userRepository.find({ where: { id: In(usersID) } });
   }
 
   findOneWithName({ name }: IUserServiceFindOneWithName): Promise<User> {
@@ -40,7 +45,7 @@ export class UserService {
       profileUrl,
     });
 
-    if (!create) throw new Error('회원 생성에 실패하였습니다.');
+    if (!create) throw new InternalServerErrorException('회원 생성에 실패하였습니다.');
 
     return create;
   }

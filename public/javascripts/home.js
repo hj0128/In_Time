@@ -1,9 +1,10 @@
+const mapContainer = document.querySelector('#map');
 const mapOptions = {
-  center: new naver.maps.LatLng(37.3595704, 127.105399),
-  zoom: 10,
+  center: new kakao.maps.LatLng(33.450701, 126.570667),
+  level: 3,
 };
 
-const map = new naver.maps.Map('map', mapOptions);
+const map = new kakao.maps.Map(mapContainer, mapOptions);
 
 
 // const getPlanList = async () => {

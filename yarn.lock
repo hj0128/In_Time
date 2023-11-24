@@ -5619,6 +5619,13 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
+typeorm-transactional-tests@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/typeorm-transactional-tests/-/typeorm-transactional-tests-2.0.0.tgz#75c823bb26bfda2d16dcb255a935efc6fe601736"
+  integrity sha512-xfeEvWjYjaVU0TM4q0CV0jPznBPCZoAubqLWvtKc+RxrvyCfjexWI23mq+QiUdOHQ8f5UTJktuYh9nyTYbvSWQ==
+  optionalDependencies:
+    fsevents "^2.3.2"
+
 typeorm@^0.3.17:
   version "0.3.17"
   resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-0.3.17.tgz#a73c121a52e4fbe419b596b244777be4e4b57949"

@@ -4,15 +4,19 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>Party</title>
     <link rel='stylesheet' href='/stylesheets/party.css' />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'></script>
     <script
-      src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'
+      type='text/javascript'
+      src='//dapi.kakao.com/v2/maps/sdk.js?appkey={{APP_KEY}}&libraries=clusterner'
     ></script>
   </head>
 
   <body>
     <a href='/' id='home'>Home</a>
     <a id='plane_create'>약속 만들기</a>
-    <div id='plan_list'>해당 파티의 약속 리스트</div>
+    <div id='map' style='width: 500px; height: 500px;'></div>
+    <div id='plan_list'>약속 리스트</div>
+    <script type='text/javascript' src='/javascripts/markerClustering.js'></script>
     <script type='text/javascript' src='/javascripts/party.js'></script>
   </body>
 </html>

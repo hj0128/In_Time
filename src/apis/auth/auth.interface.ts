@@ -1,16 +1,7 @@
 import { Request, Response } from 'express';
 import { User } from '../user/user.entity';
 import { AuthLoginDto, AuthSendTokenDto } from './auth.dto';
-
-export interface JwtReqUser {
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    password: string;
-    profileUrl: string;
-  };
-}
+import { JwtReqUser } from 'src/commons/interface/req.interface';
 
 export interface IAuthServiceSendToken {
   authSendTokenDto: AuthSendTokenDto;

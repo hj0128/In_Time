@@ -1,9 +1,11 @@
-import { JwtReqUser } from '../auth/auth.interface';
-
 export interface IPartyUserServiceFindAllWithUserID {
-  user: JwtReqUser['user'];
+  userID: string;
+}
+
+export interface IPartyUserServiceFindAllWithPartyID {
+  partyID: string;
 }
 
 export interface IPartyUserServiceCreate {
-  partyUserRelations: { party: { id: string }; user: { id: string } };
+  partyUserRelations: { party: { id: string }; user: { id: string } }[];
 }

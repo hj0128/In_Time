@@ -1,181 +1,128 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { getRepositoryToken } from '@nestjs/typeorm';
-// import { PartyService } from '../party.service';
-// import { Party } from '../party.entity';
-// import { Party_UserService } from '../../party-user/party-user.service';
-// import { Party_User } from '../../party-user/party-user.entity';
+import { Test, TestingModule } from '@nestjs/testing';
+import { PartyService } from '../party.service';
+import { Party_UserService } from '../../party-user/party-user.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Party } from '../party.entity';
+import { JwtReqUser } from '../../../commons/interface/req.interface';
+import { PartyCreateDto } from '../party.dto';
+import { InsertResult, Repository } from 'typeorm';
 
-// class MockPartyUserRepository {}
+describe('PartyService', () => {
+  let partyService: PartyService;
+  let partyUserService: Party_UserService;
+  let mockPartyRepository: Partial<Record<keyof Repository<Party>, jest.Mock>>;
 
-// class MockPartyRepository {
-//   mydb = [
-//     {
-//       id: 'P001',
-//       name: '맛집 탐방',
-//       point: 0,
-//     },
-//     {
-//       id: 'P002',
-//       name: '카페 탐방',
-//       point: 1000,
-//     },
-//   ];
-//   myDB = [
-//     {
-//       id: 'P001',
-//       name: '맛집 탐방',
-//       point: 0,
-//       partyUsers: {
-//         id: 'PU001',
-//         party: {},
-//         user: {
-//           id: 'U001',
-//           name: '철수',
-//           email: 'a@a.com',
-//           password: '1234',
-//           profileUrl: 'https://철수.jpg',
-//           badgeUrl: 'https://배지.jpg',
-//         },
-//       },
-//     },
-//     {
-//       id: 'P002',
-//       name: '카페 탐방',
-//       point: 1000,
-//       partyUsers: {
-//         id: 'PU002',
-//         party: {},
-//         user: {
-//           id: 'U001',
-//           name: '철수',
-//           email: 'a@a.com',
-//           password: '1234',
-//           profileUrl: 'https://철수.jpg',
-//           badgeUrl: 'https://배지.jpg',
-//         },
-//       },
-//     },
-//   ];
+  beforeEach(async () => {
+    const mockPartyUserService = {
+      create: jest.fn(),
+    };
 
-//   findOne({ where }) {
-//     const party = this.mydb.filter((el) => el.id === where.id);
-//     if (party) return party;
-//     return null;
-//   }
+    mockPartyRepository = {
+      findOne: jest.fn(),
+      find: jest.fn(),
+      save: jest.fn(),
+    };
 
-//   find({ where }) {
-//     const parties = this.myDB.filter((el) => el.partyUsers.user.id === where.partyUsers.user.id);
-//     if (parties) return parties;
-//     return null;
-//   }
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        PartyService,
+        {
+          provide: getRepositoryToken(Party),
+          useValue: mockPartyRepository,
+        },
+        {
+          provide: Party_UserService,
+          useValue: mockPartyUserService,
+        },
+      ],
+    }).compile();
 
-//   save({ name }) {
-//     return this.myDB.push({
-//       id: 'P003',
-//       name,
-//       point: 0,
-//       partyUsers: {
-//         id: '',
-//         party: {},
-//         user: {
-//           id: '',
-//           name: '',
-//           email: '',
-//           password: '',
-//           profileUrl: '',
-//           badgeUrl: '',
-//         },
-//       },
-//     });
-//   }
-// }
+    partyService = module.get<PartyService>(PartyService);
+    partyUserService = module.get<Party_UserService>(Party_UserService);
+  });
 
-// describe('PartyService', () => {
-//   let partyService: PartyService;
+  const mockParty: Party = {
+    id: 'Party01',
+    name: '파티명',
+    point: 0,
+    plans: [],
+    partyUsers: [],
+  };
 
-//   beforeEach(async () => {
-//     const partyModule: TestingModule = await Test.createTestingModule({
-//       providers: [
-//         PartyService,
-//         Party_UserService,
-//         {
-//           provide: getRepositoryToken(Party),
-//           useClass: MockPartyRepository,
-//         },
-//         {
-//           provide: getRepositoryToken(Party_User),
-//           useClass: MockPartyUserRepository,
-//         },
-//       ],
-//     }).compile();
+  const mockJwtReqUser: JwtReqUser['user'] = {
+    id: 'User01',
+    name: '철수',
+    email: 'a@a.com',
+    password: '1234',
+    profileUrl: 'https://b.jpg',
+  };
 
-//     partyService = partyModule.get<PartyService>(PartyService);
-//   });
+  describe('findOneWithPartyID', () => {
+    it('partyID에 해당하는 party를 반환한다.', async () => {
+      const inputPartyID: string = mockParty.id;
 
-//   describe('findOneWithPartyID', () => {
-//     it('partyID에 해당하는 party를 가져온다.', () => {
-//       const result = partyService.findOneWithPartyID({ partyID: 'P001' });
-//       expect(result).toStrictEqual({
-//         id: 'P001',
-//         name: '맛집 탐방',
-//         point: 0,
-//       });
-//     });
-//   });
+      const expectedFindOne: Party = mockParty;
 
-//   describe('findAllWithUser', () => {
-//     it('userID에 해당하는 party를 모두 가져온다.', () => {
-//       const user = {
-//         id: 'U001',
-//         name: '철수',
-//         email: 'a@a.com',
-//         password: '1234',
-//         profileUrl: 'https://철수.png',
-//       };
+      jest.spyOn(mockPartyRepository, 'findOne').mockResolvedValue(expectedFindOne);
 
-//       const result = partyService.findAllWithUser({ user });
+      const result: Party = await partyService.findOneWithPartyID({ partyID: inputPartyID });
 
-//       expect(result).toStrictEqual([
-//         { id: 'P001', name: '맛집 탐방', point: 0 },
-//         { id: 'P002', name: '카페 탐방', point: 1000 },
-//       ]);
-//     });
-//   });
+      expect(result).toEqual(expectedFindOne);
+      expect(mockPartyRepository.findOne).toHaveBeenCalledWith({ where: { id: inputPartyID } });
+    });
+  });
 
-//   describe('create', () => {
-//     const partyCreateDto = { name: '영화 관람', friendsID: '["U002", "U003"]' };
-//     const user = {
-//       id: 'U001',
-//       name: '철수',
-//       email: 'a@a.com',
-//       password: '1234',
-//       profileUrl: 'https://철수.png',
-//     };
+  describe('findAllWithUser', () => {
+    it('userID에 해당하는 모든 party(partyUsers, user 포함)를 반환한다.', async () => {
+      const inputUser: JwtReqUser['user'] = mockJwtReqUser;
 
-//     it('party를 생성한다.', async () => {
-//       const result = await partyService.create({ partyCreateDto, user });
+      const expectedFind: Party[] = [mockParty];
 
-//       expect(result).toStrictEqual({
-//         id: 'P003',
-//         name: '영화 관람',
-//         point: 0,
-//         partyUsers: {
-//           id: '',
-//           party: {},
-//           user: {
-//             id: '',
-//             name: '',
-//             email: '',
-//             password: '',
-//             profileUrl: '',
-//             badgeUrl: '',
-//           },
-//         },
-//       });
-//     });
+      jest.spyOn(mockPartyRepository, 'find').mockResolvedValue(expectedFind);
 
-//     // it('party-user를 생성한다.', () => {
-//     //   const result = await partyService.create({ partyCreateDto, user });
-//     // });
-//   });
-// });
+      const result: Party[] = await partyService.findAllWithUser({ user: inputUser });
+
+      expect(result).toEqual(expectedFind);
+      expect(mockPartyRepository.find).toHaveBeenCalledWith({
+        where: { partyUsers: { user: { id: inputUser.id } } },
+      });
+    });
+  });
+
+  describe('create', () => {
+    it('party를 생성하고 생성한 party를 반환한다.', async () => {
+      const inputPartyCreateDto: PartyCreateDto = {
+        name: '파티명2',
+        friendsID: '["U001", "U002"]',
+      };
+      const inputUser: JwtReqUser['user'] = mockJwtReqUser;
+
+      const expectedSave: Party = {
+        id: 'Party02',
+        name: '파티명2',
+        point: 0,
+        plans: [],
+        partyUsers: [],
+      };
+      const expectedCreate: InsertResult = { generatedMaps: [], identifiers: [], raw: [] };
+
+      jest.spyOn(mockPartyRepository, 'save').mockResolvedValue(expectedSave);
+      jest.spyOn(partyUserService, 'create').mockResolvedValue(expectedCreate);
+
+      const result: Party = await partyService.create({
+        partyCreateDto: inputPartyCreateDto,
+        user: inputUser,
+      });
+
+      expect(result).toEqual(expectedSave);
+      expect(mockPartyRepository.save).toHaveBeenCalledWith({ name: inputPartyCreateDto.name });
+      expect(partyUserService.create).toHaveBeenCalledWith({
+        partyUserRelations: [
+          { party: { id: 'Party02' }, user: { id: 'U001' } },
+          { party: { id: 'Party02' }, user: { id: 'U002' } },
+          { party: { id: 'Party02' }, user: { id: 'User01' } },
+        ],
+      });
+    });
+  });
+});

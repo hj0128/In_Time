@@ -15,9 +15,9 @@ export class Party {
   @Column({ default: 0 })
   point: number;
 
-  @OneToMany(() => Plan, (plans) => plans.party)
+  @OneToMany(() => Plan, (plans) => plans.party, { cascade: true })
   plans: Plan[];
 
-  @OneToMany(() => Party_User, (partyUsers) => partyUsers.party)
+  @OneToMany(() => Party_User, (partyUsers) => partyUsers.party, { cascade: true })
   partyUsers: Party_User[];
 }

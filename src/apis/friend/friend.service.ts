@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import {
   FriendListInfo,
   IFriendServiceCreate,
+  IFriendServiceCreateFriendList,
   IFriendServiceDelete,
   IFriendServiceFindAllToUser,
   IFriendServiceFindAllUser,
@@ -48,44 +49,47 @@ export class FriendService {
     const friendToUsers = await this.findAllToUser({ toUserID: userID });
 
     let friendList = [];
-    await Promise.all(
-      friendUsers
-        .filter((el) => el.isAccepted === 'SENT')
-        .map(async (el) => {
-          const toUser = await this.userService.findOneWithUserId({ id: el.toUserID });
-          friendList.push({
-            name: toUser.name,
-            profileUrl: toUser.profileUrl,
-            badgeUrl: toUser.badgeUrl,
-            status: 'sent',
-          });
+    if (friendUsers) this.createFriendList({ friends: friendUsers, friendList });
+    if (friendToUsers)
+      this.createFriendList({
+        friends: friendToUsers,
+        friendList,
+        mapFn: (el) => ({
+          id: el.id,
+          fromUserID: el.user.id,
+          name: el.user.name,
+          profileUrl: el.user.profileUrl,
+          badgeUrl: el.user.badgeUrl,
+          status: el.isAccepted === 'SENT' ? 'received' : 'friendship',
         }),
-    );
-
-    friendToUsers.forEach((el) =>
-      friendList.push({
-        id: el.id,
-        fromUserID: el.user.id,
-        name: el.user.name,
-        profileUrl: el.user.profileUrl,
-        badgeUrl: el.user.badgeUrl,
-        status: el.isAccepted === 'SENT' ? 'received' : 'friendship',
-      }),
-    );
+      });
 
     return friendList;
   }
 
-  findAllUserAndToUser({
-    userID,
-    toUserID,
-  }: IFriendServiceFindAllUserAndToUser): Promise<Friend[]> {
-    return this.friendRepository.find({
-      where: [
-        { toUserID: toUserID, user: { id: userID } },
-        { toUserID: userID, user: { id: toUserID } },
-      ],
-    });
+  async createFriendList({
+    friends,
+    friendList,
+    mapFn,
+  }: IFriendServiceCreateFriendList): Promise<void> {
+    const filteredFriends = friends.filter((el) => el.isAccepted === 'SENT');
+
+    await Promise.all(
+      filteredFriends.map(async (el) => {
+        const toUser = await this.userService.findOneWithUserId({ id: el.toUserID });
+        if (!toUser) return;
+        friendList.push(
+          mapFn
+            ? mapFn(el)
+            : {
+                name: toUser.name,
+                profileUrl: toUser.profileUrl,
+                badgeUrl: toUser.badgeUrl,
+                status: 'sent',
+              },
+        );
+      }),
+    );
   }
 
   async create({ friendCreateDto, user }: IFriendServiceCreate): Promise<Friend> {
@@ -115,6 +119,18 @@ export class FriendService {
 
       return create;
     }
+  }
+
+  findAllUserAndToUser({
+    userID,
+    toUserID,
+  }: IFriendServiceFindAllUserAndToUser): Promise<Friend[]> {
+    return this.friendRepository.find({
+      where: [
+        { toUserID: toUserID, user: { id: userID } },
+        { toUserID: userID, user: { id: toUserID } },
+      ],
+    });
   }
 
   async updateIsAccepted({ friendID }: IFriendServiceUpdateIsAccepted): Promise<void> {
