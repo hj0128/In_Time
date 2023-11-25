@@ -9,6 +9,9 @@ import { AuthModule } from './apis/auth/auth.module';
 import { APP_PIPE } from '@nestjs/core';
 import { FriendModule } from './apis/friend/friend.module';
 import { Party_UserModule } from './apis/party-user/party-user.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { RedisClientOptions } from 'redis';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -30,6 +33,11 @@ import { Party_UserModule } from './apis/party-user/party-user.module';
       synchronize: true,
       logging: true,
     }),
+    // CacheModule.register<RedisClientOptions>({
+    //   store: redisStore,
+    //   url: 'redis://my_redis:6379',
+    //   isGlobal: true,
+    // }),
   ],
   controllers: [
     AppController, //

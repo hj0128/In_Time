@@ -1,20 +1,28 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   IAuthServiceGetAccessToken,
   IAuthServiceLogin,
+  IAuthServiceLogout,
   IAuthServiceRestoreAccessToken,
   IAuthServiceSendToken,
   IAuthServiceSetRefreshToken,
   IAuthServiceSocialLogin,
+  IAuthServiceTokenEXP,
 } from './auth.interface';
 import coolsms from 'coolsms-node-sdk';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import * as jwt from 'jsonwebtoken';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthService {
   constructor(
+    // @Inject(CACHE_MANAGER)
+    // private readonly cacheManager: Cache,
+
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
   ) {}
@@ -57,7 +65,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
       },
-      { secret: process.env.JWT_REFRESH_KEY, expiresIn: '10s' },
+      { secret: process.env.JWT_REFRESH_KEY, expiresIn: '1w' },
     );
 
     res.cookie('refreshToken', refreshToken, {
@@ -78,7 +86,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
       },
-      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '5s' },
+      { secret: process.env.JWT_ACCESS_KEY, expiresIn: '1h' },
     );
   }
 
@@ -92,5 +100,42 @@ export class AuthService {
     }
 
     this.setRefreshToken({ user, res });
+  }
+
+  // async logout({ headers }: IAuthServiceLogout): Promise<string> {
+  //   const accessToken = headers.authorization.replace('Bearer ', '');
+  //   const refreshToken = headers.cookie.replace('refreshToken=', '');
+
+  //   try {
+  //     jwt.verify(accessToken, process.env.JWT_ACCESS_KEY);
+  //     jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
+  //   } catch (error) {
+  //     throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+  //   }
+
+  //   const tokenEXP = this.tokenEXP({ accessToken, refreshToken });
+  //   const accessTokenEXP = tokenEXP[0];
+  //   const refreshTokenEXP = tokenEXP[1];
+
+  //   await this.cacheManager.set(`accessToken:${accessToken}`, 'accessToken', {
+  //     ttl: accessTokenEXP,
+  //   });
+
+  //   await this.cacheManager.set(`refreshToken:${refreshToken}`, 'refreshToken', {
+  //     ttl: refreshTokenEXP,
+  //   });
+
+  //   return '로그아웃에 성공하였습니다.';
+  // }
+
+  tokenEXP({ accessToken, refreshToken }: IAuthServiceTokenEXP): number[] {
+    const accessDecoded = this.jwtService.decode(accessToken);
+    const refreshDecoded = this.jwtService.decode(refreshToken);
+
+    const result = [accessDecoded, refreshDecoded].map((el) => {
+      return Math.floor((new Date(el['exp'] * 1000).getTime() - new Date().getTime()) / 1000);
+    });
+
+    return result;
   }
 }

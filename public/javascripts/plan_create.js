@@ -120,10 +120,15 @@ const create = async () => {
       fineType: fineType.value,
       partyID,
     });
-  } catch (err) {
-    alert('약속 생성 중 오류가 발생했습니다. \n나중에 다시 시도해주세요.');
-  }
 
-  alert('약속이 생성되었습니다.');
+    alert('약속이 생성되었습니다.');
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else {
+      alert('약속을 생성하던 중 오류가 발생했습니다. \n나중에 다시 시도해주세요.');
+    }
+  }
 };
 planCreate.addEventListener('click', create);

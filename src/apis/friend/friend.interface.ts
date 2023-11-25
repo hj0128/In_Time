@@ -1,9 +1,8 @@
 import { PickType } from '@nestjs/swagger';
-
 import { FriendCreateDto, FriendDeleteDto, FriendUpdateDto } from './friend.dto';
 import { User } from '../user/user.entity';
-import { JwtReqUser } from 'src/commons/interface/req.interface';
-import { Friend, STATUS_ENUM } from './friend.entity';
+import { JwtReqUser } from '../../commons/interface/req.interface';
+import { Friend } from './friend.entity';
 
 export interface IFriendServiceFindAllUser {
   userID: string;

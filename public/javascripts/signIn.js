@@ -1,6 +1,5 @@
 const email = document.querySelector('#email');
 const password = document.querySelector('#password');
-const JWT_EXPIRY_TIME = 10000 * 3600 * 1000;
 
 const nextPasswordBox = (e) => {
   if (e.key === 'Enter' || e.keyCode === 13) {
@@ -9,20 +8,6 @@ const nextPasswordBox = (e) => {
 };
 email.addEventListener('keydown', nextPasswordBox);
 
-
-// const restore = async () => {
-//   const response = await axios.post('/auth/restoreAccessToken');
-
-//   const accessToken = response.data;
-//   axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-// };
-
-const loginSuccess = (res) => {
-  const accessToken = res.data;
-  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-
-  // setTimeout(restore, JWT_EXPIRY_TIME - 15000);
-};
 
 const login = async () => {
   if (!email.value || !password.value) {
@@ -39,12 +24,14 @@ const login = async () => {
       password: password.value,
     });
 
-    loginSuccess(res);
+    const accessToken = res.data;
+
+    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
     alert('로그인 되었습니다.');
-    // window.location.href = '/';
-  } catch (err) {
-    if (err.response.status === 401) {
+    window.location.href = '/';
+  } catch (error) {
+    if (error.response.status === 401) {
       alert('이메일 또는 비밀번호를 잘못 입력했습니다.');
     } else {
       alert('로그인 중 오류가 발생했습니다. 나중에 다시 시도해주세요.');
@@ -66,13 +53,17 @@ const loginKeydown = async (e) => {
 };
 password.addEventListener('keydown', loginKeydown);
 
+
 const test2 = async () => {
   try {
-    const a = await axios.get('/user/test')
-    // const a = await axios.post('/auth/authRestoreAccessToken');
-    console.log(axios.defaults.headers.common['Authorization'])
-    console.log(a.data);
-  } catch (err) {
-    console.log(err.response);
+    const a = await axios.get('/user/test');
+    console.log(a);
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else {
+      alert('를 하던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요');
+    }
   }
 };

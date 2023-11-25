@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { User } from '../user/user.entity';
 import { AuthLoginDto, AuthSendTokenDto } from './auth.dto';
-import { JwtReqUser } from 'src/commons/interface/req.interface';
+import { JwtReqUser } from '../../commons/interface/req.interface';
 
 export interface IAuthServiceSendToken {
   authSendTokenDto: AuthSendTokenDto;
@@ -28,4 +28,13 @@ export interface IAuthServiceGetAccessToken {
 export interface IAuthServiceSocialLogin {
   req: Request & JwtReqUser;
   res: Response;
+}
+
+export interface IAuthServiceLogout {
+  headers: Request['headers'];
+}
+
+export interface IAuthServiceTokenEXP {
+  accessToken: string;
+  refreshToken: string;
 }

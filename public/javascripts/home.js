@@ -6,7 +6,6 @@ const mapOptions = {
 
 const map = new kakao.maps.Map(mapContainer, mapOptions);
 
-
 // const getPlanList = async () => {
 //   // 로그인 유저의 플랜 모두 가져오기
 //   try {

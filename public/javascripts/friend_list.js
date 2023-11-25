@@ -8,8 +8,13 @@ const search = async () => {
       toUserName,
     });
     alert(`${toUserName}님에게 친구 요청을 보냈습니다. \n상대방이 수락하면 친구가 됩니다.`);
-  } catch (err) {
-    alert(err.response.data.message);
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else {
+      alert('친구 요청을 보내던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+    }
   }
 };
 createFriend.addEventListener('click', search);
@@ -22,8 +27,13 @@ const accept = async (id, fromUserID) => {
       fromUserID,
     });
     alert('서로 친구가 되었습니다.');
-  } catch (err) {
-    alert('친구 관계를 맺는 중 오류가 발생했습니다. \n나중에 다시 시도해 주세요.');
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else {
+      alert('친구를 맺던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+    }
   }
 };
 
@@ -33,21 +43,18 @@ const refuse = async (id) => {
       params: { friendID: id },
     });
     alert('친구 요청을 거절하였습니다.');
-  } catch (err) {
-    alert('친구 요청을 삭제하던 중 오류가 발생했습니다. \n나중에 다시 시도해 주세요.');
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else {
+      alert('친구 요청을 거절하던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+    }
   }
 };
 
 const getFriendList = async () => {
   try {
-    // const response = await axios.post('/auth/restoreAccessToken')
-
-    // const accessToken = response.data;
-
-    // axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    // console.log(accessToken)
-
-
     const friends = await axios.get('/friend/friendFindWithUserID');
 
     const listel = document.querySelector('#friend_list');
@@ -77,8 +84,13 @@ const getFriendList = async () => {
 
       listel.appendChild(el);
     }
-  } catch (err) {
-    alert('친구 리스트를 불러오던 중 오류가 발생했습니다. \n나중에 다시 시도해 주세요.');
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else {
+      alert('친구 요청을 불러오던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+    }
   }
 };
 getFriendList();

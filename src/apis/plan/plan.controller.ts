@@ -5,7 +5,7 @@ import { PlanCreateDto } from './plan.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { JwtReqUser } from 'src/commons/interface/req.interface';
+import { JwtReqUser } from '../../commons/interface/req.interface';
 
 @ApiTags('Plan')
 @Controller('/plan')

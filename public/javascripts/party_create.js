@@ -20,8 +20,13 @@ const getFriendList = async () => {
         listel.appendChild(el);
       }
     }
-  } catch (err) {
-    alert('친구 리스트를 불러오던 중 오류가 발생했습니다. \n나중에 다시 시도해 주세요.');
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else {
+      alert('친구 목록을 불러오던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요');
+    }
   }
 };
 getFriendList();
@@ -44,8 +49,11 @@ const create = async () => {
       friendsID: stringFriendID,
     });
     alert('파티가 생성되었습니다.');
-  } catch (err) {
-    if (err.response.status === 400) {
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else if (error.response.status === 400) {
       alert('파티 생성 중 오류가 발생했습니다. \n입력하신 정보를 다시 확인해 주세요.');
       return;
     } else {

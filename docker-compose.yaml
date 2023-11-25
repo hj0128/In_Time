@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:/myProject/src
+      - ./:/myProject/
     ports:
       - 3000:3000
     env_file:
@@ -19,3 +19,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
     ports:
       - 3306:3306
+
+  my_redis:
+    image: redis:latest
+    ports:
+      - 6379:6379

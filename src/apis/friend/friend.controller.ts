@@ -6,7 +6,7 @@ import { FriendCreateDto, FriendDeleteDto, FriendUpdateDto } from './friend.dto'
 import { Request } from 'express';
 import { Friend } from './friend.entity';
 import { FriendListInfo } from './friend.interface';
-import { JwtReqUser } from 'src/commons/interface/req.interface';
+import { JwtReqUser } from '../../commons/interface/req.interface';
 
 @ApiTags('Friend')
 @Controller('/friend')

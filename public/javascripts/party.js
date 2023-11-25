@@ -74,8 +74,13 @@ const getPlanList = async () => {
 
       listel.appendChild(el);
     }
-  } catch (err) {
-    alert('잘못된 접근입니다. \n다시 시도해 주세요.');
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else {
+      alert('파티를 불러오던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요');
+    }
   }
 };
 getPlanList();

@@ -1,51 +1,50 @@
-// const restoreAccessToken = async () => {
-//   const response = await axios.post('/auth/restoreAccessToken');
-//   return response.data;
-// };
+let accessToken;
 
-// axios.interceptors.request.use(
-//   (config) => {
-//     // 요청이 전달되기 전 작업할 것들
-//     return config;
-//   },
-//   (requestError) => {
-//     // 요청 오류가 있을 때 작업할 것들
-//     return Promise.reject(requestError);
-//   },
-// );
+axios.interceptors.request.use(
+  async (config) => {
+    // 요청이 전달되기 전 작업할 것들
 
-// axios.interceptors.response.use(
-//   (response) => {
-//     if (axios.defaults.headers.common['Authorization']) {
-//       response.config.headers['Authorization'] = axios.defaults.headers.common['Authorization'];
-//     }
-//     // 2xx 상태 코드일 때 동작하는 코드
-//     return response;
-//   },
-//   async (responseError) => {
-//     // 2xx 외의 상태 코드일 때 동작하는 코드
-//     if (responseError.response?.status === 401) {
-//       try {
-//         const response = await axios.post('/auth/authRestoreAccessToken');
+    return config;
+  },
+  (requestError) => {
+    // 요청 오류가 있을 때 작업할 것들
 
-//         if (response) {
-//           responseError.config.headers['Authorization'] = response;
-//           const origin = await axios.request(reportError.config)
-//           return origin;
-//         } else {
-//           responseError.config.headers['Authorization'] = '';
-//           console.log('============')
-//         }
+    return Promise.reject(requestError);
+  },
+);
 
-//         // const newAccessToken = await restoreAccessToken(responseError);
+axios.interceptors.response.use(
+  (response) => {
+    // 2xx 상태 코드일 때 동작하는 코드
 
-//         // const response = await axios.request(newAccessToken);
+    return response;
+  },
+  async (responseError) => {
+    // 2xx 외의 상태 코드일 때 동작하는 코드
+    if (responseError.response.config.url === '/auth/authRestoreAccessToken') {
+      throw new Error('토큰 만료');
+    }
 
-//         // return response;
-//       } catch (error) {
-//         console.error(error);
-//       }
-//     }
-//     return Promise.reject(error);
-//   },
-// );
+    if (responseError.response.config.url === '/auth/authLogin') {
+      return Promise.reject(responseError);
+    }
+
+    if (responseError.response?.status === 401) {
+      try {
+        const response = await axios.post('/auth/authRestoreAccessToken');
+        accessToken = response.data;
+
+        if (accessToken) {
+          responseError.config.headers['Authorization'] = `Bearer ${accessToken}`;
+          axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+          return axios.request(responseError.config);
+        }
+      } catch (error) {
+        throw new Error('토큰 만료');
+      }
+    }
+
+    return Promise.reject(responseError);
+  },
+);

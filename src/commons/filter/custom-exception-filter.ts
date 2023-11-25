@@ -4,14 +4,10 @@ import { Request, Response } from 'express';
 
 @Catch()
 export class CustomExceptionFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
+  async catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
-
-    console.log('===========');
-    console.log(exception);
-    console.log('===========');
 
     const error = {
       message: 'Internal Server Error',
@@ -19,17 +15,15 @@ export class CustomExceptionFilter implements ExceptionFilter {
     };
 
     if (exception instanceof HttpException) {
-      // if (exception.getStatus() === 401) {
-      //   response.redirect('/signIn');
-      //   return;
-      // }
       error.message = exception.message;
       error.status = exception.getStatus();
     } else if (exception instanceof AxiosError) {
       error.message = exception.response?.data?.message || 'Axios Internal Server Error';
       error.status = exception.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
     }
-    console.log(exception); // 프로덕션 환경에서 지우기
+    console.log('======exception=====');
+    console.log(exception);
+    console.log('======exception====='); // 프로덕션 환경에서 지우기
 
     response.status(error.status).json({
       message: error.message,

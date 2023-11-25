@@ -4,9 +4,8 @@ import { Party } from './party.entity';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PartyCreateDto } from './party.dto';
 import { Request } from 'express';
-
 import { AuthGuard } from '@nestjs/passport';
-import { JwtReqUser } from 'src/commons/interface/req.interface';
+import { JwtReqUser } from '../../commons/interface/req.interface';
 
 @ApiTags('Party')
 @Controller('/party')
