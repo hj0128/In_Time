@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FriendCreateDto, FriendDeleteDto, FriendUpdateDto } from './friend.dto';
 import { Request } from 'express';
 import { Friend } from './friend.entity';
-import { FriendListInfo } from './friend.interface';
+import { FriendList } from './friend.interface';
 import { JwtReqUser } from '../../commons/interface/req.interface';
 
 @ApiTags('Friend')
@@ -18,12 +18,12 @@ export class FriendController {
   @UseGuards(AuthGuard('access'))
   @ApiOperation({
     summary: '로그인 user의 모든 friend 가져오기',
-    description: '로그인 유저의 모든 friend를 가져온다.',
+    description: '로그인 유저의 모든 friend를 배열로 가져온다.',
   })
   @Get('/friendFindWithUserID')
   friendFindWithUserID(
     @Req() req: Request & JwtReqUser, //
-  ): Promise<FriendListInfo[]> {
+  ): Promise<FriendList[]> {
     return this.friendService.findWithUserID({ userID: req.user.id });
   }
 
@@ -37,6 +37,7 @@ export class FriendController {
     @Body() friendCreateDto: FriendCreateDto,
     @Req() req: Request & JwtReqUser, //
   ): Promise<Friend> {
+    console.log(req.user);
     return this.friendService.create({ friendCreateDto, user: req.user });
   }
 

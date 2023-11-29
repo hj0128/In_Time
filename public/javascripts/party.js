@@ -66,7 +66,7 @@ const getPlanList = async () => {
       const itemStr = `
         <div class="plan_list_info_name">${planName}</div>
         <div class="plan_list_info_place">${placeName}</div>
-        <div class="plan_list_info_date">${date}</div>
+        <div class="plan_list_info_date">${date.replace('T', ' ')}</div>
         <div class="plan_list_info_fine">${fine}</div>
       `;
       el.innerHTML = itemStr;

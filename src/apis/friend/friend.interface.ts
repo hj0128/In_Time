@@ -12,14 +12,14 @@ export interface IFriendServiceFindAllToUser {
   toUserID: string;
 }
 
-export interface IFriendServiceCreateFriendList {
-  friends: Friend[];
-  friendList: FriendListInfo[];
-  mapFn?: (el: Friend) => FriendListInfo;
-}
-
 export interface IFriendServiceFindWithUserID {
   userID: string;
+}
+
+export interface IFriendServiceCreateFriendList {
+  friendID: string;
+  userID: string;
+  status: string;
 }
 
 export interface IFriendServiceFindAllUserAndToUser {
@@ -45,8 +45,11 @@ export interface IFriendServiceDelete {
   friendDeleteDto: FriendDeleteDto;
 }
 
-export class FriendListInfo extends PickType(User, ['name', 'profileUrl', 'badgeUrl']) {
-  status: string;
-  friendID?: string;
+export interface FriendList {
+  friendID: string;
   fromUserID?: string;
+  name: string;
+  profileUrl: string;
+  badgeUrl: string;
+  status: string;
 }

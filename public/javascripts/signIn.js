@@ -52,18 +52,3 @@ const loginKeydown = async (e) => {
   }
 };
 password.addEventListener('keydown', loginKeydown);
-
-
-const test2 = async () => {
-  try {
-    const a = await axios.get('/user/test');
-    console.log(a);
-  } catch (error) {
-    if (error.message === '토큰 만료') {
-      alert('로그인 후 이용해 주세요.');
-      window.location.href = '/signIn';
-    } else {
-      alert('를 하던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요');
-    }
-  }
-};

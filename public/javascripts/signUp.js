@@ -141,12 +141,6 @@ const signUpSubmit = async () => {
   const errorRePassword = document.querySelector('#error_rePassword');
 
   let isValid = true;
-  if (!fileSearch.value) {
-    errorFile.innerText = '사진을 업로드해 주세요.';
-    isValid = false;
-  } else {
-    errorFile.innerText = '';
-  }
 
   if (!email.value || !email.value.includes('@')) {
     errorEmail.innerText = '이메일 형식이 올바르지 않습니다.';
@@ -195,15 +189,35 @@ const signUpSubmit = async () => {
     errorRePassword.innerText = '';
   }
 
+  const file = fileSearch.files[0];
+  if (!file) {
+    errorFile.innerText = '사진을 업로드해 주세요.';
+    isValid = false;
+  } else {
+    errorFile.innerText = '';
+  }
+
   if (isValid) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    signUp.disabled = true;
+    signUp.style = 'color: internal-light-dark; cursor:default';
+
     try {
+      const url = await axios.post('/file/fileUpload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       await axios.post('/user/userCreate', {
         name: name.value,
         email: email.value,
         password: password.value,
-        phone: phone1.value + phone2.value + phone3.value,
-        profileUrl: fileSearch.value,
+        profileUrl: url.data,
       });
+
       alert('회원가입을 축하합니다.');
       window.location.href = '/signIn';
     } catch (err) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Party_User } from './party-user.entity';
 import { InsertResult, Repository } from 'typeorm';
@@ -29,7 +29,15 @@ export class Party_UserService {
     });
   }
 
-  create({ partyUserRelations }: IPartyUserServiceCreate): Promise<InsertResult> {
-    return this.partyUserRepository.insert(partyUserRelations);
+  async create({
+    partyUserRelations,
+    queryRunner,
+  }: IPartyUserServiceCreate): Promise<InsertResult> {
+    try {
+      const partyUser = await queryRunner.manager.insert(Party_User, partyUserRelations);
+      return partyUser;
+    } catch (error) {
+      throw new InternalServerErrorException('파티-유저 테이블 생성에 실패하였습니다.');
+    }
   }
 }

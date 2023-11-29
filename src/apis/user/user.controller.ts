@@ -2,9 +2,11 @@ import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/comm
 import { UserService } from './user.service';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { User } from './user.entity';
-import { UserCreateDto } from './user.dto';
+import { UserCreateDto, UserSetRedisDto } from './user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { JwtReqUser } from 'src/commons/interface/req.interface';
+import { RedisInfo } from './user.interface';
 
 @ApiTags('User')
 @Controller('/user')
@@ -21,7 +23,7 @@ export class UserController {
   })
   @Get('/test')
   test(
-    @Req() req: Request, //
+    @Req() req: Request & JwtReqUser, //
   ) {
     return req.user;
   }
@@ -59,5 +61,30 @@ export class UserController {
     @Body() userCreateDto: UserCreateDto, //
   ): Promise<User> {
     return this.userService.create({ userCreateDto });
+  }
+
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({
+    summary: 'Redis에 user 등록하기',
+    description: 'Redis에 user의 실시간 위치를 저장한다.',
+  })
+  @Post('/userSetRedis')
+  userSetRedis(
+    @Req() req: Request & JwtReqUser,
+    @Body() userSetRedisDto: UserSetRedisDto, //
+  ): Promise<UserSetRedisDto> {
+    return this.userService.setRedis({ user: req.user, userSetRedisDto });
+  }
+
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({
+    summary: 'Redis에서 user들 가져오기',
+    description: 'Redis에서 userName과 일치하는 값을 가져온다.',
+  })
+  @Get('/userGetRedis')
+  userGetRedis(
+    @Query('usersName') usersName: string[], //
+  ): Promise<RedisInfo[]> {
+    return this.userService.getRedis({ usersName });
   }
 }

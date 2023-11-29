@@ -6,6 +6,7 @@ import { PartyCreateDto } from './party.dto';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtReqUser } from '../../commons/interface/req.interface';
+import { PartyList } from './party.interface';
 
 @ApiTags('Party')
 @Controller('/party')
@@ -23,14 +24,14 @@ export class PartyController {
 
   @UseGuards(AuthGuard('access'))
   @ApiOperation({
-    summary: '모든 party 가져오기',
+    summary: '로그인 user의 모든 party 가져오기',
     description: '로그인 유저의 모든 party를 배열로 가져온다.',
   })
   @Get('/partyFindAll')
   partyFindAll(
     @Req() req: Request & JwtReqUser, //
-  ): Promise<Party[]> {
-    return this.partyService.findAllWithUser({ user: req.user });
+  ): Promise<PartyList[]> {
+    return this.partyService.findWithUserID({ userID: req.user.id });
   }
 
   @UseGuards(AuthGuard('access'))

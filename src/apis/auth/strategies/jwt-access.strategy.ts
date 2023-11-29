@@ -7,23 +7,24 @@ import { Cache } from 'cache-manager';
 import { Request } from 'express';
 
 export class JwtAccessStrategy extends PassportStrategy(Strategy, 'access') {
-  constructor() // @Inject(CACHE_MANAGER)
-  // private readonly cacheManager: Cache, //
-  {
+  constructor(
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache, //
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.JWT_ACCESS_KEY,
-      // passReqToCallback: true,
+      passReqToCallback: true,
     });
   }
 
   async validate(req: Request, payload: Payload) {
-    // const accessToken = req.headers.authorization.replace('Bearer ', '');
+    const accessToken = req.headers.authorization.replace('Bearer ', '');
 
-    // const isAccessToken = await this.cacheManager.get(`accessToken:${accessToken}`);
-    // if (isAccessToken === 'accessToken') {
-    //   throw new UnauthorizedException('로그아웃 되었습니다.');
-    // }
+    const isAccessToken = await this.cacheManager.get(`accessToken:${accessToken}`);
+    if (isAccessToken === 'accessToken') {
+      throw new UnauthorizedException('로그아웃 되었습니다.');
+    }
 
     return {
       id: payload.id,

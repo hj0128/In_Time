@@ -66,7 +66,7 @@
   }
 }
 
-.infoWindow {
+.infoWindow_place {
   width: 100%;
   height: 100%;
   padding: 10px;
@@ -79,4 +79,23 @@
 
 .infoWindow_place_address {
   font-size: 12px;
+}
+
+.infoWindow_user {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.infoWindow_user_name {
+  font-size: 15px;
+  margin-left: auto;
+}
+
+.infoWindow_user_time {
+  font-size: 12px;
+  margin-left: 10px;
 }

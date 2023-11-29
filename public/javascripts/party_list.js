@@ -1,10 +1,10 @@
 const getPartyList = async () => {
   try {
-    const parties = await axios.get('/party/partyFindAll');
+    const partyList = await axios.get('/party/partyFindAll');
     const listel = document.querySelector('#party_list');
 
-    for (let i = 0; i < parties.data.length; i++) {
-      const { id, name, members, point } = parties.data[i];
+    for (let i = 0; i < partyList.data.length; i++) {
+      const { partyID, name, point, members } = partyList.data[i];
 
       const el = document.createElement('div');
       el.className = 'party_list_info';
@@ -13,7 +13,7 @@ const getPartyList = async () => {
       <div class="party_list_info_members">${members}</div>
       <div class="party_list_info_point">${point}</div>`;
       el.innerHTML = itemStr;
-      el.setAttribute('onclick', `location.href="/party?id=${id}"`);
+      el.setAttribute('onclick', `location.href="/party?id=${partyID}"`);
 
       listel.appendChild(el);
     }

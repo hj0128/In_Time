@@ -18,6 +18,6 @@ async function bootstrap() {
   // process.on('unhandledRejection', (reason, promise) => {
   //   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   // });
-  await app.listen(3001);
+  await app.listen(3000);
 }
 bootstrap();

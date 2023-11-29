@@ -12,10 +12,12 @@ import { Party_UserModule } from './apis/party-user/party-user.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
+import { FileModule } from './apis/file/file.module';
 
 @Module({
   imports: [
     AuthModule,
+    FileModule,
     FriendModule,
     UserModule,
     PartyModule,
@@ -24,7 +26,7 @@ import * as redisStore from 'cache-manager-redis-store';
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: process.env.DATABASE_TYPE as 'mysql',
-      host: 'localhost',
+      host: process.env.DATABASE_HOST,
       port: Number(process.env.DATABASE_PORT),
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
@@ -33,11 +35,11 @@ import * as redisStore from 'cache-manager-redis-store';
       synchronize: true,
       logging: true,
     }),
-    // CacheModule.register<RedisClientOptions>({
-    //   store: redisStore,
-    //   url: 'redis://my_redis:6379',
-    //   isGlobal: true,
-    // }),
+    CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      url: 'redis://my_redis:6379',
+      isGlobal: true,
+    }),
   ],
   controllers: [
     AppController, //

@@ -63,15 +63,15 @@ export class AuthController {
     return this.authService.restoreAccessToken({ user: req.user });
   }
 
-  // @ApiOperation({
-  //   summary: '로그아웃하기',
-  //   description: '로그아웃 시 AccessToken과 RefreshToken을 Redis에 담는다.',
-  // })
-  // @UseGuards(AuthGuard('access'))
-  // @Post('/authLogout')
-  // authLogout(
-  //   @Req() req: Request & JwtReqUser, //
-  // ): Promise<string> {
-  //   return this.authService.logout({ headers: req.headers });
-  // }
+  @ApiOperation({
+    summary: '로그아웃하기',
+    description: '로그아웃 시 AccessToken과 RefreshToken을 Redis에 담는다.',
+  })
+  @UseGuards(AuthGuard('access'))
+  @Post('/authLogout')
+  authLogout(
+    @Req() req: Request & JwtReqUser, //
+  ): Promise<string> {
+    return this.authService.logout({ headers: req.headers });
+  }
 }

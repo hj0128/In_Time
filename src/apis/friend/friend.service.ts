@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Friend, STATUS_ENUM } from './friend.entity';
 import { Repository } from 'typeorm';
 import {
-  FriendListInfo,
+  FriendList,
   IFriendServiceCreate,
   IFriendServiceCreateFriendList,
   IFriendServiceDelete,
@@ -34,6 +34,7 @@ export class FriendService {
   findAllUser({ userID }: IFriendServiceFindAllUser): Promise<Friend[]> {
     return this.friendRepository.find({
       where: { user: { id: userID } },
+      relations: ['user'],
     });
   }
 
@@ -44,57 +45,63 @@ export class FriendService {
     });
   }
 
-  async findWithUserID({ userID }: IFriendServiceFindWithUserID): Promise<FriendListInfo[]> {
+  async findWithUserID({ userID }: IFriendServiceFindWithUserID): Promise<FriendList[]> {
     const friendUsers = await this.findAllUser({ userID });
     const friendToUsers = await this.findAllToUser({ toUserID: userID });
 
-    let friendList = [];
-    if (friendUsers) this.createFriendList({ friends: friendUsers, friendList });
-    if (friendToUsers)
-      this.createFriendList({
-        friends: friendToUsers,
-        friendList,
-        mapFn: (el) => ({
-          id: el.id,
-          fromUserID: el.user.id,
-          name: el.user.name,
-          profileUrl: el.user.profileUrl,
-          badgeUrl: el.user.badgeUrl,
-          status: el.isAccepted === 'SENT' ? 'received' : 'friendship',
+    const friendList = [];
+
+    if (friendToUsers) {
+      await Promise.all(
+        friendToUsers
+          .filter((el) => el.isAccepted === 'SENT')
+          .map(async (el) => {
+            friendList.push(
+              await this.createFriendList({
+                friendID: el.id,
+                userID: el.user.id,
+                status: 'received',
+              }),
+            );
+          }),
+      );
+    }
+
+    if (friendUsers) {
+      await Promise.all(
+        friendUsers.map(async (el) => {
+          friendList.push(
+            await this.createFriendList({
+              friendID: el.id,
+              userID: el.toUserID,
+              status: el.isAccepted === 'SENT' ? 'sent' : 'friendship',
+            }),
+          );
         }),
-      });
+      );
+    }
 
     return friendList;
   }
 
   async createFriendList({
-    friends,
-    friendList,
-    mapFn,
-  }: IFriendServiceCreateFriendList): Promise<void> {
-    const filteredFriends = friends.filter((el) => el.isAccepted === 'SENT');
-
-    await Promise.all(
-      filteredFriends.map(async (el) => {
-        const toUser = await this.userService.findOneWithUserId({ id: el.toUserID });
-        if (!toUser) return;
-        friendList.push(
-          mapFn
-            ? mapFn(el)
-            : {
-                name: toUser.name,
-                profileUrl: toUser.profileUrl,
-                badgeUrl: toUser.badgeUrl,
-                status: 'sent',
-              },
-        );
-      }),
-    );
+    friendID,
+    userID,
+    status,
+  }: IFriendServiceCreateFriendList): Promise<FriendList> {
+    const user = await this.userService.findOneWithUserId({ id: userID });
+    return {
+      friendID,
+      fromUserID: user.id,
+      name: user.name,
+      profileUrl: user.profileUrl,
+      badgeUrl: user.badgeUrl,
+      status,
+    };
   }
 
   async create({ friendCreateDto, user }: IFriendServiceCreate): Promise<Friend> {
     const { toUserName } = friendCreateDto;
-
     const toUser = await this.userService.findOneWithName({ name: toUserName });
     if (!toUser) throw new NotFoundException('존재하지 않는 회원입니다.');
     if (toUser.id === user.id)

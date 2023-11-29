@@ -9,9 +9,11 @@ const search = async () => {
     });
     alert(`${toUserName}님에게 친구 요청을 보냈습니다. \n상대방이 수락하면 친구가 됩니다.`);
   } catch (error) {
-    if (error.message === '토큰 만료') {
+    if (error.response.data.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');
       window.location.href = '/signIn';
+    } else if (error.response.status === 404 || error.response.status === 400 || error.response.status === 409) {
+      alert(error.response.data.message);
     } else {
       alert('친구 요청을 보내던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
     }
@@ -59,13 +61,13 @@ const getFriendList = async () => {
 
     const listel = document.querySelector('#friend_list');
     for (let i = 0; i < friends.data.length; i++) {
-      const { id, fromUserID, name, profileUrl, badgeUrl, status } = friends.data[i];
+      const { friendID, fromUserID, name, profileUrl, badgeUrl, status } = friends.data[i];
 
       let statusInfo;
       if (status === 'received') {
         statusInfo = `
-        <button class="friend_list_info_status" onClick="accept('${id}', '${fromUserID}')">수락</button>
-        <button class="friend_list_info_status" onClick="refuse('${id}')">거절</button>`;
+        <button class="friend_list_info_status" onClick="accept('${friendID}', '${fromUserID}')">수락</button>
+        <button class="friend_list_info_status" onClick="refuse('${friendID}')">거절</button>`;
       } else if (status === 'sent') {
         statusInfo = `
         <span class="friend_list_info_status">수락 대기 중...</span>`;

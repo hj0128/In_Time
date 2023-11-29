@@ -22,6 +22,7 @@ axios.interceptors.response.use(
   async (responseError) => {
     // 2xx 외의 상태 코드일 때 동작하는 코드
     if (responseError.response.config.url === '/auth/authRestoreAccessToken') {
+      axios.defaults.headers.common['Authorization'] = ``;
       throw new Error('토큰 만료');
     }
 
@@ -41,6 +42,7 @@ axios.interceptors.response.use(
           return axios.request(responseError.config);
         }
       } catch (error) {
+        axios.defaults.headers.common['Authorization'] = ``;
         throw new Error('토큰 만료');
       }
     }

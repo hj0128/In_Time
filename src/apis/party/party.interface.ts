@@ -5,8 +5,15 @@ export interface IPartyServiceFindOneWithPartyID {
   partyID: string;
 }
 
-export interface IPartyServiceFindAllWithUser {
-  user: JwtReqUser['user'];
+export interface IPartyServiceFindWithUserID {
+  userID: string;
+}
+
+export interface PartyList {
+  partyID: string;
+  name: string;
+  point: number;
+  members: string[];
 }
 
 export interface IPartyServiceCreate {
