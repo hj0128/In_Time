@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Friend } from '../friend/friend.entity';
 import { Party_User } from '../party-user/party-user.entity';
+import { Point } from '../point/point.entity';
 
 @Entity()
 export class User {
@@ -16,10 +17,13 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ default: 0 })
+  point: number;
+
   @Column()
   profileUrl: string;
 
-  @Column({ default: 'http://badgeUrl.jpg' })
+  @Column({ default: 'https://storage.googleapis.com/in-time-project-bucket/defaults/tardy.png' })
   badgeUrl: string;
 
   @OneToMany(() => Friend, (friend) => friend.user, { cascade: true })
@@ -27,4 +31,7 @@ export class User {
 
   @OneToMany(() => Party_User, (partyUsers) => partyUsers.user, { cascade: true })
   partyUsers: Party_User[];
+
+  @OneToMany(() => Point, (points) => points.user, { cascade: true })
+  points: Point[];
 }

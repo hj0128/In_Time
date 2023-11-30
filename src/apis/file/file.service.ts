@@ -9,9 +9,9 @@ import * as iconv from 'iconv-lite';
 export class FileService {
   createStorage(): Bucket {
     return new Storage({
-      projectId: 'backend-399806',
+      projectId: 'in-time-project-406606',
       keyFilename: 'gcp-file-storage.json',
-    }).bucket('in-time-bucket');
+    }).bucket('in-time-project-bucket');
   }
 
   async upload({ file }: IFileServiceUpload): Promise<string> {
@@ -25,7 +25,7 @@ export class FileService {
 
       fileStream
         .on('finish', () => {
-          const fileUrl = `https://storage.googleapis.com/in-time-bucket/${fileName}`;
+          const fileUrl = `https://storage.googleapis.com/in-time-project-bucket/${fileName}`;
           res(fileUrl);
         })
         .on('error', (error) => {

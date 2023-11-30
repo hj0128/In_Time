@@ -50,7 +50,7 @@ describe('UserService', () => {
 
       jest.spyOn(mockUserRepository, 'findOne').mockResolvedValue(expectedFindOne);
 
-      const result: User = await userService.findOneWithUserId({ id: inputId });
+      const result: User = await userService.findOneWithUserID({ id: inputId });
 
       expect(result).toEqual(expectedFindOne);
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({

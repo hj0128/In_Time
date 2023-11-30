@@ -76,7 +76,7 @@ export class AuthService {
       path: '/',
       expires: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
     });
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
   }
 
   getAccessToken({ user }: IAuthServiceGetAccessToken): string {

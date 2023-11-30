@@ -122,6 +122,7 @@ const create = async () => {
     });
 
     alert('약속이 생성되었습니다.');
+    window.location.href = `/party?id=${partyID}`;
   } catch (error) {
     if (error.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');

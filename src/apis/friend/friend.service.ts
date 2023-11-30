@@ -89,7 +89,7 @@ export class FriendService {
     userID,
     status,
   }: IFriendServiceCreateFriendList): Promise<FriendList> {
-    const user = await this.userService.findOneWithUserId({ id: userID });
+    const user = await this.userService.findOneWithUserID({ id: userID });
     return {
       friendID,
       fromUserID: user.id,

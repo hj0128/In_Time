@@ -13,6 +13,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { FileModule } from './apis/file/file.module';
+import { PointModule } from './apis/point/point.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { FileModule } from './apis/file/file.module';
     FileModule,
     FriendModule,
     UserModule,
+    PointModule,
     PartyModule,
     Party_UserModule,
     PlanModule,

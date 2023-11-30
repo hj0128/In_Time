@@ -28,6 +28,19 @@ export class UserController {
     return req.user;
   }
 
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({
+    summary: 'userID로 user 찾기',
+    description: '해당하는 userID의 user를 찾는다.',
+  })
+  @ApiQuery({ name: 'userID', description: '찾고 싶은 user의 ID' })
+  @Get('/userFindOneWithUserID')
+  userFindOneWithUserID(
+    @Req() req: Request & JwtReqUser, //
+  ): Promise<User> {
+    return this.userService.findOneWithUserID({ id: req.user.id });
+  }
+
   @ApiOperation({
     summary: 'name으로 user 찾기',
     description: '해당하는 name의 user를 찾는다.',

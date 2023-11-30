@@ -155,7 +155,7 @@ describe('FriendService', () => {
       expect(result).toEqual(expectedFriendList);
       expect(friendService.findAllUser).toHaveBeenCalledWith({ userID: inputUserID });
       expect(friendService.findAllToUser).toHaveBeenCalledWith({ toUserID: inputUserID });
-      expect(userService.findOneWithUserId).toHaveBeenCalledWith({ id: mockFriend.toUserID });
+      expect(userService.findOneWithUserID).toHaveBeenCalledWith({ id: mockFriend.toUserID });
     });
   });
 
@@ -185,7 +185,7 @@ describe('FriendService', () => {
       expect(inputFriendList.length).toBe(1);
       expect(inputFriendList[0].name).toBe(expectedFindOneWithUserId.name);
       expect(inputMapFn).toHaveBeenCalledWith(inputFriends[0]);
-      expect(userService.findOneWithUserId).toHaveBeenCalledWith({ id: mockFriend.toUserID });
+      expect(userService.findOneWithUserID).toHaveBeenCalledWith({ id: mockFriend.toUserID });
     });
   });
 

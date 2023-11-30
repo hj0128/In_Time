@@ -27,7 +27,7 @@ export class UserService {
     private readonly cacheManager: Cache,
   ) {}
 
-  findOneWithUserId({ id }: IUserServiceFindOneWithUserID): Promise<User> {
+  findOneWithUserID({ id }: IUserServiceFindOneWithUserID): Promise<User> {
     return this.userRepository.findOne({ where: { id } });
   }
 

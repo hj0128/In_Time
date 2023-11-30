@@ -3,7 +3,6 @@ let accessToken;
 axios.interceptors.request.use(
   async (config) => {
     // 요청이 전달되기 전 작업할 것들
-
     return config;
   },
   (requestError) => {

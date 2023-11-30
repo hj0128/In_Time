@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"
+  />
+  <title>MyPage</title>
+  <link rel="stylesheet" href="/stylesheets/mypage.css" />
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'></script>
+
+</head>
+
+<body>
+  <a href="/" id="home">Home</a>
+  <a href="#" id="logout">로그아웃</a>
+  <br>
+  <img id="profile_image">
+  <div id="user_info_wrapper">
+    <div id="user_info_title">
+      <div id="name">name</div>
+      <img id="badge_image">
+    </div>
+    <div id="user_info_footer">
+      <div id="email">email</div>
+    </div>
+  </div>
+  <div id="point_wrapper">
+    <div id="point_title">
+      <div id="point_title_left">
+        내 포인트: <span id="point">0</span>
+      </div>
+      <div id="point_title_right">
+        <button id="point_fill">포인트 채우기</button>
+        <button id="point_send">포인트 보내기</button>
+      </div>
+    </div>
+    <div id="point_body">
+      <div id="point_body_title">포인트 내역</div>
+      <div id="vertical_line"></div>
+    </div>
+  </div>
+  <script src="/javascripts/axios.interceptor.js"></script>
+  <script type="text/javascript" src="/javascripts/mypage.js"></script>
+</body>
+</html>
