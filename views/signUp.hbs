@@ -51,10 +51,13 @@
         placeholder='비밀번호를 다시 입력해 주세요.'
       />
       <div class='error' id='error_rePassword'></div>
-      <div id='phone_wrapper'>
-        <input type='text' id='phone1' maxlength='3' />_
-        <input type='text' id='phone2' maxlength='4' />_
-        <input type='text' id='phone3' maxlength='4' />
+      <div id='email_wrapper'>
+        <input
+          type='text'
+          class='inputBox'
+          id='user_email'
+          placeholder='인증번호를 받을 이메일을 입력해 주세요.'
+        />
         <button id='token_send' disabled='true'>인증번호 요청</button>
       </div>
       <div id='token_wrapper'>
@@ -64,7 +67,7 @@
           placeholder='인증 번호를 입력해 주세요.'
           maxlength='6'
         />
-        <div id='time_timer'>1:00</div>
+        <div id='time_timer'>3:00</div>
         <button id='token_check' disabled='true'>인증하기</button>
       </div>
       <div class='dividing_line'></div>

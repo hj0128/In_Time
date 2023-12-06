@@ -21,7 +21,7 @@ export class AuthController {
   @Post('/authSendToken')
   authSendToken(
     @Body() authSendTokenDto: AuthSendTokenDto, //
-  ): Promise<void> {
+  ): void {
     return this.authService.sendToken({ authSendTokenDto });
   }
 

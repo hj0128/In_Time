@@ -1,3 +1,19 @@
+const back = document.querySelector('#back');
+back.addEventListener('click', () => {
+  window.history.back();
+  window.location.reload(true);
+});
+
+window.onload = () => {
+  const inputElements = document.querySelectorAll('input');
+  inputElements.forEach((input) => {
+    if (input.type !== 'button' && input.type !== 'submit' && input.type !== 'reset') {
+      input.value = '';
+    }
+  });
+};
+
+
 const mapContainer = document.querySelector('#map');
 const mapOptions = {
   center: new kakao.maps.LatLng(33.450701, 126.570667),
@@ -5,10 +21,6 @@ const mapOptions = {
 };
 
 const map = new kakao.maps.Map(mapContainer, mapOptions);
-
-
-const back = document.querySelector('#back');
-back.addEventListener('click', () => window.history.back());
 
 
 const placeChoice = (placeName) => {

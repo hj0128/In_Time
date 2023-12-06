@@ -1,3 +1,19 @@
+const back = document.querySelector('#back');
+back.addEventListener('click', () => {
+  window.history.back();
+  window.location.reload(true);
+});
+
+window.onload = () => {
+  const inputElements = document.querySelectorAll('input');
+  inputElements.forEach((input) => {
+    if (input.type !== 'button' && input.type !== 'submit' && input.type !== 'reset') {
+      input.value = '';
+    }
+  });
+};
+
+
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const planID = urlParams.get('id');
@@ -9,10 +25,6 @@ const mapOptions = {
   level: 4,
 };
 const map = new kakao.maps.Map(mapContainer, mapOptions);
-
-
-const back = document.querySelector('#back');
-back.addEventListener('click', () => window.history.back());
 
 
 // 파티 정보 세팅하기

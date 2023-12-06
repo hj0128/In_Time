@@ -21,6 +21,11 @@ export class UserCreateDto {
   @IsString()
   @IsNotEmpty()
   profileUrl: string;
+
+  @ApiProperty({ example: 'a@gmail.com', description: 'user의 실 이메일 주소' })
+  @IsEmail()
+  @IsNotEmpty()
+  userEmail: string;
 }
 
 export class UserSetRedisDto {

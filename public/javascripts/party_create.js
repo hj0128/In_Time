@@ -1,5 +1,17 @@
 const back = document.querySelector('#back');
-back.addEventListener('click', () => window.history.back());
+back.addEventListener('click', () => {
+  window.history.back();
+  window.location.reload(true);
+});
+
+window.onload = () => {
+  const inputElements = document.querySelectorAll('input');
+  inputElements.forEach((input) => {
+    if (input.type !== 'button' && input.type !== 'submit' && input.type !== 'reset') {
+      input.value = '';
+    }
+  });
+};
 
 
 const getFriendList = async () => {

@@ -9,13 +9,13 @@ import {
   IAuthServiceSocialLogin,
   IAuthServiceTokenEXP,
 } from './auth.interface';
-import coolsms from 'coolsms-node-sdk';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as jwt from 'jsonwebtoken';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AuthService {
@@ -27,16 +27,33 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  async sendToken({ authSendTokenDto }: IAuthServiceSendToken): Promise<void> {
-    const { tokenNumber, phone1, phone2, phone3 } = authSendTokenDto;
+  sendToken({ authSendTokenDto }: IAuthServiceSendToken): void {
+    const { tokenNumber, email } = authSendTokenDto;
 
-    const messageService = new coolsms(process.env.COOLSMS_KEY, process.env.COOLSMS_SECRET);
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.NODE_MAIL_GMAIL_EMAIL,
+        pass: process.env.NODE_MAIL_GMAIL_PASSWORD,
+      },
+    });
 
-    await messageService.sendOne({
-      to: phone1 + phone2 + phone3,
-      from: process.env.COOLSMS_FROM_NUMBER,
-      text: `요청하신 인증 번호는 ${tokenNumber} 입니다.`,
-      autoTypeDetect: true,
+    const html = `
+      <div style="max-width: 600px; margin: 0 auto; background-color: #f4f4f4; padding: 20px; border-radius: 10px;">
+        <h1 style="color: #333;">In_Time 회원가입을 위한 인증번호 입니다.</h1>
+        <p style="color: #555; font-size: 16px;">안녕하세요.</p>
+        <p style="color: #555; font-size: 16px;">In_Time 회원가입을 위한 인증번호는 <strong style="font-weight: bold; color: #000; font-size: 20px;">${tokenNumber}</strong> 입니다.</p>
+      </div>
+  `;
+
+    transporter.sendMail({
+      from: process.env.NODE_MAIL_GMAIL_EMAIL,
+      to: email,
+      subject: 'In_Time 회원가입 인증번호입니다.',
+      html,
     });
   }
 
@@ -96,7 +113,9 @@ export class AuthService {
     });
 
     if (!user) {
-      user = await this.userService.create({ userCreateDto: { ...req.user } });
+      user = await this.userService.create({
+        userCreateDto: { userEmail: req.user.email, ...req.user },
+      });
     }
 
     this.setRefreshToken({ user, res });

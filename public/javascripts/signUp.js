@@ -1,5 +1,17 @@
 const back = document.querySelector('#back');
-back.addEventListener('click', () => window.history.back());
+back.addEventListener('click', () => {
+  window.history.back();
+  window.location.reload(true);
+});
+
+window.onload = () => {
+  const inputElements = document.querySelectorAll('input');
+  inputElements.forEach((input) => {
+    if (input.type !== 'button' && input.type !== 'submit' && input.type !== 'reset') {
+      input.value = '';
+    }
+  });
+};
 
 
 const fileSearch = document.querySelector('#file_search');
@@ -15,9 +27,11 @@ const email = document.querySelector('#email');
 const name = document.querySelector('#name');
 const password = document.querySelector('#password');
 const rePassword = document.querySelector('#rePassword');
+const userEmail = document.querySelector('#user_email');
+const tokenSend = document.querySelector('#token_send');
 const nextBox = (e) => {
   if (e.key === 'Enter' || e.keyCode === 13) {
-    const inputs = [email, name, password, rePassword, phone1];
+    const inputs = [email, name, password, rePassword, userEmail, tokenSend];
     const currentInputIndex = inputs.indexOf(e.target);
     const nextInput = inputs[currentInputIndex + 1];
 
@@ -28,39 +42,18 @@ email.addEventListener('keydown', nextBox);
 name.addEventListener('keydown', nextBox);
 password.addEventListener('keydown', nextBox);
 rePassword.addEventListener('keydown', nextBox);
+userEmail.addEventListener('keydown', nextBox);
 
 
-const phone1 = document.querySelector('#phone1');
-const phone2 = document.querySelector('#phone2');
-const phone3 = document.querySelector('#phone3');
-const nextPhoneBox = (e) => {
-  const reg = /\D/g;
-  const inputValue = e.target.value.replace(reg, '');
-
-  if (inputValue.length === 3) {
-    phone2.focus();
-  } else if (inputValue.length === 4) {
-    phone3.focus();
-  }
-};
-phone1.addEventListener('input', nextPhoneBox);
-phone2.addEventListener('input', nextPhoneBox);
-
-
-const tokenSend = document.querySelector('#token_send');
-const nextTokenBox = (e) => {
-  const reg = /\D/g;
-  const inputValue = e.target.value.replace(reg, '');
-
-  if (inputValue.length == 4) {
+const activateTokenBox = (e) => {
+  if (e.target.value.includes('@')) {
     tokenSend.disabled = false;
     tokenSend.style.color = '#222';
     tokenSend.style.border = '1px solid #D2D2D2';
     tokenSend.style.cursor = 'pointer';
-    tokenSend.focus();
   }
 };
-phone3.addEventListener('input', nextTokenBox);
+userEmail.addEventListener('input', activateTokenBox);
 
 
 let timer;
@@ -68,27 +61,21 @@ const tokenInput = document.querySelector('#token_input');
 const tokenCheck = document.querySelector('#token_check');
 const tokenNumber = String(Math.floor(Math.random() * 1000000)).padStart(6, 0);
 const sendTokenToUser = async () => {
-  if (phone1.value.length !== 3 || phone2.value.length !== 4 || phone3.value.length !== 4) {
-    alert('휴대폰 번호를 입력해 주세요.');
-    return;
-  }
-
   clearInterval(timer);
 
-  // 인증 번호 문자로 보내기
-  // await axios.post('/auth/authSendToken', {
-  //   tokenNumber,
-  //   phone1: phone1.value,
-  //   phone2: phone2.value,
-  //   phone3: phone3.value,
-  // });
-  console.log(tokenNumber);
+  await axios.post('/auth/authSendToken', {
+    tokenNumber,
+    email: userEmail.value,
+  });
+
+  alert('입력하신 이메일로 인증번호를 전송했습니다.');
+  console.log(tokenNumber); // 배포 전 지우기
 
   tokenCheck.disabled = false;
   tokenCheck.style = 'color: #222; cursor: pointer;';
   tokenInput.focus();
 
-  let time = 60;
+  let time = 180;
   timer = setInterval(() => {
     if (time >= 0) {
       const min = Math.floor(time / 60);
@@ -146,7 +133,10 @@ const signUpSubmit = async () => {
 
   let isValid = true;
 
-  if (!email.value || !email.value.includes('@')) {
+  if (!email.value) {
+    errorEmail.innerText = '이메일을 입력해 주세요.';
+    isValid = false;
+  } else if (!email.value.includes('@')) {
     errorEmail.innerText = '이메일 형식이 올바르지 않습니다.';
     isValid = false;
   } else {
@@ -169,7 +159,7 @@ const signUpSubmit = async () => {
       params: { name: name.value },
     });
     if (isName.data.name) {
-      errorName.innerText = '중복되는 별명입니다.';
+      errorName.innerText = '이미 존재하는 별명입니다.';
       isValid = false;
     } else {
       errorName.innerText = '';
@@ -220,9 +210,10 @@ const signUpSubmit = async () => {
         email: email.value,
         password: password.value,
         profileUrl: url.data,
+        userEmail: userEmail.value,
       });
 
-      alert('회원가입을 축하합니다.');
+      alert('회원가입을 축하합니다!');
       window.location.href = '/signIn';
     } catch (err) {
       if (err.response.status === 400) {

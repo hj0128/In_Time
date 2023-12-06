@@ -16,6 +16,7 @@ import * as bcrypt from 'bcrypt';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { UserSetRedisDto } from './user.dto';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class UserService {
@@ -43,8 +44,39 @@ export class UserService {
     return this.userRepository.findOne({ where: { email } });
   }
 
+  async sendEmail({ name, userEmail }) {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.NODE_MAIL_GMAIL_EMAIL,
+        pass: process.env.NODE_MAIL_GMAIL_PASSWORD,
+      },
+    });
+
+    const html = `
+      <div style="max-width: 600px; margin: 0 auto; background-color: #f4f4f4; padding: 20px; border-radius: 10px;">
+        <h1 style="color: #333;">In_Time 회원가입을 축하합니다!</h1>
+        <p style="color: #555; font-size: 16px;">안녕하세요 ${name}님!</p>
+        <p style="color: #555; font-size: 16px;">In_Time에 가입해 주셔서 감사합니다.</p>
+        <p style="color: #555; font-size: 16px;">이제 In_Time의 다양한 서비스를 자유롭게 이용하실 수 있습니다.</p>
+        <p style="color: #555; font-size: 16px;">추가적인 정보나 도움이 필요하시면 언제든지 문의해 주세요.</p>
+        <p style="color: #555; font-size: 16px;">감사합니다!<br><br>In_Time 팀 드림</p>    
+      </div>
+    `;
+
+    transporter.sendMail({
+      from: process.env.NODE_MAIL_GMAIL_EMAIL,
+      to: userEmail,
+      subject: 'In_Time 회원가입을 축하합니다!.',
+      html,
+    });
+  }
+
   async create({ userCreateDto }: IUserServiceCreate): Promise<User> {
-    const { name, email, password, profileUrl } = userCreateDto;
+    const { name, email, password, profileUrl, userEmail } = userCreateDto;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const create = await this.userRepository.save({
@@ -55,6 +87,8 @@ export class UserService {
     });
 
     if (!create) throw new InternalServerErrorException('회원 생성에 실패하였습니다.');
+
+    await this.sendEmail({ name, userEmail });
 
     return create;
   }
