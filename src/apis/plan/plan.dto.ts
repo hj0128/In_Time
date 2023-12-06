@@ -37,13 +37,22 @@ export class PlanCreateDto {
   @IsNotEmpty()
   fine: number;
 
-  @ApiProperty({ example: '1회', description: '벌금 타입' })
-  @IsString()
-  @IsNotEmpty()
-  fineType: string;
-
-  @ApiProperty({ example: 'PT001', description: 'plan이 속할 party의 id' })
+  @ApiProperty({ example: 'Party01', description: 'plan이 속할 party의 id' })
   @IsString()
   @IsNotEmpty()
   partyID: string;
+}
+
+export class PlanDeleteDto {
+  @ApiProperty({ example: 'Plan01', description: 'plan의 id' })
+  @IsString()
+  @IsNotEmpty()
+  planID: string;
+}
+
+export class PlanRestoreDto {
+  @ApiProperty({ example: 'Plan01', description: 'plan의 id' })
+  @IsString()
+  @IsNotEmpty()
+  planID: string;
 }

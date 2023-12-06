@@ -4,8 +4,7 @@ import { User } from '../user/user.entity';
 export enum POINT_STATUS {
   POINT_FILL = 'POINT_FILL',
   POINT_SEND = 'POINT_SEND',
-  FINE_PAY = 'FINE_PAY',
-  FINE_RECEIVE = 'FINE_RECEIVE',
+  FINE = 'FINE',
 }
 
 @Entity()

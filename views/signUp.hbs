@@ -8,12 +8,28 @@
   </head>
 
   <body>
-    <a href='/home_unauth' id='home'>Home</a>
-    <div class='wrapper'>
-      <h3>회원가입</h3>
-      <div class='file_wrapper'>
-        <input type='text' id='file_box' placeholder='프로필 사진을 업로드해 주세요.' readonly />
-        <label for='file_search'>파일 찾기</label>
+    <div id='header_wrapper'>
+      <div id='header_wrapper_left'>
+        <a id='back'>이전</a>
+      </div>
+      <div id='header_wrapper_center'>
+        <a href='/' id='home'>Home</a>
+      </div>
+      <div id='header_wrapper_right'>
+        <a href='/mypage' id='my_page'>내 정보</a>
+        <a href='/friend/list' id='friend'>친구</a>
+      </div>
+    </div>
+    <div id='body_wrapper'>
+      <div id='file_wrapper'>
+        <input
+          type='text'
+          id='file_box'
+          class='inputBox'
+          placeholder='프로필 사진을 업로드해 주세요.'
+          readonly
+        />
+        <label for='file_search' id='file_search_box'>파일 찾기</label>
         <input type='file' id='file_search' accept='image/*' style='display: none;' />
       </div>
       <div class='error' id='error_file'></div>
@@ -35,13 +51,13 @@
         placeholder='비밀번호를 다시 입력해 주세요.'
       />
       <div class='error' id='error_rePassword'></div>
-      <div class='phone_wrapper'>
-        <input type='text' class='phone_number' id='phone1' maxlength='3' />_
-        <input type='text' class='phone_number' id='phone2' maxlength='4' />_
-        <input type='text' class='phone_number' id='phone3' maxlength='4' />
+      <div id='phone_wrapper'>
+        <input type='text' id='phone1' maxlength='3' />_
+        <input type='text' id='phone2' maxlength='4' />_
+        <input type='text' id='phone3' maxlength='4' />
         <button id='token_send' disabled='true'>인증번호 요청</button>
       </div>
-      <div class='token_wrapper'>
+      <div id='token_wrapper'>
         <input
           type='text'
           id='token_input'

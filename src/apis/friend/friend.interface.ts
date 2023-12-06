@@ -1,8 +1,5 @@
-import { PickType } from '@nestjs/swagger';
-import { FriendCreateDto, FriendDeleteDto, FriendUpdateDto } from './friend.dto';
-import { User } from '../user/user.entity';
+import { FriendCreateDto, FriendRefuseDto, FriendUnFriendDto, FriendUpdateDto } from './friend.dto';
 import { JwtReqUser } from '../../commons/interface/req.interface';
-import { Friend } from './friend.entity';
 
 export interface IFriendServiceFindAllUser {
   userID: string;
@@ -41,8 +38,8 @@ export interface IFriendServiceUpdate {
   user: JwtReqUser['user'];
 }
 
-export interface IFriendServiceDelete {
-  friendDeleteDto: FriendDeleteDto;
+export interface IFriendServiceRefuse {
+  friendRefuseDto: FriendRefuseDto;
 }
 
 export interface FriendList {
@@ -52,4 +49,9 @@ export interface FriendList {
   profileUrl: string;
   badgeUrl: string;
   status: string;
+}
+
+export interface IFriendServiceUnFriend {
+  friendUnFriendDto: FriendUnFriendDto;
+  userID: string;
 }

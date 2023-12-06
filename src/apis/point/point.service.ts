@@ -1,16 +1,24 @@
-import { ConflictException, Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { POINT_STATUS, Point } from './point.entity';
 import { DataSource, Repository } from 'typeorm';
 import {
   IPointServiceCheckDuplication,
-  IPointServiceEmpty,
+  IPointServiceCheckPoint,
   IPointServiceFill,
   IPointServiceFindOneWithImpUid,
   IPointServiceFindWithUserID,
+  IPointServiceFine,
+  IPointServiceSend,
 } from './point.interface';
 import { User } from '../user/user.entity';
 import { IamPortService } from '../iam-port/iam-port.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class PointService {
@@ -20,6 +28,7 @@ export class PointService {
 
     private readonly dataSource: DataSource,
     private readonly iamPortService: IamPortService,
+    private readonly userService: UserService,
   ) {}
 
   findWithUserID({ userID }: IPointServiceFindWithUserID): Promise<Point[]> {
@@ -69,25 +78,25 @@ export class PointService {
     }
   }
 
-  async send({ user: _user, pointSendDto }: IPointServiceEmpty) {
+  async checkPoint({ userID, amount }: IPointServiceCheckPoint): Promise<void> {
+    const user = await this.userService.findOneWithUserID({ id: userID });
+
+    if (user.point < amount) {
+      throw new UnprocessableEntityException('보유 포인트가 부족합니다.');
+    }
+  }
+
+  async send({ user: _user, pointSendDto }: IPointServiceSend): Promise<Point> {
     const { amount } = pointSendDto;
+    const id = _user.id;
+
+    this.checkPoint({ userID: id, amount });
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('SERIALIZABLE');
 
     try {
-      const id = _user.id;
-
-      const user = await queryRunner.manager.findOne(User, {
-        where: { id },
-        lock: { mode: 'pessimistic_write' },
-      });
-
-      if (user.point < amount) {
-        throw new UnprocessableEntityException('보유한 포인트보다 많은 금액을 보낼 수 없습니다.');
-      }
-
       const point = await queryRunner.manager.save(Point, {
         impUid: 'imp_send',
         amount: -amount,
@@ -106,6 +115,32 @@ export class PointService {
       await queryRunner.release();
 
       throw error;
+    }
+  }
+
+  async fine({ pointFineDto, queryRunner }: IPointServiceFine): Promise<Point> {
+    try {
+      const { userName, amount } = pointFineDto;
+
+      const user = await queryRunner.manager.findOne(User, {
+        where: { name: userName },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      this.checkPoint({ userID: user.id, amount });
+
+      const point = await queryRunner.manager.save(Point, {
+        impUid: 'imp_fine',
+        amount: -amount,
+        status: POINT_STATUS.FINE,
+        user,
+      });
+
+      await queryRunner.manager.increment(User, { id: user.id }, 'point', -amount);
+
+      return point;
+    } catch (error) {
+      throw new InternalServerErrorException('point 업데이트에 실패하였습니다.');
     }
   }
 }

@@ -1,5 +1,10 @@
 import { JwtReqUser } from '../../commons/interface/req.interface';
-import { PartyCreateDto } from './party.dto';
+import {
+  PartyCreateDto,
+  PartyDeleteDto,
+  PartyRestoreDto,
+  PartyUpdateAndUserAndPlanDto,
+} from './party.dto';
 
 export interface IPartyServiceFindOneWithPartyID {
   partyID: string;
@@ -19,4 +24,16 @@ export interface PartyList {
 export interface IPartyServiceCreate {
   partyCreateDto: PartyCreateDto;
   user: JwtReqUser['user'];
+}
+
+export interface IPartyServiceUpdateAndUserAndPlan {
+  partyUpdateAndUserAndPlanDto: PartyUpdateAndUserAndPlanDto;
+}
+
+export interface IPartyServiceDelete {
+  partyDeleteDto: PartyDeleteDto;
+}
+
+export interface IPartyServiceRestore {
+  partyRestoreDto: PartyRestoreDto;
 }

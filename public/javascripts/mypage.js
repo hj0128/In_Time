@@ -1,10 +1,17 @@
+const back = document.querySelector('#back');
+back.addEventListener('click', () => window.history.back());
+
+
 const getUser = async () => {
   try {
     const user = await axios.get('/user/userFindOneWithUserID');
     const { id, name, email, profileUrl, badgeUrl, point } = user.data;
 
     const points = await axios.get('point/pointFindWithUserID', {
-      userID: id,
+      params: { userID: id },
+    });
+    points.data.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
     const profileImage = document.querySelector('#profile_image');
@@ -36,16 +43,20 @@ const getUser = async () => {
         history = '포인트 채우기';
       } else if (status === 'POINT_SEND') {
         history = '포인트 보내기';
-      } else if (status === 'FINE_PAY') {
-        history = '벌금 내기';
-      } else if (status === 'FINE_RECEIVE') {
-        history = '벌금 받기';
+      } else if (status === 'FINE') {
+        history = '벌금';
       }
 
       itemStr = `
-        <span id="history">${history}</span>
-        <span id="point">${amount}</span>
-        <span id="create_time">${createDate}</span>
+        <div class="point_history_left">
+          <div class="history">${history}</div>
+        </div>
+        <div class="point_history_center">
+          <div class="point">${amount}</div>
+        </div>
+        <div class="point_history_right">
+          <div class="create_time">${createDate}</div>
+        </div>
       `;
 
       el.innerHTML = itemStr;
@@ -69,7 +80,7 @@ const logoutClickHandler = async () => {
   try {
     const res = await axios.post('/auth/authLogout');
     alert(res.data);
-    window.location.href = '/home_unauth';
+    window.location.href = '/';
   } catch (error) {
     if (error.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');
@@ -99,9 +110,9 @@ const pointSendClickHandler = async () => {
       amount: Number(amount),
     });
 
-    alert(`${amount}원을 보냅니다.`);
+    alert(`${amount}원을 보냈습니다.`);
   } catch (error) {
-    if (error.response.data.message === '토큰 만료') {
+    if (error.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');
       window.location.href = '/signIn';
     } else if (error.response.status === 422) {

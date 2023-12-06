@@ -6,6 +6,11 @@ const mapOptions = {
 
 const map = new kakao.maps.Map(mapContainer, mapOptions);
 
+
+const back = document.querySelector('#back');
+back.addEventListener('click', () => window.history.back());
+
+
 const placeChoice = (placeName) => {
   const place = document.querySelector('#place');
   place.value = placeName;
@@ -102,9 +107,8 @@ const create = async () => {
   const placeName = document.querySelector('#place').value;
   const date = document.querySelector('#date').value;
   const fine = document.querySelector('#fine').value;
-  const fineType = document.querySelector('input[name="fineType"]:checked');
 
-  if (!planName || !placeName || !date || !fine || !fineType) {
+  if (!planName || !placeName || !date || !fine) {
     return alert('모든 항목을 입력해 주세요.');
   }
 
@@ -117,7 +121,6 @@ const create = async () => {
       placeLng: Number(placeLng),
       date,
       fine: Number(fine),
-      fineType: fineType.value,
       partyID,
     });
 
@@ -127,6 +130,8 @@ const create = async () => {
     if (error.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');
       window.location.href = '/signIn';
+    } else if (error.response.status === 422) {
+      alert('파티원의 보유 포인트가 벌금보다 부족합니다.\n포인트 충전을 해주세요.');
     } else {
       alert('약속을 생성하던 중 오류가 발생했습니다. \n나중에 다시 시도해주세요.');
     }

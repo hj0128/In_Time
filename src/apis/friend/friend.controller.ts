@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Post, Query, Req, UseGuards } from '@nes
 import { FriendService } from './friend.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { FriendCreateDto, FriendDeleteDto, FriendUpdateDto } from './friend.dto';
+import { FriendCreateDto, FriendRefuseDto, FriendUnFriendDto, FriendUpdateDto } from './friend.dto';
 import { Request } from 'express';
 import { Friend } from './friend.entity';
 import { FriendList } from './friend.interface';
@@ -59,10 +59,23 @@ export class FriendController {
     summary: '친구 요청 거절',
     description: '요청을 거절할 시 요청 내역을 삭제한다.',
   })
-  @Delete('/friendDelete')
-  friendDelete(
-    @Query() friendDeleteDto: FriendDeleteDto, //
+  @Delete('/friendRefuse')
+  friendRefuse(
+    @Query() friendRefuseDto: FriendRefuseDto, //
   ): Promise<boolean> {
-    return this.friendService.delete({ friendDeleteDto });
+    return this.friendService.refuse({ friendRefuseDto });
+  }
+
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({
+    summary: '친구 끊기',
+    description: '친구 관계를 끊는다.',
+  })
+  @Delete('/friendUnFriend')
+  friendUnFriend(
+    @Query() friendUnFriendDto: FriendUnFriendDto,
+    @Req() req: Request & JwtReqUser, //
+  ): Promise<boolean> {
+    return this.friendService.unFriend({ friendUnFriendDto, userID: req.user.id });
   }
 }

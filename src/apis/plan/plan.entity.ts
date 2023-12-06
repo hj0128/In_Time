@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Party } from '../party/party.entity';
 import { Min } from 'class-validator';
 
@@ -29,8 +29,11 @@ export class Plan {
   @Column()
   fine: number;
 
-  @Column()
-  fineType: string;
+  @Column({ default: false })
+  isEnd: boolean;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @ManyToOne(() => Party, (party) => party.plans, { onDelete: 'CASCADE' })
   party: Party;

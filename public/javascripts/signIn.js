@@ -1,3 +1,7 @@
+const back = document.querySelector('#back');
+back.addEventListener('click', () => window.history.back());
+
+
 const email = document.querySelector('#email');
 const password = document.querySelector('#password');
 
@@ -52,3 +56,14 @@ const loginKeydown = async (e) => {
   }
 };
 password.addEventListener('keydown', loginKeydown);
+
+
+const google = document.querySelector('#google');
+const naver = document.querySelector('#naver');
+const kakao = document.querySelector('#kakao');
+const social = (social) => {
+  window.location.href = `/auth/${social}`;
+};
+google.addEventListener('click', () => social('google'));
+naver.addEventListener('click', () => social('naver'));
+kakao.addEventListener('click', () => social('kakao'));

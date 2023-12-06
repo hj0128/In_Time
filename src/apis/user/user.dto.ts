@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class UserCreateDto {
   @ApiProperty({ example: '철수', description: '별명' })
@@ -27,15 +27,20 @@ export class UserSetRedisDto {
   @ApiProperty({ example: '12.203', description: '위도' })
   @IsNumber()
   @IsNotEmpty()
-  lat: number;
+  myLat: number;
 
   @ApiProperty({ example: '15.205', description: '경도' })
   @IsNumber()
   @IsNotEmpty()
-  lng: number;
+  myLng: number;
 
   @ApiProperty({ example: '2023. 11. 30. 오전 11:01:46', description: '위치를 가져온 시간' })
   @IsString()
   @IsNotEmpty()
   time: string;
+
+  @ApiProperty({ example: 'true', description: 'true: 도착' })
+  @IsBoolean()
+  @IsNotEmpty()
+  isArrive: boolean;
 }

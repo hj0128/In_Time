@@ -1,3 +1,7 @@
+const back = document.querySelector('#back');
+back.addEventListener('click', () => window.history.back());
+
+
 const fileSearch = document.querySelector('#file_search');
 const fileBoxInput = () => {
   const fileBoxInput = document.querySelector('#file_box');
@@ -50,7 +54,7 @@ const nextTokenBox = (e) => {
 
   if (inputValue.length == 4) {
     tokenSend.disabled = false;
-    tokenSend.style.color = '#0068FF';
+    tokenSend.style.color = '#222';
     tokenSend.style.border = '1px solid #D2D2D2';
     tokenSend.style.cursor = 'pointer';
     tokenSend.focus();
@@ -81,7 +85,7 @@ const sendTokenToUser = async () => {
   console.log(tokenNumber);
 
   tokenCheck.disabled = false;
-  tokenCheck.style = 'color: #0068FF; cursor: pointer;';
+  tokenCheck.style = 'color: #222; cursor: pointer;';
   tokenInput.focus();
 
   let time = 60;
@@ -126,7 +130,7 @@ const checkSubmit = () => {
 
   tokenCheck.innerText = '인증 완료';
   signUp.disabled = false;
-  signUp.style = 'color: #0068FF; cursor: pointer;';
+  signUp.style = 'color: #222; cursor: pointer;';
   alert('인증이 완료되었습니다.');
   signUp.focus();
 };

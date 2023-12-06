@@ -52,7 +52,6 @@ describe('PlanController', () => {
     placeLng: 15.206,
     date: '2023-11-30',
     fine: 5000,
-    fineType: '1회',
     party: mockParty,
   };
 
@@ -113,7 +112,6 @@ describe('PlanController', () => {
         placeLng: 15.205,
         date: '2023-11-30',
         fine: 5000,
-        fineType: '1회',
         partyID: 'Party01',
       };
 

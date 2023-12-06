@@ -9,20 +9,27 @@ export class FriendCreateDto {
 }
 
 export class FriendUpdateDto {
-  @ApiProperty({ example: 'Fr001', description: '내가 수락한 friend의 ID' })
+  @ApiProperty({ example: 'Friend01', description: '내가 수락한 friend의 ID' })
   @IsString()
   @IsNotEmpty()
   friendID: string;
 
-  @ApiProperty({ example: 'U001', description: '나에게 요청을 보낸 user의 ID' })
+  @ApiProperty({ example: 'User01', description: '나에게 요청을 보낸 user의 ID' })
   @IsString()
   @IsNotEmpty()
   fromUserID: string;
 }
 
-export class FriendDeleteDto {
-  @ApiProperty({ example: 'Fr001', description: '삭제할 요청 friend의 ID' })
+export class FriendRefuseDto {
+  @ApiProperty({ example: 'Friend01', description: '요청을 삭제할 요청 friend의 ID' })
   @IsString()
   @IsNotEmpty()
   friendID: string;
+}
+
+export class FriendUnFriendDto {
+  @ApiProperty({ example: 'User01', description: '친구 관계를 끊을 user의 ID' })
+  @IsString()
+  @IsNotEmpty()
+  fromUserID: string;
 }

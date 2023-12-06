@@ -1,3 +1,7 @@
+const back = document.querySelector('#back');
+back.addEventListener('click', () => window.history.back());
+
+
 const getFriendList = async () => {
   try {
     const friends = await axios.get('/friend/friendFindWithUserID');
@@ -11,9 +15,9 @@ const getFriendList = async () => {
         el.className = 'friend_list_info';
 
         const itemStr = `
-          <input type="checkbox" name="members" value="${fromUserID}" class="friend_list_info_checkbox" />
+          <input class="friend_list_info_checkbox" type="checkbox" name="members" value="${fromUserID}" />
           <img class="friend_list_info_profileUrl" src="${profileUrl}"></img>
-          <span class="friend_list_info_name">${name}</span>
+          <div class="friend_list_info_name">${name}</div>
           <img class="friend_list_info_badgeUrl" src="${badgeUrl}"></img>`;
         el.innerHTML = itemStr;
 
@@ -32,11 +36,11 @@ const getFriendList = async () => {
 getFriendList();
 
 
-const partyName = document.querySelector('#party_name');
-const createParty = document.querySelector('#party_create');
+const partyInput = document.querySelector('#party_input');
+const createParty = document.querySelector('#create_party');
 const create = async () => {
   const friends = document.querySelectorAll('input[name="members"]:checked');
-  if (!partyName.value || friends.length === 0) return alert('모든 항목을 입력해 주세요.');
+  if (!partyInput.value || friends.length === 0) return alert('모든 항목을 입력해 주세요.');
 
   const friendsID = [];
   friends.forEach((el) => friendsID.push(el.value));
@@ -44,11 +48,11 @@ const create = async () => {
 
   try {
     await axios.post('/party/partyCreate', {
-      name: partyName.value,
+      name: partyInput.value,
       friendsID: stringFriendID,
     });
     alert('파티가 생성되었습니다.');
-    window.location.href = '/party/list';
+    window.location.href = '/';
   } catch (error) {
     if (error.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');
@@ -63,7 +67,7 @@ const create = async () => {
   }
 };
 createParty.addEventListener('click', create);
-partyName.addEventListener('keydown', (e) => {
+partyInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' || e.keyCode === 13) {
     create();
   }

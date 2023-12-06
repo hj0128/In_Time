@@ -19,3 +19,15 @@ export class PointSendDto {
   @IsNotEmpty()
   amount: number;
 }
+
+export class PointFineDto {
+  @ApiProperty({ example: '철수', description: 'user의 name' })
+  @IsString()
+  @IsNotEmpty()
+  userName: string;
+
+  @ApiProperty({ example: '5000', description: '벌금으로 낼 금액' })
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
+}

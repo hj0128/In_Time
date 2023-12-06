@@ -4,17 +4,11 @@ import { ApiExcludeEndpoint } from '@nestjs/swagger';
 @Controller()
 export class AppController {
   @ApiExcludeEndpoint()
-  @Get('/home_unauth')
-  @Render('home_unauth')
-  homeUnAuth() {
-    return { APP_KEY: process.env.KAKAO_APP_KEY };
-  }
-
   @ApiExcludeEndpoint()
   @Get('/')
   @Render('home')
   home() {
-    return { APP_KEY: process.env.KAKAO_APP_KEY };
+    return { KAKAO_APP_KEY: process.env.KAKAO_APP_KEY };
   }
 
   @ApiExcludeEndpoint()
@@ -31,13 +25,8 @@ export class AppController {
   @Get('/party')
   @Render('party')
   party() {
-    return { APP_KEY: process.env.KAKAO_APP_KEY };
+    return { KAKAO_APP_KEY: process.env.KAKAO_APP_KEY };
   }
-
-  @ApiExcludeEndpoint()
-  @Get('/party/list')
-  @Render('party_list')
-  partyList() {}
 
   @ApiExcludeEndpoint()
   @Get('/party/create')
@@ -48,14 +37,14 @@ export class AppController {
   @Get('/plan')
   @Render('plan')
   plan() {
-    return { APP_KEY: process.env.KAKAO_APP_KEY };
+    return { KAKAO_APP_KEY: process.env.KAKAO_APP_KEY };
   }
 
   @ApiExcludeEndpoint()
   @Get('/plan/create')
   @Render('plan_create')
   planCreate() {
-    return { APP_KEY: process.env.KAKAO_APP_KEY };
+    return { KAKAO_APP_KEY: process.env.KAKAO_APP_KEY };
   }
 
   @ApiExcludeEndpoint()

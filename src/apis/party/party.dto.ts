@@ -1,5 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+
+export class FindOneWithPartyIDDto {
+  partyID: string;
+}
 
 export class PartyCreateDto {
   @ApiProperty({ example: '동아리 모임', description: 'party명' })
@@ -11,4 +15,35 @@ export class PartyCreateDto {
   @IsString()
   @IsNotEmpty()
   friendsID: string;
+}
+
+export class PartyUpdateAndUserAndPlanDto {
+  @ApiProperty({ example: 'Plan01', description: 'plan의 id' })
+  @IsString()
+  @IsNotEmpty()
+  planID: string;
+
+  @ApiProperty({ example: ['철수', '유리'], description: '지각한 user의 name' })
+  @IsArray()
+  @IsNotEmpty()
+  users: string[];
+}
+
+export class PartyDeleteDto {
+  @ApiProperty({ example: 'Party01', description: 'party의 id' })
+  @IsString()
+  @IsNotEmpty()
+  partyID: string;
+
+  @ApiProperty({ example: '5000', description: 'party의 point' })
+  @IsString()
+  @IsNotEmpty()
+  point: string;
+}
+
+export class PartyRestoreDto {
+  @ApiProperty({ example: 'Party01', description: 'party의 id' })
+  @IsString()
+  @IsNotEmpty()
+  partyID: string;
 }

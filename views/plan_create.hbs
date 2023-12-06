@@ -15,32 +15,52 @@
   </head>
 
   <body>
-    <a href='/' id='home'>Home</a>
-    <br />
-    약속 이름 :
-    <input type='text' id='name' />
-    <br />
-    <form onsubmit='searchPlaces(); return false;'>
-      <input type='text' id='keyword' size='15' placeholder='서울역' />
-      <button type='submit'>검색하기</button>
-    </form>
-    <div id='map' style='width: 300px; height: 300px;'></div>
-    장소 :
-    <input type='text' id='place' readonly />
-    <br />
-    날짜 :
-    <input type='datetime-local' id='date' />
-    <br />
-    벌금 :
-    <input type='number' id='fine' />
-    <br />
-    벌금 종류 :
-    <input type='radio' id='fineType' name='fineType' value='1회' />
-    1회
-    <input type='radio' id='fineType' name='fineType' value='반복' />
-    반복
-    <br />
-    <button id='plan_create'>약속 만들기</button>
+    <div id='header_wrapper'>
+      <div id='header_wrapper_left'>
+        <a href='/' id='back'>이전</a>
+      </div>
+      <div id='header_wrapper_center'>
+        <a href='/' id='home'>Home</a>
+      </div>
+      <div id='header_wrapper_right'>
+        <a href='/mypage' id='my_page'>내 정보</a>
+        <a href='/friend/list' id='friend'>친구</a>
+      </div>
+    </div>
+    <div id='body_wrapper'>
+      <div id='body_wrapper_left'>
+        <div id='form'>
+          <form onsubmit='searchPlaces(); return false;'>
+            <input type='text' id='keyword' size='15' placeholder='장소를 입력해 주세요.' />
+            <button type='submit' id='search'>검색</button>
+          </form>
+        </div>
+        <div id='map'></div>
+      </div>
+      <div id='body_wrapper_right'>
+        <div id='body_wrapper_right_body'>
+          <div id='body_wrapper_right_name'>
+            이름 :
+            <input type='text' id='name' class='input' placeholder='약속 이름을 입력해 주세요.' />
+          </div>
+          <div id='body_wrapper_right_place'>
+            장소 :
+            <input type='text' id='place' class='input' readonly />
+          </div>
+          <div id='body_wrapper_right_date'>
+            날짜 :
+            <input type='datetime-local' id='date' class='input' />
+          </div>
+          <div id='body_wrapper_right_fine'>
+            벌금 :
+            <input type='number' id='fine' class='input' />
+          </div>
+        </div>
+        <div id='body_wrapper_right_footer'>
+          <button id='plan_create'>약속 만들기</button>
+        </div>
+      </div>
+    </div>
     <script src='/javascripts/axios.interceptor.js'></script>
     <script type='text/javascript' src='/javascripts/plan_create.js'></script>
   </body>

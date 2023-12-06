@@ -12,11 +12,12 @@ import {
   FriendList,
   IFriendServiceCreate,
   IFriendServiceCreateFriendList,
-  IFriendServiceDelete,
   IFriendServiceFindAllToUser,
   IFriendServiceFindAllUser,
   IFriendServiceFindAllUserAndToUser,
   IFriendServiceFindWithUserID,
+  IFriendServiceRefuse,
+  IFriendServiceUnFriend,
   IFriendServiceUpdate,
   IFriendServiceUpdateIsAccepted,
 } from './friend.interface';
@@ -164,10 +165,24 @@ export class FriendService {
     return create;
   }
 
-  async delete({ friendDeleteDto }: IFriendServiceDelete): Promise<boolean> {
-    const { friendID } = friendDeleteDto;
+  async refuse({ friendRefuseDto }: IFriendServiceRefuse): Promise<boolean> {
+    const { friendID } = friendRefuseDto;
 
     const result = await this.friendRepository.delete({ id: friendID });
+    if (!result) throw new InternalServerErrorException('삭제에 실패하였습니다.');
+
+    return result.affected ? true : false;
+  }
+
+  async unFriend({ friendUnFriendDto, userID }: IFriendServiceUnFriend): Promise<boolean> {
+    const friends = await this.findAllUserAndToUser({
+      userID,
+      toUserID: friendUnFriendDto.fromUserID,
+    });
+
+    const friendID = friends.map((el) => el.id);
+
+    const result = await this.friendRepository.delete(friendID);
     if (!result) throw new InternalServerErrorException('삭제에 실패하였습니다.');
 
     return result.affected ? true : false;

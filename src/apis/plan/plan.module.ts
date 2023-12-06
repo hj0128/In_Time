@@ -5,13 +5,13 @@ import { Plan } from './plan.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '../user/user.module';
 import { Party_UserModule } from '../party-user/party-user.module';
-import { PartyModule } from '../party/party.module';
+import { PointModule } from '../point/point.module';
 
 @Module({
   imports: [
     UserModule,
-    PartyModule,
     Party_UserModule,
+    PointModule,
     TypeOrmModule.forFeature([
       Plan, //
     ]),
@@ -20,6 +20,9 @@ import { PartyModule } from '../party/party.module';
     PlanController, //
   ],
   providers: [
+    PlanService, //
+  ],
+  exports: [
     PlanService, //
   ],
 })

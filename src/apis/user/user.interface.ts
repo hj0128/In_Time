@@ -35,4 +35,5 @@ export interface RedisInfo {
   lat?: number;
   lng?: number;
   time?: string;
+  isArrive?: boolean;
 }

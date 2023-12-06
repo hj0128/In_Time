@@ -1,25 +1,118 @@
+* {
+  box-sizing: border-box;
+  margin: 0px;
+}
+
+html,
+body {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 10px !important;
+  background-color: #727272;
+}
+
+#header_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 15px;
+  background-color: #999999bb;
+  border-radius: 15px;
+  width: 100%;
+  height: 5%;
+}
+
+#back {
+  cursor: pointer;
+}
+
+#header_wrapper a {
+  text-decoration: none;
+  color: #222;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+#header_wrapper_center {
+  flex: 0 0 auto;
+  text-align: center;
+}
+
+#header_wrapper_right a {
+  margin-left: 5px;
+}
+
+#body_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  width: 100%;
+  height: 80%;
+}
+
+#body_wrapper_title {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  height: 60px;
+  margin-top: 15px;
+}
+
+#party_input {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  border-bottom: 1px solid #222;
+  color: #222;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+#create_party {
+  width: 100px;
+  height: 40px;
+  margin-top: auto;
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+#friend_list {
+  background-color: #999999bb;
+  border-radius: 15px;
+  margin-top: 40px;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
 .friend_list_info {
-  border-top: 1px solid black;
-  padding: 3px;
   display: flex;
   flex-direction: row;
   align-items: center;
+  width: 100%;
+  margin-bottom: 5px;
 }
 
 .friend_list_info_profileUrl {
-  width: 40px;
-  height: 40px;
-  margin: 5px 0px;
+  width: 60px;
+  border-radius: 50%;
+  margin: 5px 10px;
 }
 
 .friend_list_info_name {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
-  margin: 0px 5px;
+  margin-right: 5px;
 }
 
 .friend_list_info_badgeUrl {
-  width: 20px;
-  height: 20px;
-  margin-right: 15px;
+  width: 30px;
 }

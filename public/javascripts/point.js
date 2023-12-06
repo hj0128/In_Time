@@ -1,7 +1,30 @@
+const back = document.querySelector('#back');
+back.addEventListener('click', () => window.history.back());
+
+
+const point = document.querySelector('#point');
+const keys = document.querySelectorAll('.key');
+const keyClickHandler = (e) => {
+  const key = e.target.innerText;
+
+  if (key === '+1,000') {
+    point.value = (parseInt(point.value) || 0) + 1000;
+  } else if (key === '+5,000') {
+    point.value = (parseInt(point.value) || 0) + 5000;
+  } else if (key === '+10,000') {
+    point.value = (parseInt(point.value) || 0) + 10000;
+  } else {
+    point.value += key;
+  }
+};
+keys.forEach((key) => {
+  key.addEventListener('click', keyClickHandler);
+});
+
+
 const kakao = document.querySelector('#kakao');
 const nhn = document.querySelector('#nhn');
 const paymentClickHandler = async (pay) => {
-  const point = document.querySelector('#point');
   if (!point.value) return alert('금액을 입력해 주세요.');
 
   let pg;
@@ -39,7 +62,7 @@ const paymentClickHandler = async (pay) => {
       },
     );
   } catch (error) {
-    if (error.response.data.message === '토큰 만료') {
+    if (error.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');
       window.location.href = '/signIn';
     } else if (error.response.status === 422 || error.response.status === 409) {

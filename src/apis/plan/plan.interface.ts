@@ -1,5 +1,5 @@
 import { JwtReqUser } from '../../commons/interface/req.interface';
-import { PlanCreateDto } from './plan.dto';
+import { PlanCreateDto, PlanDeleteDto, PlanRestoreDto } from './plan.dto';
 
 export interface IPlanServiceFindOneWithPlanID {
   planID: string;
@@ -15,4 +15,16 @@ export interface IPlanServiceFindWithUserIDAndPartyID {
 
 export interface IPlanServiceCreate {
   planCreateDto: PlanCreateDto;
+}
+
+export interface IPlanServiceCheckEnd {
+  planID: string;
+}
+
+export interface IPlanServiceDelete {
+  planDeleteDto: PlanDeleteDto;
+}
+
+export interface IPlanServiceResotre {
+  planRestoreDto: PlanRestoreDto;
 }

@@ -72,7 +72,6 @@ describe('PlanService', () => {
     placeLng: 15.205,
     date: '2023-11-30',
     fine: 5000,
-    fineType: '1회',
     party: mockParty,
   };
 
@@ -169,7 +168,6 @@ describe('PlanService', () => {
         placeLng: 15.205,
         date: '2023-11-30',
         fine: 5000,
-        fineType: '1회',
         partyID: 'Party01',
       };
 
@@ -188,7 +186,6 @@ describe('PlanService', () => {
         placeLng: 15.205,
         date: '2023-11-30',
         fine: 5000,
-        fineType: '1회',
         party: {
           id: 'Party01',
         },

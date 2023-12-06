@@ -16,18 +16,39 @@
   </head>
 
   <body>
-    <a href='/' id='home'>Home</a>
-    <br />
-    <span id='plan_name'></span>
-    <span id='date'></span>
-    <br />
-    <span id='place_name'></span>
-    <span id='fine'></span>
-    <span id='fine_type'></span>
-    <div id='my_location'>내 위치</div>
-    <div id='place_location'>도착지</div>
-    <div id='map' style='width: 500px; height: 500px'></div>
-    <div>채팅</div>
+    <div id='header_wrapper'>
+      <div id='header_wrapper_left'>
+        <a id='back'>이전</a>
+      </div>
+      <div id='header_wrapper_center'>
+        <a href='/' id='home'>Home</a>
+      </div>
+      <div id='header_wrapper_right'>
+        <a href='/mypage' id='my_page'>내 정보</a>
+        <a href='/friend/list' id='friend'>친구</a>
+      </div>
+    </div>
+    <div id='body_wrapper'>
+      <div id='body_wrapper_left'>
+        <div id='body_wrapper_left_title'></div>
+        <div id='map'></div>
+      </div>
+      <div id='plan_info'>
+        <div id='plan_name'></div>
+        <div id='plan_info_date_fine'>
+          <div id='date'></div>
+          <div id='fine'></div>
+        </div>
+        <div id='plan_info_place'>
+          <div id='place_location'>도착지</div>
+          <div id='place_name'></div>
+        </div>
+        <div id='users_icon_list'></div>
+      </div>
+    </div>
+    <div id='footer_wrapper'>
+      <div id='footer_wrapper_body'>채팅</div>
+    </div>
     <script src='/javascripts/axios.interceptor.js'></script>
     <script type='text/javascript' src='/javascripts/plan.js'></script>
   </body>

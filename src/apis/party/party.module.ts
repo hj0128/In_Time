@@ -3,13 +3,15 @@ import { PartyController } from './party.controller';
 import { PartyService } from './party.service';
 import { Party } from './party.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from '../user/user.module';
 import { Party_UserModule } from '../party-user/party-user.module';
+import { PlanModule } from '../plan/plan.module';
+import { PointModule } from '../point/point.module';
 
 @Module({
   imports: [
-    UserModule,
+    PointModule,
     Party_UserModule,
+    PlanModule,
     TypeOrmModule.forFeature([
       Party, //
     ]),

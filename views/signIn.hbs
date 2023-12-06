@@ -8,17 +8,31 @@
 </head>
 
 <body>
-  <a href="/home_unauth" id="home">Home</a>
-  <br>
-  <input type="text" id="email" placeholder="이메일">
-  <input type="password" id="password" placeholder="비밀번호">
-  <button id="sign_in">로그인</button>
-  <br>
-  <a href="/auth/google">구글 로그인</a>
-  <a href="/auth/naver">네이버 로그인</a>
-  <a href="/auth/kakao">카카오 로그인</a>
-  <br>
-  <a href="/signUp" id="sign_up">회원가입</a>
+  <div id='header_wrapper'>
+    <div id='header_wrapper_left'>
+      <a id='back'>이전</a>
+    </div>
+    <div id='header_wrapper_center'>
+      <a href="/" id="home">Home</a>
+    </div>
+    <div id='header_wrapper_right'>
+      <a href='/mypage' id='my_page'>내 정보</a>
+      <a href='/friend/list' id='friend'>친구</a>
+    </div>
+  </div>
+  <div id='body_wrapper'>
+    <input type="text" id="email" placeholder="이메일">
+    <input type="password" id="password" placeholder="비밀번호">
+    <button id="sign_in">로그인</button>
+    <button id="google">구글 로그인</button>
+    <button id="naver">네이버 로그인</button>
+    <button id="kakao">카카오 로그인</button>
+    <div id="body_wrapper_footer">
+      <a href="/password_search" id="password_search">비밀번호 찾기</a>
+      <a href="/id_search" id="id_search">아이디 찾기</a>
+      <a href="/signUp" id="sign_up">회원가입</a>
+    </div>
+  </div>
   <script src="/javascripts/axios.interceptor.js"></script>
   <script type="text/javascript" src="/javascripts/signIn.js"></script>
 </body>

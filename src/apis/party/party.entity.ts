@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Plan } from '../plan/plan.entity';
 import { Min } from 'class-validator';
 import { Party_User } from '../party-user/party-user.entity';
@@ -14,6 +14,9 @@ export class Party {
   @Min(0)
   @Column({ default: 0 })
   point: number;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @OneToMany(() => Plan, (plans) => plans.party, { cascade: true })
   plans: Plan[];

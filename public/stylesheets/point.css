@@ -1,0 +1,110 @@
+* {
+  box-sizing: border-box;
+  margin: 0px;
+}
+
+html,
+body {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 10px !important;
+  background-color: #727272;
+}
+
+#header_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 15px;
+  background-color: #999999bb;
+  border-radius: 15px;
+  width: 100%;
+  height: 5%;
+}
+
+#back {
+  cursor: pointer;
+}
+
+#header_wrapper a {
+  text-decoration: none;
+  color: #222;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+#header_wrapper_center {
+  flex: 0 0 auto;
+  text-align: center;
+}
+
+#header_wrapper_right a {
+  margin-left: 5px;
+}
+
+#body_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  width: 100%;
+  height: 70%;
+  color: #222;
+}
+
+#point {
+  width: 100%;
+  height: 60px;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  border-bottom: 1px solid #222;
+  color: #222;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 15px;
+}
+
+#keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 50px;
+  text-align: center;
+}
+
+.key {
+  padding: 10px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.key:hover {
+  background-color: #999999bb;
+  border-radius: 50%;
+  color: #222;
+  cursor: pointer;
+}
+
+#body_wrapper_footer {
+  display: flex;
+  flex-direction: row;
+  margin-top: 30px;
+}
+
+#body_wrapper_footer button {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 15px 20px;
+  border-radius: 15px;
+  margin: 10px;
+  background-color: #999999bb;
+  color: #222;
+}

@@ -1,0 +1,142 @@
+* {
+  box-sizing: border-box;
+  margin: 0px;
+}
+
+html,
+body {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 10px !important;
+  background-color: #727272;
+}
+
+#header_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 15px;
+  background-color: #999999bb;
+  border-radius: 15px;
+  width: 100%;
+  height: 5%;
+}
+
+#back {
+  cursor: pointer;
+}
+
+#header_wrapper a {
+  text-decoration: none;
+  color: #222;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+#header_wrapper_center {
+  flex: 0 0 auto;
+  text-align: center;
+}
+
+#header_wrapper_right a {
+  margin-left: 5px;
+  display: none;
+}
+
+#body_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 100px;
+  width: 100%;
+  height: 90%;
+}
+
+#email {
+  font-size: 17px;
+  font-weight: 500;
+  padding: 20px;
+  width: 30%;
+  outline: none;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 0px;
+}
+
+#password {
+  font-size: 17px;
+  font-weight: 500;
+  padding: 20px;
+  width: 30%;
+  outline: none;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 0px;
+}
+
+#sign_in {
+  font-size: 17px;
+  font-weight: 500;
+  padding: 20px;
+  width: 30%;
+  outline: none;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  border: 0px;
+  background-color: #999999bb;
+  cursor: pointer;
+}
+
+#google {
+  font-size: 17px;
+  font-weight: 500;
+  padding: 20px;
+  width: 30%;
+  outline: none;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 0px;
+  background-color: #999999bb;
+  cursor: pointer;
+}
+
+#naver {
+  font-size: 17px;
+  font-weight: 500;
+  padding: 20px;
+  width: 30%;
+  outline: none;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 0px;
+  background-color: #999999bb;
+  cursor: pointer;
+}
+
+#kakao {
+  font-size: 17px;
+  font-weight: 500;
+  padding: 20px;
+  width: 30%;
+  outline: none;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  border: 0px;
+  background-color: #999999bb;
+  cursor: pointer;
+}
+
+#body_wrapper_footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#body_wrapper_footer a {
+  color: #222;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0px 10px;
+}
