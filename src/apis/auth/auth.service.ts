@@ -16,6 +16,7 @@ import * as jwt from 'jsonwebtoken';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import * as nodemailer from 'nodemailer';
+// import { Payload } from './strategies/jwt-access.interface';
 
 @Injectable()
 export class AuthService {
@@ -157,4 +158,16 @@ export class AuthService {
 
     return result;
   }
+
+  // async getUserFromAuthenticationToken(token: string) {
+  //   const payload: Payload = this.jwtService.verify(token, {
+  //     secret: process.env.JWT_ACCESS_KEY,
+  //   });
+
+  //   return {
+  //     id: payload.id,
+  //     name: payload.name,
+  //     email: payload.email,
+  //   };
+  // }
 }

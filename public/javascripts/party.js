@@ -1,7 +1,6 @@
 const back = document.querySelector('#back');
 back.addEventListener('click', () => {
-  window.history.back();
-  window.location.reload(true);
+  window.location = document.referrer;
 });
 
 window.onload = () => {
@@ -157,3 +156,75 @@ const getParty = async () => {
   }
 };
 getParty();
+
+
+let socket = io();
+
+const chatContainer = document.querySelector('#chat_container');
+const chatList = document.querySelector('#chat_list');
+const messageInfo = document.querySelector('#message_info');
+const messageSubmit = document.querySelector('#message_submit');
+
+const displayChatHistory = (history) => {
+  chatList.innerHTML = '';
+
+  history.forEach((chat) => {
+    const li = document.createElement('li');
+    li.className = 'chat_item';
+
+    const p = document.createElement('p');
+    p.textContent = `${chat.userName}: ${chat.message}`;
+
+    li.appendChild(p);
+    chatList.appendChild(li);
+  });
+
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+};
+
+const appendMessage = (message) => {
+  const li = document.createElement('li');
+  li.className = 'chat-item';
+
+  const p = document.createElement('p');
+  p.textContent = message;
+
+  li.appendChild(p);
+  chatList.appendChild(li);
+
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+};
+
+const joinRoom = () => {
+  socket.emit('join', { room: partyID });
+};
+joinRoom();
+
+socket.on('chatHistory', ({ history }) => {
+  displayChatHistory(history);
+});
+
+socket.on('chatMessage', ({ message, userName }) => {
+  appendMessage(`${userName} : ${message}`);
+});
+
+const messageSubmitHandler = () => {
+  const accessToken = axios.defaults.headers.common['Authorization'].split('Bearer ')[1];
+
+  socket = io('http://localhost:3000', {
+    query: { token: accessToken },
+  });
+
+  if (messageInfo.value.trim() !== '') {
+    socket.emit('chatMessage', { message: messageInfo.value, room: partyID });
+
+    // 메시지 전송 후 입력 필드 비우기
+    messageInfo.value = '';
+  }
+};
+messageInfo.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    messageSubmitHandler();
+  }
+});
+messageSubmit.addEventListener('click', messageSubmitHandler);

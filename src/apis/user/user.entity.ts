@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Friend } from '../friend/friend.entity';
 import { Party_User } from '../party-user/party-user.entity';
 import { Point } from '../point/point.entity';
@@ -25,6 +25,9 @@ export class User {
 
   @Column({ default: 'https://storage.googleapis.com/in-time-project-bucket/defaults/tardy.png' })
   badgeUrl: string;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @OneToMany(() => Friend, (friend) => friend.user, { cascade: true })
   friends: Friend[];

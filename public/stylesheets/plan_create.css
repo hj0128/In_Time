@@ -23,6 +23,10 @@ body {
   height: 5%;
 }
 
+#back {
+  cursor: pointer;
+}
+
 #header_wrapper a {
   text-decoration: none;
   color: #222;

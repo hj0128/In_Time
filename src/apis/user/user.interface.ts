@@ -21,6 +21,10 @@ export interface IUserServiceCreate {
   userCreateDto: UserCreateDto;
 }
 
+export interface IUserServiceDelete {
+  userID: string;
+}
+
 export interface IUserServiceSetRedis {
   user: JwtReqUser['user'];
   userSetRedisDto: UserSetRedisDto;

@@ -1,0 +1,50 @@
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+.rooms {
+  display: flex;
+  flex-direction: column;
+}
+
+.room {
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.chat-container {
+  height: 100px;
+  max-height: 100px; /* 채팅 창의 최대 높이를 설정 */
+  overflow-y: auto; /* 세로 스크롤이 필요할 때만 표시 */
+  background-color: gray;
+}
+
+.chat-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chat-input {
+  display: flex;
+  margin-top: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 5px;
+}
+
+button {
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;
+}

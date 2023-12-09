@@ -14,10 +14,12 @@ import { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { FileModule } from './apis/file/file.module';
 import { PointModule } from './apis/point/point.module';
+import { ChatModule } from './apis/chat/chat.module';
 
 @Module({
   imports: [
     AuthModule,
+    ChatModule,
     FileModule,
     FriendModule,
     UserModule,
@@ -34,7 +36,7 @@ import { PointModule } from './apis/point/point.module';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_DATABASE,
       entities: [__dirname + '/apis/**/*.entity.*'],
-      synchronize: true,
+      synchronize: true, // 개발 중에만 사용, 프로덕션에서는 비활성화
       logging: true,
     }),
     CacheModule.register<RedisClientOptions>({

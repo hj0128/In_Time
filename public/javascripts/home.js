@@ -1,3 +1,17 @@
+const back = document.querySelector('#back');
+back.addEventListener('click', () => {
+  window.location = document.referrer;
+});
+
+window.onload = () => {
+  const inputElements = document.querySelectorAll('input');
+  inputElements.forEach((input) => {
+    if (input.type !== 'button' && input.type !== 'submit' && input.type !== 'reset') {
+      input.value = '';
+    }
+  });
+};
+
 const mapContainer = document.querySelector('#map');
 const mapOptions = {
   center: new kakao.maps.LatLng(33.450701, 126.570667),
@@ -15,6 +29,7 @@ const partyDelete = async (name, partyID, point) => {
     await axios.delete('/party/partyDelete', {
       params: { partyID, point },
     });
+
     alert(`파티(${name})를 삭제하였습니다.`);
     window.location.href = '/';
   } catch (error) {

@@ -1,7 +1,6 @@
 const back = document.querySelector('#back');
 back.addEventListener('click', () => {
-  window.history.back();
-  window.location.reload(true);
+  window.location = document.referrer;
 });
 
 window.onload = () => {

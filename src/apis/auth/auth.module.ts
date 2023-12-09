@@ -25,5 +25,8 @@ import { UserModule } from '../user/user.module';
     JwtNaverStrategy,
     JwtKakaoStrategy, //
   ],
+  exports: [
+    AuthService, //
+  ],
 })
 export class AuthModule {}

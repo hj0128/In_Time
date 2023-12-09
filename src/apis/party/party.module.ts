@@ -6,9 +6,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Party_UserModule } from '../party-user/party-user.module';
 import { PlanModule } from '../plan/plan.module';
 import { PointModule } from '../point/point.module';
+import { ChatModule } from '../chat/chat.module';
 
 @Module({
   imports: [
+    ChatModule,
     PointModule,
     Party_UserModule,
     PlanModule,

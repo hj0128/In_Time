@@ -25,6 +25,6 @@ export interface IPlanServiceDelete {
   planDeleteDto: PlanDeleteDto;
 }
 
-export interface IPlanServiceResotre {
+export interface IPlanServiceRestore {
   planRestoreDto: PlanRestoreDto;
 }

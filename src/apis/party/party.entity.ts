@@ -2,6 +2,7 @@ import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } f
 import { Plan } from '../plan/plan.entity';
 import { Min } from 'class-validator';
 import { Party_User } from '../party-user/party-user.entity';
+import { Chat } from '../chat/chat.entity';
 
 @Entity()
 export class Party {
@@ -23,4 +24,7 @@ export class Party {
 
   @OneToMany(() => Party_User, (partyUsers) => partyUsers.party, { cascade: true })
   partyUsers: Party_User[];
+
+  @OneToMany(() => Chat, (chats) => chats.party, { cascade: true })
+  chats: Chat[];
 }

@@ -1,9 +1,10 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { GoneException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { In, Repository } from 'typeorm';
 import {
   IUserServiceCreate,
+  IUserServiceDelete,
   IUserServiceFindAllWithUserID,
   IUserServiceFindOneWithEmail,
   IUserServiceFindOneWithName,
@@ -91,6 +92,20 @@ export class UserService {
     await this.sendEmail({ name, userEmail });
 
     return create;
+  }
+
+  async delete({ userID }: IUserServiceDelete): Promise<boolean> {
+    const user = await this.findOneWithUserID({ id: userID });
+    if (user.deletedAt)
+      throw new GoneException(
+        '이미 탈퇴한 사용자입니다. 계정을 복구하시려면 다시 로그인해 주세요.',
+      );
+
+    const result = await this.userRepository.softDelete({ id: userID });
+    console.log(result);
+    if (!result) throw new InternalServerErrorException('회원탈퇴에 실패하였습니다.');
+
+    return result.affected ? true : false;
   }
 
   async setRedis({ user, userSetRedisDto }: IUserServiceSetRedis): Promise<UserSetRedisDto> {

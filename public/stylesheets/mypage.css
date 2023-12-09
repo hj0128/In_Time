@@ -85,6 +85,7 @@ body {
 #body_wrapper_right {
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   width: 60%;
 }
 
@@ -97,6 +98,7 @@ body {
   background-color: #999999bb;
   font-size: 15px;
   border-radius: 15px;
+  width: 100%;
 }
 
 #point_fill {
@@ -131,6 +133,10 @@ button:hover {
   background-color: #999999bb;
   font-size: 15px;
   border-radius: 15px;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 #point_body_title {
@@ -146,9 +152,10 @@ button:hover {
 .point_history {
   display: flex;
   flex-direction: row;
-  margin: 5px;
+  padding: 5px;
   font-size: 13px;
   width: 100%;
+  height: 100%;
 }
 
 .point_history_left {
@@ -161,4 +168,14 @@ button:hover {
 
 .point_history_right {
   width: 20%;
+}
+
+#withdraw {
+  font-size: 12px;
+  font-weight: 400;
+  padding-right: 5px;
+  color: white;
+  background-color: #727272;
+  border: 0px;
+  cursor: pointer;
 }

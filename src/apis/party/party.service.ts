@@ -15,6 +15,7 @@ import { Party_UserService } from '../party-user/party-user.service';
 import { PlanService } from '../plan/plan.service';
 import { PointService } from '../point/point.service';
 import { Plan } from '../plan/plan.entity';
+import { ChatService } from '../chat/chat.service';
 
 @Injectable()
 export class PartyService {
@@ -22,10 +23,11 @@ export class PartyService {
     @InjectRepository(Party)
     private readonly partyRepository: Repository<Party>,
 
+    private readonly chatService: ChatService,
+    private readonly dataSource: DataSource,
     private readonly partyUserService: Party_UserService,
     private readonly planService: PlanService,
     private readonly pointService: PointService,
-    private readonly dataSource: DataSource,
   ) {}
 
   findOneWithPartyID({ partyID }: IPartyServiceFindOneWithPartyID): Promise<Party> {
@@ -145,16 +147,56 @@ export class PartyService {
       throw new BadRequestException('포인트 보유');
     }
 
-    const result = await this.partyRepository.softDelete({ id: partyDeleteDto.partyID });
-    if (!result) throw new InternalServerErrorException('삭제에 실패하였습니다.');
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ COMMITTED');
 
-    return result.affected ? true : false;
+    try {
+      const partyResult = await queryRunner.manager.softDelete(Party, {
+        id: partyDeleteDto.partyID,
+      });
+
+      await this.chatService.delete({
+        chatDelete: {
+          partyID: partyDeleteDto.partyID,
+          queryRunner,
+        },
+      });
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+
+      return partyResult.affected ? true : false;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      throw new InternalServerErrorException('파티 삭제에 실패하였습니다.');
+    }
   }
 
   async restore({ partyRestoreDto }: IPartyServiceRestore): Promise<boolean> {
-    const result = await this.partyRepository.restore({ id: partyRestoreDto.partyID });
-    if (!result) throw new InternalServerErrorException('복구에 실패하였습니다.');
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ COMMITTED');
 
-    return result.affected ? true : false;
+    try {
+      const partyResult = await queryRunner.manager.restore(Party, { id: partyRestoreDto.partyID });
+
+      await this.chatService.restore({
+        chatRestore: {
+          partyID: partyRestoreDto.partyID,
+          queryRunner,
+        },
+      });
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+
+      return partyResult.affected ? true : false;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      throw new InternalServerErrorException('파티 복구에 실패하였습니다.');
+    }
   }
 }

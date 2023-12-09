@@ -1,7 +1,6 @@
 const back = document.querySelector('#back');
 back.addEventListener('click', () => {
-  window.history.back();
-  window.location.reload(true);
+  window.location = document.referrer;
 });
 
 window.onload = () => {
@@ -135,3 +134,25 @@ const pointSendClickHandler = async () => {
   }
 };
 pointSend.addEventListener('click', pointSendClickHandler);
+
+
+const withdraw = document.querySelector('#withdraw');
+const withdrawClickHandler = async () => {
+  try {
+    const isAccept = confirm('회원가입을 탈퇴하시겠습니까?');
+    if (!isAccept) return;
+
+    await axios.post('/user/userDelete');
+
+    alert('회원탈퇴에 성공하셨습니다.');
+    window.location.href = '/';
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else {
+      alert('회원가입을 탈퇴하던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+    }
+  }
+};
+withdraw.addEventListener('click', withdrawClickHandler);

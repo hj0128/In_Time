@@ -78,6 +78,18 @@ export class UserController {
 
   @UseGuards(AuthGuard('access'))
   @ApiOperation({
+    summary: 'user 삭제하기',
+    description: '회원 탈퇴에 성공하면 user를 DB에서 삭제한다.',
+  })
+  @Post('/userDelete')
+  userDelete(
+    @Req() req: Request & JwtReqUser, //
+  ): Promise<boolean> {
+    return this.userService.delete({ userID: req.user.id });
+  }
+
+  @UseGuards(AuthGuard('access'))
+  @ApiOperation({
     summary: 'Redis에 user 등록하기',
     description: 'Redis에 user의 실시간 위치를 저장한다.',
   })

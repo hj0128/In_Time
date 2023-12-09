@@ -8,6 +8,8 @@
   />
   <title>Home</title>
   <link rel="stylesheet" href="/stylesheets/home.css" />
+  <script type='text/javascript' src='https://code.jquery.com/jquery-1.12.4.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'></script>
   <script
     type='text/javascript'
@@ -18,7 +20,7 @@
 <body>
   <div id="header_wrapper">
     <div id="header_wrapper_left">
-      <a href="/" id="back">이전</a>
+        <a id='back'>이전</a>
     </div>
     <div id="header_wrapper_center">
       <a href="/" id="home">Home</a>

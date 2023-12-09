@@ -5,6 +5,8 @@
     <title>Party</title>
     <link rel='stylesheet' href='/stylesheets/party.css' />
     <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js'></script>
+    <script type='text/javascript' src='https://code.jquery.com/jquery-1.12.4.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js'></script>
     <script
       type='text/javascript'
       src='//dapi.kakao.com/v2/maps/sdk.js?appkey={{KAKAO_APP_KEY}}&libraries=clusterner'
@@ -34,8 +36,13 @@
       </div>
     </div>
     <div id='footer_wrapper'>
-      <div id='footer_wrapper_body'>채팅</div>
-      맵에 맛집 마커 추가할 수 있게 검색 기능 넣기
+      <div id='chat_container'>
+        <ul id='chat_list'></ul>
+      </div>
+      <div id='chat_input'>
+        <input type='text' id='message_info' />
+        <button id='message_submit'>보내기</button>
+      </div>
     </div>
     <script src='/javascripts/axios.interceptor.js'></script>
     <script type='text/javascript' src='/javascripts/party.js'></script>

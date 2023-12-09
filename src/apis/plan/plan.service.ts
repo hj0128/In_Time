@@ -9,7 +9,7 @@ import {
   IPlanServiceFindOneWithPlanID,
   IPlanServiceFindWithPartyID,
   IPlanServiceFindWithUserIDAndPartyID,
-  IPlanServiceResotre,
+  IPlanServiceRestore,
 } from './plan.interface';
 import { Party_UserService } from '../party-user/party-user.service';
 import { PointService } from '../point/point.service';
@@ -87,7 +87,7 @@ export class PlanService {
     return result.affected ? true : false;
   }
 
-  async restore({ planRestoreDto }: IPlanServiceResotre): Promise<boolean> {
+  async restore({ planRestoreDto }: IPlanServiceRestore): Promise<boolean> {
     const result = await this.planRepository.restore({ id: planRestoreDto.planID });
     if (!result) throw new InternalServerErrorException('복구에 실패하였습니다.');
 
