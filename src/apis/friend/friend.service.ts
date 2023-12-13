@@ -1,9 +1,12 @@
 import {
   BadRequestException,
   ConflictException,
+  GoneException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Friend, STATUS_ENUM } from './friend.entity';
@@ -29,6 +32,7 @@ export class FriendService {
     @InjectRepository(Friend)
     private readonly friendRepository: Repository<Friend>,
 
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService, //
   ) {}
 
@@ -104,7 +108,8 @@ export class FriendService {
   async create({ friendCreateDto, user }: IFriendServiceCreate): Promise<Friend> {
     const { toUserName } = friendCreateDto;
     const toUser = await this.userService.findOneWithName({ name: toUserName });
-    if (!toUser) throw new NotFoundException('존재하지 않는 회원입니다.');
+    if (!toUser) throw new NotFoundException('존재하지 않는 사용자입니다.');
+    if (toUser.deletedAt) throw new GoneException('탈퇴한 사용자입니다.');
     if (toUser.id === user.id)
       throw new BadRequestException('자신에게 친구 요청을 보낼 수 없습니다.');
 

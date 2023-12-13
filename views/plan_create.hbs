@@ -29,13 +29,14 @@
     </div>
     <div id='body_wrapper'>
       <div id='body_wrapper_left'>
-        <div id='form'>
-          <form onsubmit='searchPlaces(); return false;'>
-            <input type='text' id='keyword' size='15' placeholder='장소를 입력해 주세요.' />
-            <button type='submit' id='search'>검색</button>
-          </form>
+        <div id='map'>
+          <div id='form'>
+            <form onsubmit='searchPlaces(); return false;'>
+              <input type='text' id='keyword' size='15' placeholder='장소를 입력해 주세요.' />
+              <button type='submit' id='search'>검색</button>
+            </form>
+          </div>
         </div>
-        <div id='map'></div>
       </div>
       <div id='body_wrapper_right'>
         <div id='body_wrapper_right_body'>
@@ -45,7 +46,13 @@
           </div>
           <div id='body_wrapper_right_place'>
             장소 :
-            <input type='text' id='place' class='input' readonly />
+            <input
+              type='text'
+              id='place'
+              class='input'
+              placeholder='장소를 선택해 주세요.'
+              readonly
+            />
           </div>
           <div id='body_wrapper_right_date'>
             날짜 :
@@ -53,7 +60,7 @@
           </div>
           <div id='body_wrapper_right_fine'>
             벌금 :
-            <input type='number' id='fine' class='input' />
+            <input type='number' id='fine' class='input' min='0' />
           </div>
         </div>
         <div id='body_wrapper_right_footer'>

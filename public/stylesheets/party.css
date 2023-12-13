@@ -56,7 +56,6 @@ body {
   flex-direction: column;
   width: 85%;
   height: 100%;
-  text-align: center;
 }
 
 #body_wrapper_left_title {
@@ -75,6 +74,31 @@ body {
 .body_wrapper_left_title_center {
   text-align: center;
   flex-grow: 1;
+}
+
+#form {
+  position: relative;
+  z-index: 2;
+  padding: 10px;
+}
+
+#keyword {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border: 0px;
+  border-radius: 10px;
+  outline: none;
+}
+
+#search {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border: 0px;
+  border-radius: 10px;
+  background-color: #999999bb;
+  cursor: pointer;
 }
 
 #map {
@@ -144,14 +168,20 @@ body {
 }
 
 #footer_wrapper {
+  display: flex;
+  flex-direction: row;
   margin-top: 10px;
-  background-color: #999999bb;
-  border-radius: 15px;
   width: 100%;
   height: 20%;
-  color: #222;
+}
+
+#footer_wrapper_left {
   display: flex;
   flex-direction: column;
+  width: 85%;
+  height: 100%;
+  border-radius: 15px;
+  background-color: #999999bb;
 }
 
 #chat_container {
@@ -159,6 +189,7 @@ body {
   height: 100%;
   max-height: 100%;
   overflow-y: auto;
+  color: #222;
 }
 
 #chat_list {
@@ -196,4 +227,82 @@ body {
   border-bottom-right-radius: 15px;
   border: 0px;
   cursor: pointer;
+}
+
+#footer_wrapper_right {
+  width: 15%;
+  height: 100%;
+  margin-left: 10px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+#party_point_list {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  background-color: #999999bb;
+  font-size: 15px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.point_history {
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+  font-size: 13px;
+  width: 100%;
+}
+
+.point_history_left {
+  width: 30%;
+}
+
+.point_history_center {
+  width: 30%;
+  text-align: center;
+}
+
+.point_history_right {
+  width: 40%;
+  text-align: end;
+}
+
+#point_send {
+  width: 100%;
+  height: 50px;
+  border: 0px;
+  font-size: 12px;
+  font-weight: 500;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  cursor: pointer;
+}
+
+.infoWindow_info {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+}
+
+.infoWindow_info_title {
+  font-weight: 500;
+  font-size: 15px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.infoWindow_info_address {
+  font-size: 13px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
 }

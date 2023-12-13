@@ -5,14 +5,13 @@ import { In, Repository } from 'typeorm';
 import {
   IPlanServiceCheckEnd,
   IPlanServiceCreate,
-  IPlanServiceDelete,
   IPlanServiceFindOneWithPlanID,
   IPlanServiceFindWithPartyID,
   IPlanServiceFindWithUserIDAndPartyID,
-  IPlanServiceRestore,
+  IPlanServiceSoftDelete,
 } from './plan.interface';
 import { Party_UserService } from '../party-user/party-user.service';
-import { PointService } from '../point/point.service';
+import { User_PointService } from '../user_point/user-point.service';
 
 @Injectable()
 export class PlanService {
@@ -21,7 +20,7 @@ export class PlanService {
     private readonly planRepository: Repository<Plan>,
 
     private readonly partyUserService: Party_UserService,
-    private readonly pointService: PointService,
+    private readonly userPointService: User_PointService,
   ) {}
 
   findOneWithPlanID({ planID }: IPlanServiceFindOneWithPlanID): Promise<Plan> {
@@ -54,7 +53,7 @@ export class PlanService {
 
     await Promise.all(
       partyUsers.map(async (el) => {
-        await this.pointService.checkPoint({ userID: el.user.id, amount: fine });
+        await this.userPointService.checkPoint({ userID: el.user.id, amount: fine });
       }),
     );
 
@@ -80,16 +79,9 @@ export class PlanService {
     return plan;
   }
 
-  async delete({ planDeleteDto }: IPlanServiceDelete): Promise<boolean> {
-    const result = await this.planRepository.softDelete({ id: planDeleteDto.planID });
+  async softDelete({ planSoftDeleteDto }: IPlanServiceSoftDelete): Promise<boolean> {
+    const result = await this.planRepository.softDelete({ id: planSoftDeleteDto.planID });
     if (!result) throw new InternalServerErrorException('삭제에 실패하였습니다.');
-
-    return result.affected ? true : false;
-  }
-
-  async restore({ planRestoreDto }: IPlanServiceRestore): Promise<boolean> {
-    const result = await this.planRepository.restore({ id: planRestoreDto.planID });
-    if (!result) throw new InternalServerErrorException('복구에 실패하였습니다.');
 
     return result.affected ? true : false;
   }

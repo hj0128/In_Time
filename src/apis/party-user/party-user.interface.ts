@@ -12,3 +12,7 @@ export interface IPartyUserServiceCreate {
   partyUserRelations: { party: { id: string }; user: { id: string } }[];
   queryRunner: QueryRunner;
 }
+
+export interface IPartyUserServiceCheckPartyMembers {
+  userID: string;
+}

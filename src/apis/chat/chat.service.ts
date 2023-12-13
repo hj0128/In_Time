@@ -1,13 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Chat } from './chat.entity';
-import {
-  IChatServiceChatSaveMessageDto,
-  IChatServiceDelete,
-  IChatServiceGetHistory,
-  IChatServiceRestore,
-} from './chat.interface';
+import { IChatServiceChatSaveMessageDto, IChatServiceGetHistory } from './chat.interface';
 
 @Injectable()
 export class ChatService {
@@ -29,31 +24,5 @@ export class ChatService {
       where: { room },
       order: { timestamp: 'ASC' },
     });
-  }
-
-  async delete({ chatDelete }: IChatServiceDelete): Promise<UpdateResult> {
-    try {
-      const { partyID, queryRunner } = chatDelete;
-
-      const result = await queryRunner.manager.softDelete(Chat, { party: { id: partyID } });
-
-      return result;
-    } catch (error) {
-      throw new InternalServerErrorException('채팅 삭제에 실패하였습니다.');
-    }
-  }
-
-  async restore({ chatRestore }: IChatServiceRestore) {
-    try {
-      const { partyID, queryRunner } = chatRestore;
-
-      const result = await queryRunner.manager.restore(Chat, {
-        party: { id: partyID },
-      });
-
-      return result.affected ? true : false;
-    } catch (error) {
-      throw new InternalServerErrorException('채팅 복구에 실패하였습니다.');
-    }
   }
 }

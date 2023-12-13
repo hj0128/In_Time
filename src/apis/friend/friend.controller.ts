@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { FriendService } from './friend.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -37,7 +37,6 @@ export class FriendController {
     @Body() friendCreateDto: FriendCreateDto,
     @Req() req: Request & JwtReqUser, //
   ): Promise<Friend> {
-    console.log(req.user);
     return this.friendService.create({ friendCreateDto, user: req.user });
   }
 
@@ -61,7 +60,7 @@ export class FriendController {
   })
   @Delete('/friendRefuse')
   friendRefuse(
-    @Query() friendRefuseDto: FriendRefuseDto, //
+    @Body() friendRefuseDto: FriendRefuseDto, //
   ): Promise<boolean> {
     return this.friendService.refuse({ friendRefuseDto });
   }
@@ -73,7 +72,7 @@ export class FriendController {
   })
   @Delete('/friendUnFriend')
   friendUnFriend(
-    @Query() friendUnFriendDto: FriendUnFriendDto,
+    @Body() friendUnFriendDto: FriendUnFriendDto,
     @Req() req: Request & JwtReqUser, //
   ): Promise<boolean> {
     return this.friendService.unFriend({ friendUnFriendDto, userID: req.user.id });

@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PlanService } from './plan.service';
 import { Plan } from './plan.entity';
-import { PlanCreateDto, PlanDeleteDto, PlanRestoreDto } from './plan.dto';
+import { PlanCreateDto, PlanSoftDeleteDto } from './plan.dto';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -66,25 +66,13 @@ export class PlanController {
 
   @UseGuards(AuthGuard('access'))
   @ApiOperation({
-    summary: '약속 삭제',
-    description: '약속을 삭제한다.',
+    summary: '약속 소프트 삭제',
+    description: '약속을 소프트 삭제한다.',
   })
-  @Delete('/planDelete')
-  planDelete(
-    @Query() planDeleteDto: PlanDeleteDto, //
+  @Delete('/planSoftDelete')
+  planSoftDelete(
+    @Body() planSoftDeleteDto: PlanSoftDeleteDto, //
   ): Promise<boolean> {
-    return this.planService.delete({ planDeleteDto });
-  }
-
-  @UseGuards(AuthGuard('access'))
-  @ApiOperation({
-    summary: '약속 복구',
-    description: '삭제된 약속을 복구한다.',
-  })
-  @Put('/planRestore')
-  planRestore(
-    @Body() planRestoreDto: PlanRestoreDto, //
-  ): Promise<boolean> {
-    return this.planService.restore({ planRestoreDto });
+    return this.planService.softDelete({ planSoftDeleteDto });
   }
 }

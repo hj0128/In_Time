@@ -130,6 +130,20 @@ const setUsersIcon = ({ usersName, usersImage }) => {
 };
 
 
+const setArrive = ({ userName }) => {
+  const userArriveList = document.querySelector('#user_arrive_list');
+
+  const existingUserElement = userArriveList.querySelector(`.${userName}`);
+  if (!existingUserElement) {
+    const el = document.createElement('div');
+    el.className = userName;
+    el.innerHTML = userName;
+
+    userArriveList.appendChild(el);
+  }
+};
+
+
 // 멤버들 위치 업데이트
 const getUserLocation = async ({ usersName, usersImage }) => {
   const res = await axios.get('/user/userGetRedis', {
@@ -141,7 +155,12 @@ const getUserLocation = async ({ usersName, usersImage }) => {
   for (let i in usersLocation) {
     const target = usersLocation[i];
     const latlng = new kakao.maps.LatLng(target.myLat, target.myLng);
-    console.log(target.userName, target.time)
+
+    // 도착했으면 표시
+    if (target.isArrive) {
+      setArrive({ userName: target.userName });
+    }
+
     // 멤버들 마커 표시
     const marker = new kakao.maps.CustomOverlay({
       map,
@@ -166,7 +185,7 @@ const getUserLocation = async ({ usersName, usersImage }) => {
 
 
 // 시간이 종료됐을 때 벌금 내기 (이미 냈는지 확인 후)
-const userFine = async ({ usersName }) => {
+const userFine = async ({ usersName, partyID }) => {
   try {
     const plan = await axios.get('/plan/planFindOneWithPlanID', { params: { planID } });
     if (plan.data.isEnd) return;
@@ -183,6 +202,7 @@ const userFine = async ({ usersName }) => {
     // 유저 업데이트
     await axios.post('/party/partyUpdateAndUserAndPlan', {
       planID,
+      partyID,
       users: tardyUser,
     });
   } catch (error) {
@@ -218,7 +238,7 @@ const distanceLocation = ({ placeLat, placeLng, myLat, myLng }) => {
 
 
 // 내 위치 저장하기
-const setUsersLocation = async ({ usersName, endTimeDiff, placeLat, placeLng, intervalID }) => {
+const setUsersLocation = async ({ usersName, partyID, endTimeDiff, placeLat, placeLng, intervalID }) => {
   if (navigator.geolocation) {
     const options = {
       enableHighAccuracy: true, // 높은 정확도
@@ -235,7 +255,7 @@ const setUsersLocation = async ({ usersName, endTimeDiff, placeLat, placeLng, in
           clearInterval(intervalID);
 
           // 누가 지각했는지 보고 지각한 사람 돈 뺏기
-          await userFine({ usersName });
+          await userFine({ usersName, partyID });
 
           alert('약속 시간이 종료되었습니다.');
         }, endTimeDiff);
@@ -255,8 +275,8 @@ const setUsersLocation = async ({ usersName, endTimeDiff, placeLat, placeLng, in
         // 내 위치 업데이트
         // 도착지 50m 안에 들어오면 도착했다는 표시하기
         if (distance <= 50) { // 50m 안이면 목적지 도착, 위치 저장 멈추기
-          await axios.post('/user/userSetRedis', { myLat, myLng, time, isArrive: true });
           navigator.geolocation.clearWatch(watchID);
+          await axios.post('/user/userSetRedis', { myLat, myLng, time, isArrive: true });
           alert('목적지에 도착하였습니다.');
         } else { // 50m 밖이면 계속 위치 저장하기
           await axios.post('/user/userSetRedis', { myLat, myLng, time, isArrive: false });
@@ -271,16 +291,92 @@ const setUsersLocation = async ({ usersName, endTimeDiff, placeLat, placeLng, in
 };
 
 
+const setChat = ({ partyID }) => {
+  let socket = io();
+
+  const chatContainer = document.querySelector('#chat_container');
+  const chatList = document.querySelector('#chat_list');
+  const messageInfo = document.querySelector('#message_info');
+  const messageSubmit = document.querySelector('#message_submit');
+
+  const displayChatHistory = (history) => {
+    chatList.innerHTML = '';
+
+    history.forEach((chat) => {
+      const li = document.createElement('li');
+      li.className = 'chat_item';
+
+      const p = document.createElement('p');
+      p.textContent = `${chat.userName}: ${chat.message}`;
+
+      li.appendChild(p);
+      chatList.appendChild(li);
+    });
+
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  };
+
+  const appendMessage = (message) => {
+    const li = document.createElement('li');
+    li.className = 'chat-item';
+
+    const p = document.createElement('p');
+    p.textContent = message;
+
+    li.appendChild(p);
+    chatList.appendChild(li);
+
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  };
+
+  const joinRoom = () => {
+    socket.emit('join', { room: partyID });
+  };
+  joinRoom();
+
+  socket.on('chatHistory', ({ history }) => {
+    displayChatHistory(history);
+  });
+
+  socket.on('chatMessage', ({ message, userName }) => {
+    appendMessage(`${userName} : ${message}`);
+  });
+
+  const messageSubmitHandler = () => {
+    const accessToken = axios.defaults.headers.common['Authorization'].split('Bearer ')[1];
+
+    socket = io('http://localhost:3000', {
+      query: { token: accessToken },
+    });
+
+    if (messageInfo.value.trim() !== '') {
+      socket.emit('chatMessage', { message: messageInfo.value, room: partyID });
+
+      // 메시지 전송 후 입력 필드 비우기
+      messageInfo.value = '';
+    }
+  };
+  messageInfo.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      messageSubmitHandler();
+    }
+  });
+  messageSubmit.addEventListener('click', messageSubmitHandler);
+
+}
+
+
 // 페이지에 필요한 모든 정보를 가져옴
 const getPlan = async () => {
   try {
     // 플랜 정보 가져오기
     const plan = await axios.get('/plan/planFindOneWithPlanID', { params: { planID } });
     const { planName, placeName, placeAddress, placeLat, placeLng, date, fine, party } = plan.data;
+    const partyID = party.id;
 
     // 플랜에 속한 멤버 정보 가져오기
     const partyUser = await axios.get('/party_user/partyUserFindAllWithPartyID', {
-      params: { partyID: party.id },
+      params: { partyID },
     });
 
     // 멤버들 이름과 이미지가 담긴 배열
@@ -294,7 +390,7 @@ const getPlan = async () => {
     });
 
     // 파티 정보 세팅하기 (맨 위 타이틀)
-    setPartyInfo({ partyID: party.id });
+    setPartyInfo({ partyID });
 
     // 플랜 정보 세팅하기 (맨 위 타이틀)
     setPlanInfo({ planName, placeName, date, fine });
@@ -304,6 +400,9 @@ const getPlan = async () => {
 
     // 멤버들 아이콘 세팅하기
     setUsersIcon({ usersName, usersImage });
+
+    // 채팅 가져오기
+    setChat({ partyID });
 
     // 약속 시간까지의 시간차 구하기
     const currentDate = new Date().getTime(); // 현재시간 2023 09:48
@@ -320,7 +419,7 @@ const getPlan = async () => {
       }, 3000);
 
       // 내 위치 저장하기
-      await setUsersLocation({ usersName, endTimeDiff, placeLat, placeLng, intervalID });
+      await setUsersLocation({ usersName, partyID, endTimeDiff, placeLat, placeLng, intervalID });
     }, startTimeDiff);
   } catch (error) {
     if (error.message === '토큰 만료') {
@@ -332,3 +431,34 @@ const getPlan = async () => {
   }
 };
 getPlan();
+
+
+const pointSend = document.querySelector('#point_send');
+const pointSendClickHandler = async () => {
+  try {
+    const amount = prompt('보낼 금액을 입력해 주세요.', '5000');
+    if (amount === null) return;
+    if (amount <= 0) {
+      alert('1원 이상부터 보낼 수 있습니다.');
+      return;
+    }
+
+    await axios.post('/point/pointPartyPointToUser', {
+      partyID,
+      amount: Number(amount),
+    });
+
+    alert(`${amount}원을 보냈습니다.`);
+    window.location.href = `/party?id=${partyID}`;
+  } catch (error) {
+    if (error.message === '토큰 만료') {
+      alert('로그인 후 이용해 주세요.');
+      window.location.href = '/signIn';
+    } else if (error.response.status === 422) {
+      alert(error.response.data.message);
+    } else {
+      alert('포인트를 내보내던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+    }
+  }
+};
+pointSend.addEventListener('click', pointSendClickHandler);

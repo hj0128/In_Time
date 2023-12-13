@@ -9,7 +9,7 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.js'></script>
     <script
       type='text/javascript'
-      src='//dapi.kakao.com/v2/maps/sdk.js?appkey={{KAKAO_APP_KEY}}&libraries=clusterner'
+      src='//dapi.kakao.com/v2/maps/sdk.js?appkey={{KAKAO_APP_KEY}}&libraries=services,clusterer'
     ></script>
   </head>
 
@@ -29,19 +29,32 @@
     <div id='body_wrapper'>
       <div id='body_wrapper_left'>
         <div id='body_wrapper_left_title'></div>
-        <div id='map'></div>
+        <div id='map'>
+          <div id='form'>
+            <form onsubmit='searchPlaces(); return false;'>
+              <input type='text' id='keyword' size='15' placeholder='장소를 입력해 주세요.' />
+              <button type='submit' id='search'>검색</button>
+            </form>
+          </div>
+        </div>
       </div>
       <div id='plan_list'>
         <a id='plan_create'>약속 만들기</a>
       </div>
     </div>
     <div id='footer_wrapper'>
-      <div id='chat_container'>
-        <ul id='chat_list'></ul>
+      <div id='footer_wrapper_left'>
+        <div id='chat_container'>
+          <ul id='chat_list'></ul>
+        </div>
+        <div id='chat_input'>
+          <input type='text' id='message_info' />
+          <button id='message_submit'>보내기</button>
+        </div>
       </div>
-      <div id='chat_input'>
-        <input type='text' id='message_info' />
-        <button id='message_submit'>보내기</button>
+      <div id='footer_wrapper_right'>
+        <div id='party_point_list'></div>
+        <button id='point_send'>포인트 보내기</button>
       </div>
     </div>
     <script src='/javascripts/axios.interceptor.js'></script>

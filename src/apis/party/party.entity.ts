@@ -3,6 +3,8 @@ import { Plan } from '../plan/plan.entity';
 import { Min } from 'class-validator';
 import { Party_User } from '../party-user/party-user.entity';
 import { Chat } from '../chat/chat.entity';
+import { Marker } from '../marker/marker.entity';
+import { Party_Point } from '../party_point/party-point.entity';
 
 @Entity()
 export class Party {
@@ -19,6 +21,9 @@ export class Party {
   @DeleteDateColumn()
   deletedAt: Date;
 
+  @OneToMany(() => Party_Point, (partyPoints) => partyPoints.party, { cascade: true })
+  partyPoints: Party_Point[];
+
   @OneToMany(() => Plan, (plans) => plans.party, { cascade: true })
   plans: Plan[];
 
@@ -27,4 +32,7 @@ export class Party {
 
   @OneToMany(() => Chat, (chats) => chats.party, { cascade: true })
   chats: Chat[];
+
+  @OneToMany(() => Marker, (markers) => markers.party, { cascade: true })
+  markers: Marker[];
 }

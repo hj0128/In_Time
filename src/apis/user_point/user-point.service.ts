@@ -1,42 +1,48 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   UnprocessableEntityException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { POINT_STATUS, Point } from './point.entity';
+import { USER_POINT_STATUS, User_Point } from './user-point.entity';
 import { DataSource, Repository } from 'typeorm';
 import {
   IPointServiceCheckDuplication,
   IPointServiceCheckPoint,
   IPointServiceFill,
   IPointServiceFindOneWithImpUid,
-  IPointServiceFindWithUserID,
   IPointServiceFine,
   IPointServiceSend,
-} from './point.interface';
+  IUserPointServiceFindWithUserID,
+} from './user-point.interface';
 import { User } from '../user/user.entity';
 import { IamPortService } from '../iam-port/iam-port.service';
 import { UserService } from '../user/user.service';
+import { Party } from '../party/party.entity';
+import { PARTY_POINT_STATUS, Party_Point } from '../party_point/party-point.entity';
 
 @Injectable()
-export class PointService {
+export class User_PointService {
   constructor(
-    @InjectRepository(Point)
-    private readonly pointRepository: Repository<Point>,
+    @InjectRepository(User_Point)
+    private readonly userPointRepository: Repository<User_Point>,
+
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
 
     private readonly dataSource: DataSource,
     private readonly iamPortService: IamPortService,
-    private readonly userService: UserService,
   ) {}
 
-  findWithUserID({ userID }: IPointServiceFindWithUserID): Promise<Point[]> {
-    return this.pointRepository.find({ where: { user: { id: userID } } });
+  findWithUserID({ userID }: IUserPointServiceFindWithUserID): Promise<User_Point[]> {
+    return this.userPointRepository.find({ where: { user: { id: userID } } });
   }
 
-  findOneWithImpUid({ impUid }: IPointServiceFindOneWithImpUid): Promise<Point> {
-    return this.pointRepository.findOne({ where: { impUid } });
+  findOneWithImpUid({ impUid }: IPointServiceFindOneWithImpUid): Promise<User_Point> {
+    return this.userPointRepository.findOne({ where: { impUid } });
   }
 
   async checkDuplication({ impUid }: IPointServiceCheckDuplication): Promise<void> {
@@ -44,7 +50,7 @@ export class PointService {
     if (point) throw new ConflictException('이미 처리된 결제 아이디입니다.');
   }
 
-  async fill({ user: _user, pointFillDto }: IPointServiceFill): Promise<Point> {
+  async fill({ user: _user, pointFillDto }: IPointServiceFill): Promise<User_Point> {
     const { impUid, amount } = pointFillDto;
 
     await this.iamPortService.checkPaid({ impUid, amount });
@@ -56,10 +62,10 @@ export class PointService {
     await queryRunner.startTransaction('SERIALIZABLE');
 
     try {
-      const point = await queryRunner.manager.save(Point, {
+      const point = await queryRunner.manager.save(User_Point, {
         impUid,
         amount,
-        status: POINT_STATUS.POINT_FILL,
+        status: USER_POINT_STATUS.POINT_FILL,
         user: _user,
       });
 
@@ -86,21 +92,25 @@ export class PointService {
     }
   }
 
-  async send({ user: _user, pointSendDto }: IPointServiceSend): Promise<Point> {
+  async send({ user: _user, pointSendDto }: IPointServiceSend): Promise<User_Point> {
     const { amount } = pointSendDto;
     const id = _user.id;
 
-    this.checkPoint({ userID: id, amount });
+    if (amount <= 0) {
+      throw new UnprocessableEntityException('1원 이상부터 보낼 수 있습니다.');
+    }
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('SERIALIZABLE');
 
     try {
-      const point = await queryRunner.manager.save(Point, {
+      await this.checkPoint({ userID: id, amount });
+
+      const point = await queryRunner.manager.save(User_Point, {
         impUid: 'imp_send',
         amount: -amount,
-        status: POINT_STATUS.POINT_SEND,
+        status: USER_POINT_STATUS.POINT_SEND,
         user: _user,
       });
 
@@ -113,27 +123,38 @@ export class PointService {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
-
       throw error;
     }
   }
 
-  async fine({ pointFineDto, queryRunner }: IPointServiceFine): Promise<Point> {
+  async fine({ pointFineDto, queryRunner }: IPointServiceFine): Promise<User_Point> {
     try {
-      const { userName, amount } = pointFineDto;
+      const { userName, partyID, amount } = pointFineDto;
 
       const user = await queryRunner.manager.findOne(User, {
         where: { name: userName },
         lock: { mode: 'pessimistic_write' },
       });
 
+      const party = await queryRunner.manager.findOne(Party, {
+        where: { id: partyID },
+        lock: { mode: 'pessimistic_write' },
+      });
+
       this.checkPoint({ userID: user.id, amount });
 
-      const point = await queryRunner.manager.save(Point, {
+      const point = await queryRunner.manager.save(User_Point, {
         impUid: 'imp_fine',
         amount: -amount,
-        status: POINT_STATUS.FINE,
+        status: USER_POINT_STATUS.FINE_SEND,
         user,
+      });
+
+      await queryRunner.manager.save(Party_Point, {
+        userName,
+        amount: amount,
+        status: PARTY_POINT_STATUS.FINE_RECEIVE,
+        party,
       });
 
       await queryRunner.manager.increment(User, { id: user.id }, 'point', -amount);

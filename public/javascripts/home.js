@@ -21,13 +21,13 @@ const mapOptions = {
 const map = new kakao.maps.Map(mapContainer, mapOptions);
 
 
-const partyDelete = async (name, partyID, point) => {
+const partyDelete = async (name, partyID) => {
   const isDelete = confirm(`파티(${name})를 삭제하시겠습니까?`);
   if (!isDelete) return;
 
   try {
-    await axios.delete('/party/partyDelete', {
-      params: { partyID, point },
+    await axios.delete('/party/partySoftDelete', {
+      data: { partyID },
     });
 
     alert(`파티(${name})를 삭제하였습니다.`);
@@ -58,7 +58,7 @@ const getPartyList = async () => {
       const itemStr = `
         <div class="party_list_info_title">
           <div class="party_list_info_name" onClick="location.href='/party?id=${partyID}'">${name}</div>
-          <img class="party_delete" onClick="partyDelete('${name}', '${partyID}', ${point})") src="https://storage.googleapis.com/in-time-project-bucket/defaults/trash.png">
+          <img class="party_delete" onClick="partyDelete('${name}', '${partyID}')") src="https://storage.googleapis.com/in-time-project-bucket/defaults/trash.png">
         </div>
         <div class="party_list_info_body">
           <div class="party_list_info_members">${members}</div>

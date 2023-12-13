@@ -23,25 +23,18 @@ export class PartyUpdateAndUserAndPlanDto {
   @IsNotEmpty()
   planID: string;
 
+  @ApiProperty({ example: 'Party1', description: 'party의 id' })
+  @IsString()
+  @IsNotEmpty()
+  partyID: string;
+
   @ApiProperty({ example: ['철수', '유리'], description: '지각한 user의 name' })
   @IsArray()
   @IsNotEmpty()
   users: string[];
 }
 
-export class PartyDeleteDto {
-  @ApiProperty({ example: 'Party01', description: 'party의 id' })
-  @IsString()
-  @IsNotEmpty()
-  partyID: string;
-
-  @ApiProperty({ example: '5000', description: 'party의 point' })
-  @IsString()
-  @IsNotEmpty()
-  point: string;
-}
-
-export class PartyRestoreDto {
+export class PartySoftDeleteDto {
   @ApiProperty({ example: 'Party01', description: 'party의 id' })
   @IsString()
   @IsNotEmpty()

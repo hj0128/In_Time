@@ -43,14 +43,7 @@ export class PlanCreateDto {
   partyID: string;
 }
 
-export class PlanDeleteDto {
-  @ApiProperty({ example: 'Plan01', description: 'plan의 id' })
-  @IsString()
-  @IsNotEmpty()
-  planID: string;
-}
-
-export class PlanRestoreDto {
+export class PlanSoftDeleteDto {
   @ApiProperty({ example: 'Plan01', description: 'plan의 id' })
   @IsString()
   @IsNotEmpty()

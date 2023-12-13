@@ -18,13 +18,13 @@ const getUser = async () => {
     const user = await axios.get('/user/userFindOneWithUserID');
     const { id, name, email, profileUrl, badgeUrl, point } = user.data;
 
-    const points = await axios.get('point/pointFindWithUserID', {
+    const points = await axios.get('userPoint/userPointFindWithUserID', {
       params: { userID: id },
     });
     points.data.sort((a, b) => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
-
+    console.log(points)
     const profileImage = document.querySelector('#profile_image');
     const userName = document.querySelector('#name');
     const userBadge = document.querySelector('#badge_image');
@@ -50,12 +50,17 @@ const getUser = async () => {
       el.className = 'point_history';
 
       let history;
+      let point = amount;
       if (status === 'POINT_FILL') {
         history = '포인트 채우기';
+        point = `+${amount}`;
       } else if (status === 'POINT_SEND') {
         history = '포인트 보내기';
-      } else if (status === 'FINE') {
+      } else if (status === 'FINE_SEND') {
         history = '벌금';
+      } else if (status === 'PARTY_RECEIVE') {
+        history = '파티 포인트';
+        point = `+${Math.abs(amount)}`;
       }
 
       itemStr = `
@@ -63,7 +68,7 @@ const getUser = async () => {
           <div class="history">${history}</div>
         </div>
         <div class="point_history_center">
-          <div class="point">${amount}</div>
+          <div class="point">${point}</div>
         </div>
         <div class="point_history_right">
           <div class="create_time">${createDate}</div>
@@ -116,12 +121,17 @@ const pointSendClickHandler = async () => {
   try {
     const amount = prompt('보낼 금액을 입력해 주세요.', '5000');
     if (amount === null) return;
+    if (amount <= 0) {
+      alert('1원 이상부터 보낼 수 있습니다.');
+      return;
+    }
 
-    await axios.post('/point/pointSend', {
+    await axios.post('/userPoint/userPointSend', {
       amount: Number(amount),
     });
 
     alert(`${amount}원을 보냈습니다.`);
+    window.location.href = '/mypage';
   } catch (error) {
     if (error.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');
@@ -144,14 +154,18 @@ const withdrawClickHandler = async () => {
 
     await axios.post('/user/userDelete');
 
-    alert('회원탈퇴에 성공하셨습니다.');
+    alert('회원탈퇴에 성공하였습니다.');
     window.location.href = '/';
   } catch (error) {
     if (error.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');
       window.location.href = '/signIn';
+    } else if (error.response.status === 410) {
+      alert('이미 탈퇴한 사용자입니다.');
+    } else if (error.response.status === 403) {
+      alert(error.response.data.message);
     } else {
-      alert('회원가입을 탈퇴하던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
+      alert('회원탈퇴 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
     }
   }
 };

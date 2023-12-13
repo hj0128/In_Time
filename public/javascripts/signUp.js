@@ -48,7 +48,6 @@ const activateTokenBox = (e) => {
   if (e.target.value.includes('@')) {
     tokenSend.disabled = false;
     tokenSend.style.color = '#222';
-    tokenSend.style.border = '1px solid #D2D2D2';
     tokenSend.style.cursor = 'pointer';
   }
 };

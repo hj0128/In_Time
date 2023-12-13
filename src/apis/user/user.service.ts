@@ -1,16 +1,23 @@
-import { GoneException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  GoneException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import {
   IUserServiceCreate,
-  IUserServiceDelete,
   IUserServiceFindAllWithUserID,
   IUserServiceFindOneWithEmail,
   IUserServiceFindOneWithName,
   IUserServiceFindOneWithUserID,
   IUserServiceGetRedis,
   IUserServiceSetRedis,
+  IUserServiceSoftDelete,
   RedisInfo,
 } from './user.interface';
 import * as bcrypt from 'bcrypt';
@@ -18,6 +25,12 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { UserSetRedisDto } from './user.dto';
 import * as nodemailer from 'nodemailer';
+import { AuthService } from '../auth/auth.service';
+import { Friend } from '../friend/friend.entity';
+import { Party_UserService } from '../party-user/party-user.service';
+import { Party_User } from '../party-user/party-user.entity';
+import { User_Point } from '../user_point/user-point.entity';
+// import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class UserService {
@@ -27,6 +40,12 @@ export class UserService {
 
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+
+    private readonly dataSource: DataSource,
+    private readonly partyUserService: Party_UserService,
   ) {}
 
   findOneWithUserID({ id }: IUserServiceFindOneWithUserID): Promise<User> {
@@ -37,12 +56,16 @@ export class UserService {
     return this.userRepository.find({ where: { id: In(usersID) } });
   }
 
-  findOneWithName({ name }: IUserServiceFindOneWithName): Promise<User> {
-    return this.userRepository.findOne({ where: { name } });
+  async findOneWithName({ name }: IUserServiceFindOneWithName): Promise<User> {
+    const users = await this.userRepository.find({ where: { name }, withDeleted: true });
+
+    return users[0];
   }
 
-  findOneWithEmail({ email }: IUserServiceFindOneWithEmail): Promise<User> {
-    return this.userRepository.findOne({ where: { email } });
+  async findOneWithEmail({ email }: IUserServiceFindOneWithEmail): Promise<User> {
+    const users = await this.userRepository.find({ where: { email }, withDeleted: true });
+
+    return users[0];
   }
 
   async sendEmail({ name, userEmail }) {
@@ -94,19 +117,67 @@ export class UserService {
     return create;
   }
 
-  async delete({ userID }: IUserServiceDelete): Promise<boolean> {
+  async softDelete({ userID, headers }: IUserServiceSoftDelete): Promise<boolean> {
     const user = await this.findOneWithUserID({ id: userID });
-    if (user.deletedAt)
-      throw new GoneException(
-        '이미 탈퇴한 사용자입니다. 계정을 복구하시려면 다시 로그인해 주세요.',
-      );
+    if (user.deletedAt) throw new GoneException('이미 탈퇴한 사용자입니다.');
+    if (user.point > 0) throw new ForbiddenException('포인트를 모두 출금한 후 탈퇴해 주세요.');
 
-    const result = await this.userRepository.softDelete({ id: userID });
-    console.log(result);
-    if (!result) throw new InternalServerErrorException('회원탈퇴에 실패하였습니다.');
+    await this.partyUserService.checkPartyMembers({ userID });
 
-    return result.affected ? true : false;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ COMMITTED');
+
+    try {
+      await queryRunner.manager.softDelete(User_Point, { user: { id: userID } });
+      await queryRunner.manager.softDelete(Friend, { user: { id: userID } });
+      await queryRunner.manager.softDelete(Friend, { toUserID: userID });
+      await queryRunner.manager.softDelete(Party_User, { user: { id: userID } });
+
+      const result = await queryRunner.manager.softDelete(User, { id: userID });
+
+      await this.authService.logout({ headers });
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+
+      return result.affected ? true : false;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      throw error;
+    }
   }
+
+  // softDelete된 user를 하루 뒤에 완전히 삭제
+  // async softDelete({ userID }: IUserServiceDelete): Promise<User> {
+  //   const user = await this.findOneWithUserID({ id: userID });
+  //   if (user.deletedAt) throw new GoneException('이미 탈퇴한 사용자입니다.');
+
+  //   user.deletedAt = new Date();
+  //   const result = await this.userRepository.save(user);
+
+  //   return result;
+  // }
+
+  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  // async delete(): Promise<void> {
+  //   const oneDayAgo = new Date();
+  //   oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+
+  //   const softDeletedUsers = await this.userRepository
+  //     .createQueryBuilder('user')
+  //     .where('user.deletedAt IS NOT NULL')
+  //     .getMany();
+
+  //   for (const user of softDeletedUsers) {
+  //     const deletedAtDate = new Date(user.deletedAt);
+
+  //     if (deletedAtDate.getTime() <= oneDayAgo.getTime()) {
+  //       await this.userRepository.delete(user);
+  //     }
+  //   }
+  // }
 
   async setRedis({ user, userSetRedisDto }: IUserServiceSetRedis): Promise<UserSetRedisDto> {
     return this.cacheManager.set(`${user.name}`, userSetRedisDto, { ttl: 7200 });

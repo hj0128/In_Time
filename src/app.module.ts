@@ -13,8 +13,11 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { FileModule } from './apis/file/file.module';
-import { PointModule } from './apis/point/point.module';
+import { User_PointModule } from './apis/user_point/user-point.module';
 import { ChatModule } from './apis/chat/chat.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MarkerModule } from './apis/marker/marker.module';
+import { Party_PointModule } from './apis/party_point/party-point.module';
 
 @Module({
   imports: [
@@ -22,12 +25,15 @@ import { ChatModule } from './apis/chat/chat.module';
     ChatModule,
     FileModule,
     FriendModule,
+    MarkerModule,
     UserModule,
-    PointModule,
+    User_PointModule,
+    Party_PointModule,
     PartyModule,
     Party_UserModule,
     PlanModule,
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: process.env.DATABASE_TYPE as 'mysql',
       host: process.env.DATABASE_HOST,

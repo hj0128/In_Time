@@ -1,4 +1,10 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  GoneException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+  forwardRef,
+} from '@nestjs/common';
 import {
   IAuthServiceGetAccessToken,
   IAuthServiceLogin,
@@ -16,7 +22,6 @@ import * as jwt from 'jsonwebtoken';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import * as nodemailer from 'nodemailer';
-// import { Payload } from './strategies/jwt-access.interface';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +30,8 @@ export class AuthService {
     private readonly cacheManager: Cache,
 
     private readonly jwtService: JwtService,
+
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
   ) {}
 
@@ -63,6 +70,7 @@ export class AuthService {
 
     const user = await this.userService.findOneWithEmail({ email });
     if (!user) throw new UnauthorizedException('회원 가입 되지 않은 이메일입니다.');
+    if (user.deletedAt) throw new GoneException('탈퇴한 사용자입니다.');
 
     const isAuth = await bcrypt.compare(password, user.password);
     if (!isAuth) throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
@@ -112,6 +120,7 @@ export class AuthService {
     let user = await this.userService.findOneWithEmail({
       email: req.user.email,
     });
+    if (user.deletedAt) throw new GoneException('탈퇴한 사용자입니다.');
 
     if (!user) {
       user = await this.userService.create({
@@ -158,16 +167,4 @@ export class AuthService {
 
     return result;
   }
-
-  // async getUserFromAuthenticationToken(token: string) {
-  //   const payload: Payload = this.jwtService.verify(token, {
-  //     secret: process.env.JWT_ACCESS_KEY,
-  //   });
-
-  //   return {
-  //     id: payload.id,
-  //     name: payload.name,
-  //     email: payload.email,
-  //   };
-  // }
 }

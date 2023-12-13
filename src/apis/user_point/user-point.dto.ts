@@ -20,11 +20,28 @@ export class PointSendDto {
   amount: number;
 }
 
+export class PointPartyPointToUserDto {
+  @ApiProperty({ example: 'PartyID', description: 'party의 ID' })
+  @IsString()
+  @IsNotEmpty()
+  partyID: string;
+
+  @ApiProperty({ example: '5000', description: '보낼 금액' })
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
+}
+
 export class PointFineDto {
   @ApiProperty({ example: '철수', description: 'user의 name' })
   @IsString()
   @IsNotEmpty()
   userName: string;
+
+  @ApiProperty({ example: 'Party01', description: 'party의 id' })
+  @IsString()
+  @IsNotEmpty()
+  partyID: string;
 
   @ApiProperty({ example: '5000', description: '벌금으로 낼 금액' })
   @IsNumber()

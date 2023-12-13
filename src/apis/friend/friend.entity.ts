@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 
 export enum STATUS_ENUM {
@@ -16,6 +16,9 @@ export class Friend {
 
   @Column({ type: 'enum', enum: STATUS_ENUM })
   isAccepted: STATUS_ENUM;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @ManyToOne(() => User, (user) => user.friends, { onDelete: 'CASCADE' })
   user: User;

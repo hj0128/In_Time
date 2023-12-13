@@ -178,10 +178,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // 클라이언트에서 'chatMessage' 메시지를 받으면 호출되는 메서드
   @SubscribeMessage('chatMessage')
   async handleChatMessage(client: Socket, data: { message: string; room: string }): Promise<void> {
-    console.log('========hey======');
-    console.log(data.message, data.room);
     if (!this.roomUsers[data.room]) {
-      console.log('방없쪄');
       return;
     }
 

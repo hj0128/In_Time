@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Party } from '../party/party.entity';
 import { User } from '../user/user.entity';
 
@@ -6,6 +6,9 @@ import { User } from '../user/user.entity';
 export class Party_User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 
   @ManyToOne(() => Party, (party) => party.partyUsers, { onDelete: 'CASCADE' })
   party: Party;

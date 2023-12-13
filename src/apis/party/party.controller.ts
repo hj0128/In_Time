@@ -1,12 +1,11 @@
-import { Body, Controller, Delete, Get, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { PartyService } from './party.service';
 import { Party } from './party.entity';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   FindOneWithPartyIDDto,
   PartyCreateDto,
-  PartyDeleteDto,
-  PartyRestoreDto,
+  PartySoftDeleteDto,
   PartyUpdateAndUserAndPlanDto,
 } from './party.dto';
 import { Request } from 'express';
@@ -79,25 +78,13 @@ export class PartyController {
 
   @UseGuards(AuthGuard('access'))
   @ApiOperation({
-    summary: '파티 삭제',
-    description: '파티를 삭제한다.',
+    summary: '파티 소프트 삭제',
+    description: '파티를 소프트 삭제한다.',
   })
-  @Delete('/partyDelete')
-  partyDelete(
-    @Query() partyDeleteDto: PartyDeleteDto, //
+  @Delete('/partySoftDelete')
+  partySoftDelete(
+    @Body() partySoftDeleteDto: PartySoftDeleteDto, //
   ): Promise<boolean> {
-    return this.partyService.delete({ partyDeleteDto });
-  }
-
-  @UseGuards(AuthGuard('access'))
-  @ApiOperation({
-    summary: '파티 복구',
-    description: '삭제된 파티를 복구한다.',
-  })
-  @Put('/partyRestore')
-  partyRestore(
-    @Body() partyRestoreDto: PartyRestoreDto, //
-  ): Promise<boolean> {
-    return this.partyService.restore({ partyRestoreDto });
+    return this.partyService.softDelete({ partySoftDeleteDto });
   }
 }

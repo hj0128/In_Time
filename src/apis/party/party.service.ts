@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Party } from './party.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -8,14 +14,17 @@ import {
   IPartyServiceFindOneWithPartyID,
   IPartyServiceFindWithUserID,
   PartyList,
-  IPartyServiceDelete,
-  IPartyServiceRestore,
+  IPartyServiceSoftDelete,
 } from './party.interface';
 import { Party_UserService } from '../party-user/party-user.service';
 import { PlanService } from '../plan/plan.service';
-import { PointService } from '../point/point.service';
+
 import { Plan } from '../plan/plan.entity';
-import { ChatService } from '../chat/chat.service';
+import { Chat } from '../chat/chat.entity';
+import { Party_User } from '../party-user/party-user.entity';
+import { User_PointService } from '../user_point/user-point.service';
+import { Party_Point } from '../party_point/party-point.entity';
+import { Marker } from '../marker/marker.entity';
 
 @Injectable()
 export class PartyService {
@@ -23,11 +32,12 @@ export class PartyService {
     @InjectRepository(Party)
     private readonly partyRepository: Repository<Party>,
 
-    private readonly chatService: ChatService,
-    private readonly dataSource: DataSource,
+    @Inject(forwardRef(() => Party_UserService))
     private readonly partyUserService: Party_UserService,
+
+    private readonly dataSource: DataSource,
     private readonly planService: PlanService,
-    private readonly pointService: PointService,
+    private readonly userPointService: User_PointService,
   ) {}
 
   findOneWithPartyID({ partyID }: IPartyServiceFindOneWithPartyID): Promise<Party> {
@@ -100,7 +110,7 @@ export class PartyService {
   async updateAndUserAndPlan({
     partyUpdateAndUserAndPlanDto,
   }: IPartyServiceUpdateAndUserAndPlan): Promise<void> {
-    const { planID, users } = partyUpdateAndUserAndPlanDto;
+    const { planID, partyID, users } = partyUpdateAndUserAndPlanDto;
 
     const plan = await this.planService.checkEnd({ planID });
 
@@ -109,11 +119,13 @@ export class PartyService {
     await queryRunner.startTransaction('SERIALIZABLE');
 
     try {
+      // 플랜에 약속시간 종료됨 확인
       await queryRunner.manager.save(Plan, {
         id: planID,
         isEnd: true,
       });
 
+      // 파티의 포인트 업데이트
       await queryRunner.manager.increment(
         Party,
         { id: plan.party.id },
@@ -121,11 +133,13 @@ export class PartyService {
         plan.fine * users.length,
       );
 
+      // 유저 포인트 테이블 업데이트
       await Promise.all(
         users.map(async (user) => {
-          await this.pointService.fine({
+          await this.userPointService.fine({
             pointFineDto: {
               userName: user,
+              partyID,
               amount: plan.fine,
             },
             queryRunner,
@@ -142,8 +156,10 @@ export class PartyService {
     }
   }
 
-  async delete({ partyDeleteDto }: IPartyServiceDelete): Promise<boolean> {
-    if (Number(partyDeleteDto.point) > 0) {
+  async softDelete({ partySoftDeleteDto }: IPartyServiceSoftDelete): Promise<boolean> {
+    const party = await this.findOneWithPartyID({ partyID: partySoftDeleteDto.partyID });
+
+    if (Number(party.point) > 0) {
       throw new BadRequestException('포인트 보유');
     }
 
@@ -152,15 +168,28 @@ export class PartyService {
     await queryRunner.startTransaction('READ COMMITTED');
 
     try {
-      const partyResult = await queryRunner.manager.softDelete(Party, {
-        id: partyDeleteDto.partyID,
+      await queryRunner.manager.softDelete(Chat, {
+        party: { id: party.id },
       });
 
-      await this.chatService.delete({
-        chatDelete: {
-          partyID: partyDeleteDto.partyID,
-          queryRunner,
-        },
+      await queryRunner.manager.softDelete(Plan, {
+        party: { id: party.id },
+      });
+
+      await queryRunner.manager.softDelete(Party_User, {
+        party: { id: party.id },
+      });
+
+      await queryRunner.manager.softDelete(Party_Point, {
+        party: { id: party.id },
+      });
+
+      await queryRunner.manager.softDelete(Marker, {
+        party: { id: party.id },
+      });
+
+      const partyResult = await queryRunner.manager.softDelete(Party, {
+        id: partySoftDeleteDto.partyID,
       });
 
       await queryRunner.commitTransaction();
@@ -171,32 +200,6 @@ export class PartyService {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
       throw new InternalServerErrorException('파티 삭제에 실패하였습니다.');
-    }
-  }
-
-  async restore({ partyRestoreDto }: IPartyServiceRestore): Promise<boolean> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction('READ COMMITTED');
-
-    try {
-      const partyResult = await queryRunner.manager.restore(Party, { id: partyRestoreDto.partyID });
-
-      await this.chatService.restore({
-        chatRestore: {
-          partyID: partyRestoreDto.partyID,
-          queryRunner,
-        },
-      });
-
-      await queryRunner.commitTransaction();
-      await queryRunner.release();
-
-      return partyResult.affected ? true : false;
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      await queryRunner.release();
-      throw new InternalServerErrorException('파티 복구에 실패하였습니다.');
     }
   }
 }

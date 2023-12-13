@@ -85,7 +85,7 @@ export class UserController {
   userDelete(
     @Req() req: Request & JwtReqUser, //
   ): Promise<boolean> {
-    return this.userService.delete({ userID: req.user.id });
+    return this.userService.softDelete({ userID: req.user.id, headers: req.headers });
   }
 
   @UseGuards(AuthGuard('access'))

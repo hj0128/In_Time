@@ -48,6 +48,8 @@ const login = async () => {
   } catch (error) {
     if (error.response.status === 401) {
       alert('이메일 또는 비밀번호를 잘못 입력했습니다.');
+    } else if (error.response.status === 410) {
+      alert('탈퇴한 사용자입니다.');
     } else {
       alert('로그인 중 오류가 발생했습니다. 나중에 다시 시도해주세요.');
     }
@@ -73,7 +75,15 @@ const google = document.querySelector('#google');
 const naver = document.querySelector('#naver');
 const kakao = document.querySelector('#kakao');
 const social = (social) => {
-  window.location.href = `/auth/${social}`;
+  try {
+    window.location.href = `/auth/${social}`;
+  } catch (error) {
+    if (error.response.status === 410) {
+      alert('탈퇴한 사용자입니다.');
+    } else {
+      alert('로그인 중 오류가 발생했습니다. 나중에 다시 시도해주세요.');
+    }
+  }
 };
 google.addEventListener('click', () => social('google'));
 naver.addEventListener('click', () => social('naver'));

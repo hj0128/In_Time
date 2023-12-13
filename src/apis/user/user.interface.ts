@@ -1,5 +1,6 @@
 import { JwtReqUser } from 'src/commons/interface/req.interface';
 import { UserCreateDto, UserSetRedisDto } from './user.dto';
+import { Request } from 'express';
 
 export interface IUserServiceFindOneWithUserID {
   id: string;
@@ -21,8 +22,9 @@ export interface IUserServiceCreate {
   userCreateDto: UserCreateDto;
 }
 
-export interface IUserServiceDelete {
+export interface IUserServiceSoftDelete {
   userID: string;
+  headers: Request['headers'];
 }
 
 export interface IUserServiceSetRedis {

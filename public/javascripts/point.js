@@ -59,8 +59,7 @@ const paymentClickHandler = async (pay) => {
       },
       async (rsp) => {
         if (rsp.success) {
-          console.log(rsp);
-          await axios.post('/point/pointFill', {
+          await axios.post('/userPoint/userPointFill', {
             impUid: rsp.imp_uid,
             amount: rsp.paid_amount,
           });
