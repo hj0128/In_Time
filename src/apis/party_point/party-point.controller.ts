@@ -18,6 +18,7 @@ export class Party_PointController {
     description: '해당하는 partyID의 point 내역을 찾는다.',
   })
   @ApiQuery({ name: 'partyID', description: '찾고 싶은 party의 id' })
+  @UseGuards(AuthGuard('access'))
   @Get('/partyPointFindWithPartyID')
   partyPointFindWithPartyID(
     @Query('partyID') partyID: string, //
@@ -25,11 +26,11 @@ export class Party_PointController {
     return this.partyPointService.findWithPartyID({ partyID });
   }
 
-  @UseGuards(AuthGuard('access'))
   @ApiOperation({
     summary: '파티 포인트를 유저에게 보낸다.',
     description: 'party의 포인트를 user에게 보낸다.',
   })
+  @UseGuards(AuthGuard('access'))
   @Post('/partyPointUserSend')
   partyPointUserSend(
     @Req() req: Request & JwtReqUser,

@@ -375,7 +375,7 @@ const getPlan = async () => {
     const partyID = party.id;
 
     // 플랜에 속한 멤버 정보 가져오기
-    const partyUser = await axios.get('/party_user/partyUserFindAllWithPartyID', {
+    const partyUser = await axios.get('/partyUser/partyUserFindAllWithPartyID', {
       params: { partyID },
     });
 

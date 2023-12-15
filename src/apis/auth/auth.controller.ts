@@ -16,7 +16,7 @@ export class AuthController {
 
   @ApiOperation({
     summary: 'user에게 인증 번호 전송',
-    description: '회원가입을 위해 user의 휴대폰에 인증 번호를 전송한다.',
+    description: '회원가입을 위해 user의 실 이메일로 인증 번호를 전송한다.',
   })
   @Post('/authSendToken')
   authSendToken(

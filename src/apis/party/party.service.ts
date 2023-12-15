@@ -15,6 +15,7 @@ import {
   IPartyServiceFindWithUserID,
   PartyList,
   IPartyServiceSoftDelete,
+  IPartyServiceDelete,
 } from './party.interface';
 import { Party_UserService } from '../party-user/party-user.service';
 import { PlanService } from '../plan/plan.service';
@@ -52,23 +53,19 @@ export class PartyService {
       relations: ['partyUsers'],
     });
 
-    const partyList = [];
+    const partyList = await Promise.all(
+      parties.map(async (party) => {
+        const partyUsers = await this.partyUserService.findAllWithPartyID({ partyID: party.id });
+        const members = partyUsers.map((partyUser) => partyUser.user.name);
 
-    if (parties) {
-      await Promise.all(
-        parties.map(async (el) => {
-          const partyUsers = await this.partyUserService.findAllWithPartyID({ partyID: el.id });
-          const members = partyUsers.map((el) => el.user.name);
-
-          partyList.push({
-            partyID: el.id,
-            name: el.name,
-            point: el.point,
-            members,
-          });
-        }),
-      );
-    }
+        return {
+          partyID: party.id,
+          name: party.name,
+          point: party.point,
+          members,
+        };
+      }),
+    );
 
     return partyList;
   }
@@ -201,5 +198,11 @@ export class PartyService {
       await queryRunner.release();
       throw new InternalServerErrorException('파티 삭제에 실패하였습니다.');
     }
+  }
+
+  async delete({ partyDeleteDto }: IPartyServiceDelete): Promise<boolean> {
+    const result = await this.partyRepository.delete({ id: partyDeleteDto.partyID });
+
+    return result.affected ? true : false;
   }
 }

@@ -1,10 +1,7 @@
-import { Inject, Injectable, UnprocessableEntityException, forwardRef } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PARTY_POINT_STATUS, Party_Point } from './party-point.entity';
 import { DataSource, Repository } from 'typeorm';
-
-import { IamPortService } from '../iam-port/iam-port.service';
-import { UserService } from '../user/user.service';
 import {
   IPartyPointServiceFindWithPartyID,
   IPartyPointServiceUserSend,
@@ -32,10 +29,6 @@ export class Party_PointService {
   }: IPartyPointServiceUserSend): Promise<Party_Point> {
     const { partyID, amount } = partyPointUserSendDto;
     const id = _user.id;
-
-    if (amount <= 0) {
-      throw new UnprocessableEntityException('1원 이상부터 보낼 수 있습니다.');
-    }
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();

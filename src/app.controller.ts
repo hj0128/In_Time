@@ -4,11 +4,6 @@ import { ApiExcludeEndpoint } from '@nestjs/swagger';
 @Controller()
 export class AppController {
   @ApiExcludeEndpoint()
-  @Get('/chat')
-  @Render('chat')
-  chat() {}
-
-  @ApiExcludeEndpoint()
   @Get('/')
   @Render('home')
   home() {
@@ -55,11 +50,6 @@ export class AppController {
   @Get('/friend/list')
   @Render('friend_list')
   friendList() {}
-
-  @ApiExcludeEndpoint()
-  @Get('/friend/create')
-  @Render('friend_create')
-  friendCreate() {}
 
   @ApiExcludeEndpoint()
   @Get('/signIn')

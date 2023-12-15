@@ -28,6 +28,13 @@ export class UserCreateDto {
   userEmail: string;
 }
 
+export class UserDeleteDto {
+  @ApiProperty({ example: 'User01', description: 'user의 id' })
+  @IsString()
+  @IsNotEmpty()
+  userID: string;
+}
+
 export class UserSetRedisDto {
   @ApiProperty({ example: '12.203', description: '위도' })
   @IsNumber()

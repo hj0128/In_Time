@@ -15,10 +15,7 @@ describe('PartyUserController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [Party_UserController],
       providers: [
-        {
-          provide: Party_UserService,
-          useValue: mockPartyUserService,
-        },
+        { provide: Party_UserService, useValue: mockPartyUserService }, //
       ],
     }).compile();
 
@@ -27,7 +24,7 @@ describe('PartyUserController', () => {
   });
 
   describe('partyUserFindAllWithPartyID', () => {
-    it('partyID와 일치하는 모든 party-user를 반환한다.', async () => {
+    it('partyID에 연결된 user의 정보를 모두 가져온다.', async () => {
       const inputPartyID: string = 'Party01';
 
       const expectedFindAllWithPartyID: Party_User[] = [];

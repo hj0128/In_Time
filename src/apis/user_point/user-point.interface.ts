@@ -1,10 +1,5 @@
 import { JwtReqUser } from 'src/commons/interface/req.interface';
-import {
-  PointFillDto,
-  PointFineDto,
-  PointPartyPointToUserDto,
-  PointSendDto,
-} from './user-point.dto';
+import { PointFillDto, PointFineDto, PointSendDto } from './user-point.dto';
 import { QueryRunner } from 'typeorm';
 
 export interface IUserPointServiceFindWithUserID {
@@ -41,9 +36,4 @@ export interface IPointServiceSend {
 export interface IPointServiceFine {
   pointFineDto: PointFineDto;
   queryRunner: QueryRunner;
-}
-
-export interface IPointServicePartyPointToUser {
-  user: JwtReqUser['user'];
-  pointPartyPointToUserDto: PointPartyPointToUserDto;
 }

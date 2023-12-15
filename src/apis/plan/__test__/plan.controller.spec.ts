@@ -5,27 +5,25 @@ import { PlanController } from '../plan.controller';
 import { PlanService } from '../plan.service';
 import { Plan } from '../plan.entity';
 import { Party } from 'src/apis/party/party.entity';
-import { PlanCreateDto } from '../plan.dto';
+import { PlanCreateDto, PlanSoftDeleteDto } from '../plan.dto';
 
 describe('PlanController', () => {
   let planController: PlanController;
   let planService: PlanService;
 
   beforeEach(async () => {
-    const mockplanService = {
+    const mockPlanService = {
       findOneWithPlanID: jest.fn(),
       findWithPartyID: jest.fn(),
       findWithUserIDAndPartyID: jest.fn(),
       create: jest.fn(),
+      softDelete: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PlanController],
       providers: [
-        {
-          provide: PlanService,
-          useValue: mockplanService,
-        },
+        { provide: PlanService, useValue: mockPlanService }, //
       ],
     }).compile();
 
@@ -33,25 +31,37 @@ describe('PlanController', () => {
     planService = module.get<PlanService>(PlanService);
   });
 
-  const mockReq: Request & JwtReqUser = { user: { id: 'User01' } } as Request & JwtReqUser;
-
+  const mockReq: Request & JwtReqUser = {
+    user: {
+      id: 'User01',
+      name: '철수',
+      email: 'a@a.com',
+      password: '1234',
+      profileUrl: 'http://a.jpg',
+    },
+  } as Request & JwtReqUser;
   const mockParty: Party = {
     id: 'Party01',
     name: '파티명',
     point: 0,
+    deletedAt: null,
+    chats: [],
+    markers: [],
+    partyPoints: [],
     partyUsers: [],
     plans: [],
   };
-
   const mockPlan: Plan = {
     id: 'Plan01',
     planName: '플랜명',
-    placeName: '장소명',
-    placeAddress: '주소',
-    placeLat: 12.203,
-    placeLng: 15.206,
-    date: '2023-11-30',
+    placeName: '미진삼겹살',
+    placeAddress: '대구 달서구 월성동 1195-1',
+    placeLat: 35.8668,
+    placeLng: 128.6015,
+    date: '2023-11-11T19:30',
     fine: 5000,
+    isEnd: false,
+    deletedAt: null,
     party: mockParty,
   };
 
@@ -106,13 +116,13 @@ describe('PlanController', () => {
     it('plan을 생성한 후 생성된 plan을 반환한다.', async () => {
       const inputPlanCreateDto: PlanCreateDto = {
         planName: '플랜명',
-        placeName: '장소',
-        placeAddress: '주소',
-        placeLat: 12.203,
-        placeLng: 15.205,
-        date: '2023-11-30',
+        placeName: '미진삼겹살',
+        placeAddress: '대구 달서구 월성동 1195-1',
+        placeLat: 35.8668,
+        placeLng: 128.6015,
+        date: '2023-11-11T19:30',
         fine: 5000,
-        partyID: 'Party01',
+        partyID: mockParty.id,
       };
 
       const expectedCreate: Plan = mockPlan;
@@ -123,6 +133,21 @@ describe('PlanController', () => {
 
       expect(result).toEqual(expectedCreate);
       expect(planService.create).toHaveBeenCalledWith({ planCreateDto: inputPlanCreateDto });
+    });
+  });
+
+  describe('planSoftDelete', () => {
+    it('약속을 소프트 삭제한다.', async () => {
+      const inputPlanSoftDeleteDto: PlanSoftDeleteDto = { planID: 'Plan01' };
+
+      jest.spyOn(planService, 'softDelete').mockResolvedValueOnce(true);
+
+      const result: boolean = await planController.planSoftDelete(inputPlanSoftDeleteDto);
+
+      expect(result).toBe(true);
+      expect(planService.softDelete).toHaveBeenCalledWith({
+        planSoftDeleteDto: inputPlanSoftDeleteDto,
+      });
     });
   });
 });

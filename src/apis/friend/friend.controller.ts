@@ -15,11 +15,11 @@ export class FriendController {
     private readonly friendService: FriendService, //
   ) {}
 
-  @UseGuards(AuthGuard('access'))
   @ApiOperation({
     summary: '로그인 user의 모든 friend 가져오기',
     description: '로그인 유저의 모든 friend를 배열로 가져온다.',
   })
+  @UseGuards(AuthGuard('access'))
   @Get('/friendFindWithUserID')
   friendFindWithUserID(
     @Req() req: Request & JwtReqUser, //
@@ -27,11 +27,11 @@ export class FriendController {
     return this.friendService.findWithUserID({ userID: req.user.id });
   }
 
-  @UseGuards(AuthGuard('access'))
   @ApiOperation({
     summary: 'friend 생성하기',
     description: '로그인 user가 친구 신청을 한다.',
   })
+  @UseGuards(AuthGuard('access'))
   @Post('/friendCreate')
   friendCreate(
     @Body() friendCreateDto: FriendCreateDto,
@@ -40,11 +40,11 @@ export class FriendController {
     return this.friendService.create({ friendCreateDto, user: req.user });
   }
 
-  @UseGuards(AuthGuard('access'))
   @ApiOperation({
     summary: '친구 관계 맺기',
     description: '요청을 수락할 시 서로 친구 관계로 변경한다.',
   })
+  @UseGuards(AuthGuard('access'))
   @Post('/friendUpdate')
   friendUpdate(
     @Body() friendUpdateDto: FriendUpdateDto,
@@ -53,11 +53,11 @@ export class FriendController {
     return this.friendService.update({ friendUpdateDto, user: req.user });
   }
 
-  @UseGuards(AuthGuard('access'))
   @ApiOperation({
     summary: '친구 요청 거절',
     description: '요청을 거절할 시 요청 내역을 삭제한다.',
   })
+  @UseGuards(AuthGuard('access'))
   @Delete('/friendRefuse')
   friendRefuse(
     @Body() friendRefuseDto: FriendRefuseDto, //
@@ -65,11 +65,11 @@ export class FriendController {
     return this.friendService.refuse({ friendRefuseDto });
   }
 
-  @UseGuards(AuthGuard('access'))
   @ApiOperation({
     summary: '친구 끊기',
     description: '친구 관계를 끊는다.',
   })
+  @UseGuards(AuthGuard('access'))
   @Delete('/friendUnFriend')
   friendUnFriend(
     @Body() friendUnFriendDto: FriendUnFriendDto,

@@ -29,10 +29,10 @@ export class AuthService {
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
 
-    private readonly jwtService: JwtService,
-
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+
+    private readonly jwtService: JwtService,
   ) {}
 
   sendToken({ authSendTokenDto }: IAuthServiceSendToken): void {

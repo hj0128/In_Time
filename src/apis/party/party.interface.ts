@@ -1,5 +1,10 @@
 import { JwtReqUser } from '../../commons/interface/req.interface';
-import { PartyCreateDto, PartySoftDeleteDto, PartyUpdateAndUserAndPlanDto } from './party.dto';
+import {
+  PartyCreateDto,
+  PartyDeleteDto,
+  PartySoftDeleteDto,
+  PartyUpdateAndUserAndPlanDto,
+} from './party.dto';
 
 export interface IPartyServiceFindOneWithPartyID {
   partyID: string;
@@ -27,4 +32,8 @@ export interface IPartyServiceUpdateAndUserAndPlan {
 
 export interface IPartyServiceSoftDelete {
   partySoftDeleteDto: PartySoftDeleteDto;
+}
+
+export interface IPartyServiceDelete {
+  partyDeleteDto: PartyDeleteDto;
 }

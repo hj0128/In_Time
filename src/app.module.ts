@@ -43,7 +43,7 @@ import { Party_PointModule } from './apis/party_point/party-point.module';
       database: process.env.DATABASE_DATABASE,
       entities: [__dirname + '/apis/**/*.entity.*'],
       synchronize: true, // 개발 중에만 사용, 프로덕션에서는 비활성화
-      logging: true,
+      logging: false,
     }),
     CacheModule.register<RedisClientOptions>({
       store: redisStore,

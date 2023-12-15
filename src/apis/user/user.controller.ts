@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { User } from './user.entity';
-import { UserCreateDto, UserSetRedisDto } from './user.dto';
+import { UserCreateDto, UserDeleteDto, UserSetRedisDto } from './user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { JwtReqUser } from 'src/commons/interface/req.interface';
@@ -15,25 +15,12 @@ export class UserController {
     private readonly userService: UserService, //
   ) {}
 
-  // 지우기
-  @UseGuards(AuthGuard('access'))
-  @ApiOperation({
-    summary: 'TEST',
-    description: 'test',
-  })
-  @Get('/test')
-  test(
-    @Req() req: Request & JwtReqUser, //
-  ) {
-    return req.user;
-  }
-
-  @UseGuards(AuthGuard('access'))
   @ApiOperation({
     summary: 'userID로 user 찾기',
     description: '해당하는 userID의 user를 찾는다.',
   })
   @ApiQuery({ name: 'userID', description: '찾고 싶은 user의 ID' })
+  @UseGuards(AuthGuard('access'))
   @Get('/userFindOneWithUserID')
   userFindOneWithUserID(
     @Req() req: Request & JwtReqUser, //
@@ -76,23 +63,34 @@ export class UserController {
     return this.userService.create({ userCreateDto });
   }
 
-  @UseGuards(AuthGuard('access'))
   @ApiOperation({
-    summary: 'user 삭제하기',
-    description: '회원 탈퇴에 성공하면 user를 DB에서 삭제한다.',
+    summary: 'user 소프트 삭제하기',
+    description: '회원 탈퇴에 성공하면 user를 소프트 삭제한다.',
   })
-  @Post('/userDelete')
-  userDelete(
+  @UseGuards(AuthGuard('access'))
+  @Delete('/userSoftDelete')
+  userSoftDelete(
     @Req() req: Request & JwtReqUser, //
   ): Promise<boolean> {
     return this.userService.softDelete({ userID: req.user.id, headers: req.headers });
   }
 
-  @UseGuards(AuthGuard('access'))
+  @ApiOperation({
+    summary: 'user 하드 삭제하기',
+    description: 'user를 DB에서 완전히 삭제한다.',
+  })
+  @Delete('/userDelete')
+  userDelete(
+    @Body() userDeleteDto: UserDeleteDto, //
+  ): Promise<boolean> {
+    return this.userService.delete({ userDeleteDto });
+  }
+
   @ApiOperation({
     summary: 'Redis에 user 등록하기',
     description: 'Redis에 user의 실시간 위치를 저장한다.',
   })
+  @UseGuards(AuthGuard('access'))
   @Post('/userSetRedis')
   userSetRedis(
     @Req() req: Request & JwtReqUser,
@@ -101,11 +99,11 @@ export class UserController {
     return this.userService.setRedis({ user: req.user, userSetRedisDto });
   }
 
-  @UseGuards(AuthGuard('access'))
   @ApiOperation({
     summary: 'Redis에서 user들 가져오기',
     description: 'Redis에서 userName과 일치하는 값을 가져온다.',
   })
+  @UseGuards(AuthGuard('access'))
   @Get('/userGetRedis')
   userGetRedis(
     @Query('usersName') usersName: string[], //

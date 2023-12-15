@@ -5,15 +5,20 @@ import { FriendService } from '../friend.service';
 import { UserService } from '../../user/user.service';
 import { Friend, STATUS_ENUM } from '../friend.entity';
 import { User } from '../../user/user.entity';
+import { JwtReqUser } from 'src/commons/interface/req.interface';
+import { FriendList } from '../friend.interface';
+import {
+  FriendCreateDto,
+  FriendRefuseDto,
+  FriendUnFriendDto,
+  FriendUpdateDto,
+} from '../friend.dto';
 import {
   BadRequestException,
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { FriendListInfo } from '../friend.interface';
-import { FriendCreateDto, FriendDeleteDto, FriendUpdateDto } from '../friend.dto';
-import { JwtReqUser } from 'src/commons/interface/req.interface';
 
 describe('FriendService', () => {
   let friendService: FriendService;
@@ -21,11 +26,6 @@ describe('FriendService', () => {
   let mockFriendRepository: Partial<Record<keyof Repository<Friend>, jest.Mock>>;
 
   beforeEach(async () => {
-    const mockUserService = {
-      findOneWithUserId: jest.fn(),
-      findOneWithName: jest.fn(),
-    };
-
     mockFriendRepository = {
       find: jest.fn(),
       save: jest.fn(),
@@ -33,17 +33,12 @@ describe('FriendService', () => {
       delete: jest.fn(),
     };
 
+    const mockUserService = { findOneWithUserID: jest.fn(), findOneWithName: jest.fn() };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FriendService,
-        {
-          provide: getRepositoryToken(Friend),
-          useValue: mockFriendRepository,
-        },
-        {
-          provide: UserService,
-          useValue: mockUserService,
-        },
+        { provide: getRepositoryToken(Friend), useValue: mockFriendRepository },
+        { provide: UserService, useValue: mockUserService },
       ],
     }).compile();
 
@@ -51,37 +46,47 @@ describe('FriendService', () => {
     userService = module.get<UserService>(UserService);
   });
 
-  const mockUser: User = {
-    id: 'User01',
-    name: '철수',
-    email: 'a@a.com',
-    password: '1234',
-    profileUrl: 'https://a.jpg',
-    badgeUrl: 'https://b.jpg',
-    partyUsers: [],
-    friends: [],
-  };
-
-  const mockFriend: Friend = {
-    id: 'Friend01',
-    toUserID: 'User02',
-    isAccepted: STATUS_ENUM.SENT,
-    user: mockUser,
-  };
-
   const mockJwtReqUser: JwtReqUser['user'] = {
     id: 'User01',
     name: '철수',
     email: 'a@a.com',
     password: '1234',
-    profileUrl: 'https://b.jpg',
+    profileUrl: 'http://a.jpg',
+  };
+  const mockUser: User = {
+    id: 'User01',
+    name: '철수',
+    email: 'a@a.com',
+    password: '1234',
+    point: 0,
+    profileUrl: 'http://a.jpg',
+    badgeUrl: 'http://b.jpg',
+    deletedAt: null,
+    partyUsers: [],
+    friends: [],
+    userPoints: [],
+  };
+  const mockFriend: Friend = {
+    id: 'Friend01',
+    toUserID: 'User01',
+    isAccepted: STATUS_ENUM.FRIENDSHIP,
+    deletedAt: null,
+    user: mockUser,
+  };
+  const mockFriendList: FriendList = {
+    friendID: 'Friend01',
+    fromUserID: 'User01',
+    name: '철수',
+    profileUrl: 'http://a.jpg',
+    badgeUrl: 'http://b.jpg',
+    status: 'friendship',
   };
 
   describe('findAllUser', () => {
     it('userID에 해당하는 모든 friend를 반환한다.', async () => {
-      const inputUserID: string = 'User01';
+      const inputUserID: string = mockUser.id;
 
-      const expectedFind: Friend[] = [mockFriend];
+      const expectedFind: Friend[] = [];
 
       jest.spyOn(mockFriendRepository, 'find').mockResolvedValue(expectedFind);
 
@@ -90,15 +95,16 @@ describe('FriendService', () => {
       expect(result).toEqual(expectedFind);
       expect(mockFriendRepository.find).toHaveBeenCalledWith({
         where: { user: { id: inputUserID } },
+        relations: ['user'],
       });
     });
   });
 
   describe('findAllToUser', () => {
     it('toUserID에 해당하는 모든 friend를 반환한다.', async () => {
-      const inputToUserID: string = 'User02';
+      const inputToUserID: string = mockUser.id;
 
-      const expectedFind: Friend[] = [mockFriend];
+      const expectedFind: Friend[] = [];
 
       jest.spyOn(mockFriendRepository, 'find').mockResolvedValue(expectedFind);
 
@@ -113,79 +119,44 @@ describe('FriendService', () => {
   });
 
   describe('findWithUserID', () => {
-    it('userID와 일치하는 모든 friend를 반환한다.', async () => {
-      const inputUserID: string = 'User01';
-
-      const expectedFindAllUser: Friend[] = [mockFriend];
-
-      jest.spyOn(friendService, 'findAllUser').mockResolvedValue(expectedFindAllUser);
-
-      await friendService.findWithUserID({ userID: inputUserID });
-
-      expect(friendService.findAllUser).toHaveBeenCalledWith({ userID: inputUserID });
-    });
-
-    it('toUserID와 일치하는 모든 friend를 반환한다.', async () => {
-      const inputUserID: string = 'User01';
-
-      const expectedFindAllUser: Friend[] = [mockFriend];
-
-      jest.spyOn(friendService, 'findAllToUser').mockResolvedValue(expectedFindAllUser);
-
-      await friendService.findWithUserID({ userID: inputUserID });
-
-      expect(friendService.findAllToUser).toHaveBeenCalledWith({ toUserID: inputUserID });
-    });
-
     it('userID에 대한 친구 목록을 반환한다.', async () => {
-      const inputUserID: string = 'User01';
+      const inputUserID: string = mockUser.id;
 
-      const expectedFindAllUser: Friend[] = [mockFriend];
-      const expectedFindOneWithUserId: User = mockUser;
-      const expectedFriendList: FriendListInfo[] = [
-        { badgeUrl: 'https://b.jpg', name: '철수', profileUrl: 'https://a.jpg', status: 'sent' },
-      ];
+      const expectedFriend: Friend[] = [];
+      const expectedFriendList: FriendList = mockFriendList;
+      const expectedFriendListArray: FriendList[] = [];
 
-      jest.spyOn(friendService, 'findAllUser').mockResolvedValue(expectedFindAllUser);
-      jest.spyOn(friendService, 'findAllToUser').mockResolvedValue([]);
-      jest.spyOn(userService, 'findOneWithUserId').mockResolvedValue(expectedFindOneWithUserId);
+      jest.spyOn(friendService, 'findAllUser').mockResolvedValue(expectedFriend);
+      jest.spyOn(friendService, 'findAllToUser').mockResolvedValue(expectedFriend);
+      jest.spyOn(friendService, 'createFriendList').mockResolvedValue(expectedFriendList);
 
-      const result = await friendService.findWithUserID({ userID: inputUserID });
+      const result: FriendList[] = await friendService.findWithUserID({ userID: inputUserID });
 
-      expect(result).toEqual(expectedFriendList);
+      expect(result).toEqual(expectedFriendListArray);
       expect(friendService.findAllUser).toHaveBeenCalledWith({ userID: inputUserID });
       expect(friendService.findAllToUser).toHaveBeenCalledWith({ toUserID: inputUserID });
-      expect(userService.findOneWithUserID).toHaveBeenCalledWith({ id: mockFriend.toUserID });
     });
   });
 
   describe('createFriendList', () => {
     it('friendList를 생성하면 예상 항목을 추가한다.', async () => {
-      const inputFriends: Friend[] = [mockFriend];
-      const inputFriendList: any[] = [];
-      const inputMapFn: jest.Mock<FriendListInfo, [Friend]> = jest.fn((el) => ({
-        id: el.id,
-        fromUserID: el.user.id,
-        name: el.user.name,
-        profileUrl: el.user.profileUrl,
-        badgeUrl: el.user.badgeUrl,
-        status: el.isAccepted === 'SENT' ? 'received' : 'friendship',
-      }));
+      const inputFriendID: string = mockFriend.id;
+      const inputUserID: string = mockUser.id;
+      const inputStatus: string = mockFriendList.status;
 
+      const expectedFriendList: FriendList = mockFriendList;
       const expectedFindOneWithUserId: User = mockUser;
 
-      jest.spyOn(userService, 'findOneWithUserId').mockResolvedValue(expectedFindOneWithUserId);
+      jest.spyOn(userService, 'findOneWithUserID').mockResolvedValue(expectedFindOneWithUserId);
 
-      await friendService.createFriendList({
-        friends: inputFriends,
-        friendList: inputFriendList,
-        mapFn: inputMapFn,
+      const result: FriendList = await friendService.createFriendList({
+        friendID: inputFriendID,
+        userID: inputUserID,
+        status: inputStatus,
       });
 
-      expect(inputFriendList.length).toBe(1);
-      expect(inputFriendList[0].name).toBe(expectedFindOneWithUserId.name);
-      expect(inputMapFn).toHaveBeenCalledWith(inputFriends[0]);
-      expect(userService.findOneWithUserID).toHaveBeenCalledWith({ id: mockFriend.toUserID });
+      expect(result).toEqual(expectedFriendList);
+      expect(userService.findOneWithUserID).toHaveBeenCalledWith({ id: inputUserID });
     });
   });
 
@@ -239,7 +210,13 @@ describe('FriendService', () => {
 
     it('이미 요청을 받은 경우 ConflictException을 발생시킨다.', async () => {
       const expectedFindAllUserAndToUser: Friend[] = [
-        { id: 'Friend01', toUserID: 'User01', isAccepted: STATUS_ENUM.SENT, user: mockUser },
+        {
+          id: 'Friend01',
+          toUserID: 'User01',
+          isAccepted: STATUS_ENUM.SENT,
+          user: mockUser,
+          deletedAt: null,
+        },
       ];
       const expectedFindOneWithName: User = mockUser;
       expectedFindOneWithName.id = 'User02';
@@ -377,7 +354,7 @@ describe('FriendService', () => {
       expect(result).toEqual(expectedSave);
       expect(mockFriendRepository.save).toHaveBeenCalledWith({
         toUserID: inputFriendUpdateDto.fromUserID,
-        isAccept: STATUS_ENUM.FRIENDSHIP,
+        isAccepted: STATUS_ENUM.FRIENDSHIP,
         user: { id: inputUser.id },
       });
       expect(friendService.updateIsAccepted).toHaveBeenCalledWith({
@@ -387,29 +364,65 @@ describe('FriendService', () => {
     });
   });
 
-  describe('delete', () => {
-    const inputFriendDeleteDto: FriendDeleteDto = { friendID: 'Friend01' };
+  describe('refuse', () => {
+    const inputFriendRefuseDto: FriendRefuseDto = { friendID: 'Friend01' };
 
-    it('친구를 삭제하고 삭제 여부를 반환한다.', async () => {
+    it('친구 요청을 삭제하고 삭제 여부를 반환한다.', async () => {
       jest.spyOn(mockFriendRepository, 'delete').mockResolvedValue({ affected: 1 });
 
-      const result: boolean = await friendService.delete({
-        friendDeleteDto: inputFriendDeleteDto,
+      const result: boolean = await friendService.refuse({
+        friendRefuseDto: inputFriendRefuseDto,
       });
 
       expect(result).toEqual(true);
       expect(mockFriendRepository.delete).toHaveBeenCalledWith({
-        id: inputFriendDeleteDto.friendID,
+        id: inputFriendRefuseDto.friendID,
       });
     });
 
-    it('친구 삭제에 실패하면 InternalServerErrorException을 발생시킨다.', async () => {
+    it('친구 요청 삭제에 실패하면 InternalServerErrorException을 발생시킨다.', async () => {
       jest.spyOn(mockFriendRepository, 'delete').mockResolvedValue({ affected: 0 });
 
       try {
-        await friendService.delete({ friendDeleteDto: inputFriendDeleteDto });
+        await friendService.refuse({ friendRefuseDto: inputFriendRefuseDto });
       } catch (error) {
         expect(error).toBeInstanceOf(InternalServerErrorException);
+      }
+    });
+  });
+
+  describe('unFriend', () => {
+    const inputFriendUnFriendDto: FriendUnFriendDto = { fromUserID: 'User01' };
+    const inputUserID: string = mockUser.id;
+
+    it('친구 관계를 삭제하고 삭제 여부를 반환한다.', async () => {
+      const expectedFriend: Friend[] = [];
+
+      jest.spyOn(friendService, 'findAllUserAndToUser').mockResolvedValue(expectedFriend);
+      jest.spyOn(mockFriendRepository, 'delete').mockResolvedValue({ affected: 1 });
+
+      const result: boolean = await friendService.unFriend({
+        friendUnFriendDto: inputFriendUnFriendDto,
+        userID: inputUserID,
+      });
+
+      expect(result).toBe(true);
+      expect(friendService.findAllUserAndToUser).toHaveBeenCalledWith({
+        userID: inputUserID,
+        toUserID: inputFriendUnFriendDto.fromUserID,
+      });
+    });
+
+    it('친구 관계 삭제에 실패하면 InternalServerErrorException을 발생시킨다.', async () => {
+      jest.spyOn(mockFriendRepository, 'delete').mockResolvedValue({ affected: 0 });
+
+      try {
+        await friendService.unFriend({
+          friendUnFriendDto: inputFriendUnFriendDto,
+          userID: inputUserID,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
       }
     });
   });

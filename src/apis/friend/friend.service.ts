@@ -125,7 +125,7 @@ export class FriendService {
     } else {
       const create = await this.friendRepository.save({
         toUserID: toUser.id,
-        isAccept: STATUS_ENUM.SENT,
+        isAccepted: STATUS_ENUM.SENT,
         user: { id: user.id },
       });
       if (!create) throw new InternalServerErrorException('친구 요청에 실패하였습니다.');
@@ -159,7 +159,7 @@ export class FriendService {
 
     const create = await this.friendRepository.save({
       toUserID: fromUserID,
-      isAccept: STATUS_ENUM.FRIENDSHIP,
+      isAccepted: STATUS_ENUM.FRIENDSHIP,
       user: { id: user.id },
     });
     if (!create) throw new InternalServerErrorException('친구 생성에 실패하였습니다.');
@@ -174,7 +174,7 @@ export class FriendService {
     const { friendID } = friendRefuseDto;
 
     const result = await this.friendRepository.delete({ id: friendID });
-    if (!result) throw new InternalServerErrorException('삭제에 실패하였습니다.');
+    if (!result) throw new InternalServerErrorException('친구 요청 거절에 실패하였습니다.');
 
     return result.affected ? true : false;
   }
@@ -188,7 +188,7 @@ export class FriendService {
     const friendID = friends.map((el) => el.id);
 
     const result = await this.friendRepository.delete(friendID);
-    if (!result) throw new InternalServerErrorException('삭제에 실패하였습니다.');
+    if (!result) throw new InternalServerErrorException('친구 관계 끊기에 실패하였습니다.');
 
     return result.affected ? true : false;
   }

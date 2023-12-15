@@ -16,15 +16,13 @@ window.onload = () => {
 const getUser = async () => {
   try {
     const user = await axios.get('/user/userFindOneWithUserID');
-    const { id, name, email, profileUrl, badgeUrl, point } = user.data;
+    const { name, email, profileUrl, badgeUrl, point } = user.data;
 
-    const points = await axios.get('userPoint/userPointFindWithUserID', {
-      params: { userID: id },
-    });
+    const points = await axios.get('userPoint/userPointFindWithUserID');
     points.data.sort((a, b) => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
-    console.log(points)
+
     const profileImage = document.querySelector('#profile_image');
     const userName = document.querySelector('#name');
     const userBadge = document.querySelector('#badge_image');
@@ -152,7 +150,7 @@ const withdrawClickHandler = async () => {
     const isAccept = confirm('회원가입을 탈퇴하시겠습니까?');
     if (!isAccept) return;
 
-    await axios.post('/user/userDelete');
+    await axios.delete('/user/userSoftDelete');
 
     alert('회원탈퇴에 성공하였습니다.');
     window.location.href = '/';

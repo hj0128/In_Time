@@ -2,7 +2,7 @@ import { Bucket, Storage } from '@google-cloud/storage';
 import { Injectable } from '@nestjs/common';
 import { IFileServiceUpload } from './file.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { getToday } from 'src/commons/library/utils';
+import { getToday } from '../../commons/library/utils';
 import * as iconv from 'iconv-lite';
 
 @Injectable()
@@ -29,8 +29,8 @@ export class FileService {
           res(fileUrl);
         })
         .on('error', (error) => {
-          console.error(`Upload failed: ${error}`);
-          rej('업로드 실패');
+          rej(new Error('업로드 실패'));
+          throw error;
         });
 
       fileStream.end(file.buffer);

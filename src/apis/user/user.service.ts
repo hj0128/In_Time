@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   GoneException,
   Inject,
@@ -11,11 +12,13 @@ import { User } from './user.entity';
 import { DataSource, In, Repository } from 'typeorm';
 import {
   IUserServiceCreate,
+  IUserServiceDelete,
   IUserServiceFindAllWithUserID,
   IUserServiceFindOneWithEmail,
   IUserServiceFindOneWithName,
   IUserServiceFindOneWithUserID,
   IUserServiceGetRedis,
+  IUserServiceSendEmail,
   IUserServiceSetRedis,
   IUserServiceSoftDelete,
   RedisInfo,
@@ -30,7 +33,6 @@ import { Friend } from '../friend/friend.entity';
 import { Party_UserService } from '../party-user/party-user.service';
 import { Party_User } from '../party-user/party-user.entity';
 import { User_Point } from '../user_point/user-point.entity';
-// import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class UserService {
@@ -68,7 +70,7 @@ export class UserService {
     return users[0];
   }
 
-  async sendEmail({ name, userEmail }) {
+  async sendEmail({ name, userEmail }: IUserServiceSendEmail): Promise<void> {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       host: 'smtp.gmail.com',
@@ -101,6 +103,13 @@ export class UserService {
 
   async create({ userCreateDto }: IUserServiceCreate): Promise<User> {
     const { name, email, password, profileUrl, userEmail } = userCreateDto;
+
+    const duplicateNameUser = await this.findOneWithName({ name });
+    const duplicateEmailUser = await this.findOneWithEmail({ email });
+    if (duplicateNameUser || duplicateEmailUser) {
+      throw new ConflictException('이메일 또는 별명이 중복되어 사용이 불가합니다.');
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const create = await this.userRepository.save({
@@ -149,41 +158,19 @@ export class UserService {
     }
   }
 
-  // softDelete된 user를 하루 뒤에 완전히 삭제
-  // async softDelete({ userID }: IUserServiceDelete): Promise<User> {
-  //   const user = await this.findOneWithUserID({ id: userID });
-  //   if (user.deletedAt) throw new GoneException('이미 탈퇴한 사용자입니다.');
+  async delete({ userDeleteDto }: IUserServiceDelete): Promise<boolean> {
+    const result = await this.userRepository.delete({ id: userDeleteDto.userID });
 
-  //   user.deletedAt = new Date();
-  //   const result = await this.userRepository.save(user);
-
-  //   return result;
-  // }
-
-  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  // async delete(): Promise<void> {
-  //   const oneDayAgo = new Date();
-  //   oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-
-  //   const softDeletedUsers = await this.userRepository
-  //     .createQueryBuilder('user')
-  //     .where('user.deletedAt IS NOT NULL')
-  //     .getMany();
-
-  //   for (const user of softDeletedUsers) {
-  //     const deletedAtDate = new Date(user.deletedAt);
-
-  //     if (deletedAtDate.getTime() <= oneDayAgo.getTime()) {
-  //       await this.userRepository.delete(user);
-  //     }
-  //   }
-  // }
+    return result.affected ? true : false;
+  }
 
   async setRedis({ user, userSetRedisDto }: IUserServiceSetRedis): Promise<UserSetRedisDto> {
     return this.cacheManager.set(`${user.name}`, userSetRedisDto, { ttl: 7200 });
   }
 
   async getRedis({ usersName }: IUserServiceGetRedis): Promise<RedisInfo[]> {
+    if (!usersName) return [];
+
     const usersLocation = await Promise.all(
       usersName.map(async (userName) => {
         const value = await this.cacheManager.get(userName);

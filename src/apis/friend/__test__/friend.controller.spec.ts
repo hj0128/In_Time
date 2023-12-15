@@ -4,8 +4,14 @@ import { JwtReqUser } from '../../../commons/interface/req.interface';
 import { FriendController } from '../friend.controller';
 import { FriendService } from '../friend.service';
 import { Friend, STATUS_ENUM } from '../friend.entity';
-import { FriendListInfo } from '../friend.interface';
-import { FriendCreateDto, FriendDeleteDto, FriendUpdateDto } from '../friend.dto';
+import {
+  FriendCreateDto,
+  FriendRefuseDto,
+  FriendUnFriendDto,
+  FriendUpdateDto,
+} from '../friend.dto';
+import { User } from 'src/apis/user/user.entity';
+import { FriendList } from '../friend.interface';
 
 describe('FriendController', () => {
   let friendController: FriendController;
@@ -16,16 +22,14 @@ describe('FriendController', () => {
       findWithUserID: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
-      delete: jest.fn(),
+      refuse: jest.fn(),
+      unFriend: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FriendController],
       providers: [
-        {
-          provide: FriendService,
-          useValue: mockFriendService,
-        },
+        { provide: FriendService, useValue: mockFriendService }, //
       ],
     }).compile();
 
@@ -33,23 +37,33 @@ describe('FriendController', () => {
     friendService = module.get<FriendService>(FriendService);
   });
 
-  const mockReq: Request & JwtReqUser = { user: { id: 'User01' } } as Request & JwtReqUser;
-
-  const mockUser = {
+  const mockReq: Request & JwtReqUser = {
+    user: {
+      id: 'User01',
+      name: '철수',
+      email: 'a@a.com',
+      password: '1234',
+      profileUrl: 'http://a.jpg',
+    },
+  } as Request & JwtReqUser;
+  const mockUser: User = {
     id: 'User01',
     name: '철수',
     email: 'a@a.com',
     password: '1234',
+    point: 0,
     profileUrl: 'https://a.jpg',
     badgeUrl: 'https://b.jpg',
+    deletedAt: null,
     partyUsers: [],
     friends: [],
+    userPoints: [],
   };
-
   const mockFriend: Friend = {
     id: 'Friend01',
     toUserID: 'User02',
-    isAccepted: STATUS_ENUM.SENT,
+    isAccepted: STATUS_ENUM.FRIENDSHIP,
+    deletedAt: null,
     user: mockUser,
   };
 
@@ -57,11 +71,11 @@ describe('FriendController', () => {
     it('로그인 유저의 모든 friend를 배열로 가져온다.', async () => {
       const inputReq: Request & JwtReqUser = mockReq;
 
-      const expectedFindWithUserID: FriendListInfo[] = [];
+      const expectedFindWithUserID: FriendList[] = [];
 
       jest.spyOn(friendService, 'findWithUserID').mockResolvedValueOnce(expectedFindWithUserID);
 
-      const result: FriendListInfo[] = await friendController.friendFindWithUserID(inputReq);
+      const result: FriendList[] = await friendController.friendFindWithUserID(inputReq);
 
       expect(result).toEqual(expectedFindWithUserID);
       expect(friendService.findWithUserID).toHaveBeenCalledWith({ userID: inputReq.user.id });
@@ -93,7 +107,6 @@ describe('FriendController', () => {
       const inputReq: Request & JwtReqUser = mockReq;
 
       const expectedUpdate: Friend = mockFriend;
-      expectedUpdate.isAccepted = STATUS_ENUM.FRIENDSHIP;
 
       jest.spyOn(friendService, 'update').mockResolvedValueOnce(expectedUpdate);
 
@@ -107,18 +120,36 @@ describe('FriendController', () => {
     });
   });
 
-  describe('friendDelete', () => {
+  describe('friendRefuse', () => {
     it('친구 요청 거절 시, 요청 컬럼이 삭제되었으면 true를 반환한다.', async () => {
-      const inputFriendDeleteDto: FriendDeleteDto = { friendID: 'User01' };
+      const inputFriendRefuseDto: FriendRefuseDto = { friendID: 'User01' };
 
-      const expectedDelete: boolean = true;
+      jest.spyOn(friendService, 'refuse').mockResolvedValueOnce(true);
 
-      jest.spyOn(friendService, 'delete').mockResolvedValueOnce(expectedDelete);
+      const result: boolean = await friendController.friendRefuse(inputFriendRefuseDto);
 
-      const result: boolean = await friendController.friendDelete(inputFriendDeleteDto);
+      expect(result).toBe(true);
+      expect(friendService.refuse).toHaveBeenCalledWith({ friendRefuseDto: inputFriendRefuseDto });
+    });
+  });
 
-      expect(result).toEqual(expectedDelete);
-      expect(friendService.delete).toHaveBeenCalledWith({ friendDeleteDto: inputFriendDeleteDto });
+  describe('friendUnFriend', () => {
+    it('친구 요청 거절 시, 요청 컬럼이 삭제되었으면 true를 반환한다.', async () => {
+      const inputFriendUnFriendDto: FriendUnFriendDto = { fromUserID: 'User01' };
+      const inputReq: Request & JwtReqUser = mockReq;
+
+      jest.spyOn(friendService, 'unFriend').mockResolvedValueOnce(true);
+
+      const result: boolean = await friendController.friendUnFriend(
+        inputFriendUnFriendDto,
+        inputReq,
+      );
+
+      expect(result).toBe(true);
+      expect(friendService.unFriend).toHaveBeenCalledWith({
+        friendUnFriendDto: inputFriendUnFriendDto,
+        userID: inputReq.user.id,
+      });
     });
   });
 });

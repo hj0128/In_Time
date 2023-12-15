@@ -11,7 +11,7 @@ export class PartyCreateDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: '["U001", "U002"]', description: '각 user의 id' })
+  @ApiProperty({ example: '["User01", "User02"]', description: '각 user의 id' })
   @IsString()
   @IsNotEmpty()
   friendsID: string;
@@ -35,6 +35,13 @@ export class PartyUpdateAndUserAndPlanDto {
 }
 
 export class PartySoftDeleteDto {
+  @ApiProperty({ example: 'Party01', description: 'party의 id' })
+  @IsString()
+  @IsNotEmpty()
+  partyID: string;
+}
+
+export class PartyDeleteDto {
   @ApiProperty({ example: 'Party01', description: 'party의 id' })
   @IsString()
   @IsNotEmpty()

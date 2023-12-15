@@ -1,10 +1,4 @@
-import {
-  ForbiddenException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  forwardRef,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Party_User } from './party-user.entity';
 import { InsertResult, Repository } from 'typeorm';
@@ -14,16 +8,12 @@ import {
   IPartyUserServiceFindAllWithPartyID,
   IPartyUserServiceFindAllWithUserID,
 } from './party-user.interface';
-import { PartyService } from '../party/party.service';
 
 @Injectable()
 export class Party_UserService {
   constructor(
     @InjectRepository(Party_User)
     private readonly partyUserRepository: Repository<Party_User>,
-
-    @Inject(forwardRef(() => PartyService))
-    private readonly partyService: PartyService,
   ) {}
 
   findAllWithUserID({ userID }: IPartyUserServiceFindAllWithUserID): Promise<Party_User[]> {

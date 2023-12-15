@@ -96,10 +96,6 @@ export class User_PointService {
     const { amount } = pointSendDto;
     const id = _user.id;
 
-    if (amount <= 0) {
-      throw new UnprocessableEntityException('1원 이상부터 보낼 수 있습니다.');
-    }
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('SERIALIZABLE');

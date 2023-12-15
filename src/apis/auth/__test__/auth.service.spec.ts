@@ -4,67 +4,61 @@ import { AuthService } from '../auth.service';
 import { UserService } from '../../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthLoginDto, AuthSendTokenDto } from '../auth.dto';
-import CoolsmsMessageService from 'coolsms-node-sdk';
 import { User } from '../../user/user.entity';
 import { Request, Response } from 'express';
 import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as nodemailer from 'nodemailer';
+import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
+import * as jwt from 'jsonwebtoken';
+import { IncomingHttpHeaders } from 'http';
+import { UserSetRedisDto } from 'src/apis/user/user.dto';
 
 describe('AuthService', () => {
   let authService: AuthService;
   let userService: UserService;
   let jwtService: JwtService;
+  let cacheManager: any;
 
   beforeEach(async () => {
-    const mockUserService = {
-      findOneWithEmail: jest.fn(),
-      create: jest.fn(),
-    };
-
-    const mockJwtService = {
-      sign: jest.fn().mockReturnValue('mockedToken'),
-    };
+    const mockUserService = { findOneWithEmail: jest.fn(), create: jest.fn() };
+    const mockJwtService = { sign: jest.fn().mockReturnValue('mockedToken'), decode: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       providers: [
         AuthService,
-        {
-          provide: JwtService,
-          useValue: mockJwtService,
-        },
-        {
-          provide: UserService,
-          useValue: mockUserService,
-        },
+        { provide: UserService, useValue: mockUserService },
+        { provide: JwtService, useValue: mockJwtService },
       ],
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
     userService = module.get<UserService>(UserService);
     jwtService = module.get<JwtService>(JwtService);
+    cacheManager = module.get<any>(CACHE_MANAGER);
   });
-
-  const mockUser: User = {
-    id: 'User01',
-    name: '철수',
-    email: 'a@a.com',
-    password: '1234',
-    profileUrl: 'https://a.jpg',
-    badgeUrl: 'https://b.jpg',
-    partyUsers: [],
-    friends: [],
-  };
 
   const mockJwtReqUser: JwtReqUser['user'] = {
     id: 'User01',
     name: '철수',
     email: 'a@a.com',
     password: '1234',
-    profileUrl: 'https://b.jpg',
+    profileUrl: 'http://a.jpg',
   };
-
-  const mockReq: Request & JwtReqUser = { user: { email: '' } } as Request & JwtReqUser;
-
+  const mockUser: User = {
+    id: 'User01',
+    name: '철수',
+    email: 'a@a.com',
+    password: '1234',
+    point: 0,
+    profileUrl: 'https://a.jpg',
+    badgeUrl: 'https://b.jpg',
+    deletedAt: null,
+    partyUsers: [],
+    friends: [],
+    userPoints: [],
+  };
   const mockRes: Response = {
     cookie: jest.fn(),
     setHeader: jest.fn(),
@@ -72,27 +66,31 @@ describe('AuthService', () => {
 
   describe('sendToken', () => {
     it('user에게 인증 번호를 전송한다.', async () => {
-      const mockCoolsmsSendOne = jest.fn();
+      const sendMailSpy = jest.spyOn(nodemailer, 'createTransport').mockReturnValue({
+        sendMail: jest.fn().mockResolvedValue({}),
+      } as any);
 
-      const inputAuthSendTokenDto: AuthSendTokenDto = {
-        tokenNumber: '000000',
-        phone1: '010',
-        phone2: '1234',
-        phone3: '5678',
-      };
+      const inputAuthSendTokenDto: AuthSendTokenDto = { email: 'a@a.com', tokenNumber: '000000' };
 
-      jest.spyOn(CoolsmsMessageService.prototype, 'sendOne').mockImplementation(mockCoolsmsSendOne);
+      const result: void = authService.sendToken({ authSendTokenDto: inputAuthSendTokenDto });
 
-      await authService.sendToken({ authSendTokenDto: inputAuthSendTokenDto });
-
-      expect(mockCoolsmsSendOne).toHaveBeenCalledWith({
-        to:
-          inputAuthSendTokenDto.phone1 +
-          inputAuthSendTokenDto.phone2 +
-          inputAuthSendTokenDto.phone3,
-        from: process.env.COOLSMS_FROM_NUMBER,
-        text: `요청하신 인증 번호는 ${inputAuthSendTokenDto.tokenNumber} 입니다.`,
-        autoTypeDetect: true,
+      expect(result).toBeUndefined();
+      expect(sendMailSpy).toHaveBeenCalledWith({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.NODE_MAIL_GMAIL_EMAIL,
+          pass: process.env.NODE_MAIL_GMAIL_PASSWORD,
+        },
+      });
+      expect(sendMailSpy.mock.calls[0][0]).toMatchObject({
+        auth: { pass: undefined, user: undefined },
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        service: 'gmail',
       });
     });
   });
@@ -163,7 +161,7 @@ describe('AuthService', () => {
 
       jest
         .spyOn(authService, 'getAccessToken')
-        .mockResolvedValue(Promise.resolve(expectedGetAccessToken) as never);
+        .mockReturnValue(Promise.resolve(expectedGetAccessToken) as never);
 
       const result: string = await authService.restoreAccessToken({ user: inputUser });
 
@@ -180,7 +178,7 @@ describe('AuthService', () => {
       jest.spyOn(jwtService, 'sign');
       jest.spyOn(mockRes, 'setHeader');
 
-      await authService.setRefreshToken({ user: mockUser, res: mockRes });
+      authService.setRefreshToken({ user: mockUser, res: mockRes });
 
       expect(jwtService.sign).toHaveBeenCalled();
       expect(mockRes.cookie).toHaveBeenCalledWith('refreshToken', 'mockedToken', {
@@ -211,26 +209,73 @@ describe('AuthService', () => {
           email: inputUser.email,
           name: inputUser.name,
         },
-        { secret: process.env.JWT_ACCESS_KEY, expiresIn: '5s' },
+        { secret: process.env.JWT_ACCESS_KEY, expiresIn: '1h' },
       );
     });
   });
 
   describe('socialLogin', () => {
     it('소셜 로그인을 처리한다.', async () => {
-      const inputReq: Request & JwtReqUser = mockReq;
+      const inputReq: Request & JwtReqUser = { user: mockJwtReqUser } as Request & JwtReqUser;
 
       const expectedCreate: User = mockUser;
 
-      jest.spyOn(userService, 'findOneWithEmail').mockResolvedValue(null);
+      jest.spyOn(userService, 'findOneWithEmail').mockResolvedValue(expectedCreate);
       jest.spyOn(userService, 'create').mockResolvedValue(expectedCreate);
       jest.spyOn(authService, 'setRefreshToken').mockImplementation(() => {});
 
       await authService.socialLogin({ req: inputReq, res: mockRes });
 
       expect(userService.findOneWithEmail).toHaveBeenCalledWith({ email: inputReq.user.email });
-      expect(userService.create).toHaveBeenCalledWith({ userCreateDto: { ...inputReq.user } });
       expect(authService.setRefreshToken).toHaveBeenCalledWith({ user: mockUser, res: mockRes });
+    });
+  });
+
+  describe('logout', () => {
+    it('유효한 토큰을 제공하면 로그아웃에 성공하고 메시지를 반환한다.', async () => {
+      const mockUserSetRedis: UserSetRedisDto = {
+        myLat: 12.203,
+        myLng: 15.205,
+        time: '2023. 11. 30. 오전 11:01:46',
+        isArrive: true,
+      };
+
+      const inputHeaders: IncomingHttpHeaders = {
+        authorization: 'Bearer validAccessToken',
+        cookie: 'refreshToken=validRefreshToken',
+      };
+
+      const expectedUserSetRedisDto: UserSetRedisDto = mockUserSetRedis;
+
+      jest.spyOn(jwt, 'verify').mockResolvedValue({} as never);
+      jest.spyOn(authService, 'tokenEXP').mockResolvedValue([1, 2] as never);
+      jest.spyOn(cacheManager, 'set').mockResolvedValue(expectedUserSetRedisDto);
+
+      const result: string = await authService.logout({
+        headers: inputHeaders,
+      });
+
+      expect(result).toEqual('로그아웃에 성공하였습니다.');
+    });
+  });
+
+  describe('tokenEXP', () => {
+    it('토큰의 만료 시간을 배열로 반환한다.', async () => {
+      const accessDecoded = { exp: Math.floor(new Date().getTime() / 1000) + 3600 }; // Expire after 1 hour
+      const refreshDecoded = { exp: Math.floor(new Date().getTime() / 1000) + 86400 }; // Expire after 1 day
+
+      jest.spyOn(jwtService, 'decode').mockReturnValueOnce(accessDecoded as any);
+      jest.spyOn(jwtService, 'decode').mockReturnValueOnce(refreshDecoded as any);
+
+      const result = authService.tokenEXP({
+        accessToken: 'mockAccessToken',
+        refreshToken: 'mockRefreshToken',
+      });
+
+      expect(result).toHaveLength(2);
+
+      expect(result[0]).toEqual(expect.any(Number));
+      expect(result[1]).toEqual(expect.any(Number));
     });
   });
 });
