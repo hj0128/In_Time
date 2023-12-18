@@ -17,8 +17,7 @@ describe('UserController', () => {
       findOneWithEmail: jest.fn(),
       create: jest.fn(),
       softDelete: jest.fn(),
-      setRedis: jest.fn(),
-      getRedis: jest.fn(),
+      delete: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -53,6 +52,7 @@ describe('UserController', () => {
     userPoints: [],
     partyUsers: [],
     friends: [],
+    userLocations: [],
   };
 
   describe('userFindOneWithUserID', () => {

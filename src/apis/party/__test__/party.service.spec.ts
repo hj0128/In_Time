@@ -6,12 +6,12 @@ import { Party } from '../party.entity';
 import { JwtReqUser } from '../../../commons/interface/req.interface';
 import { DataSource, InsertResult, Repository, UpdateResult } from 'typeorm';
 import { PlanService } from '../../plan/plan.service';
-import { User_PointService } from '../../user_point/user-point.service';
+import { User_PointService } from '../../user-point/user-point.service';
 import { PartyList } from '../party.interface';
 import { PartyCreateDto, PartySoftDeleteDto, PartyUpdateAndUserAndPlanDto } from '../party.dto';
 import { Plan } from '../../plan/plan.entity';
 import { InternalServerErrorException } from '@nestjs/common';
-import { USER_POINT_STATUS, User_Point } from '../../user_point/user-point.entity';
+import { USER_POINT_STATUS, User_Point } from '../../user-point/user-point.entity';
 import { User } from '../../user/user.entity';
 
 describe('PartyService', () => {
@@ -25,6 +25,7 @@ describe('PartyService', () => {
     save: jest.fn(),
     increment: jest.fn(),
     softDelete: jest.fn(),
+    findOne: jest.fn(),
   };
 
   const queryRunner = {
@@ -107,6 +108,7 @@ describe('PartyService', () => {
     partyUsers: [],
     friends: [],
     userPoints: [],
+    userLocations: [],
   };
   const mockUserPoint: User_Point = {
     id: 'UserPoint01',
@@ -254,9 +256,11 @@ describe('PartyService', () => {
       const inputPartySoftDeleteDto: PartySoftDeleteDto = { partyID: 'Party01' };
 
       const expectedParty: Party = mockParty;
+      const expectedPlan: Plan = mockPlan;
       const expectedSoftDelete: UpdateResult = { generatedMaps: [], affected: 1, raw: [] };
 
       jest.spyOn(partyService, 'findOneWithPartyID').mockResolvedValue(expectedParty);
+      jest.spyOn(manager, 'findOne').mockResolvedValue(expectedPlan);
       jest.spyOn(manager, 'softDelete').mockResolvedValue(expectedSoftDelete);
 
       const result: boolean = await partyService.softDelete({

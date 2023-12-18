@@ -1,22 +1,37 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DeleteResult, In, Repository } from 'typeorm';
+import { DataSource, In, Repository, UpdateResult } from 'typeorm';
 import { JwtReqUser } from '../../../commons/interface/req.interface';
 import { PlanService } from '../plan.service';
 import { Party_UserService } from '../../party-user/party-user.service';
 import { Plan } from '../plan.entity';
 import { User } from '../../user/user.entity';
 import { Party } from '../../party/party.entity';
-import { User_PointService } from '../../user_point/user-point.service';
+import { User_PointService } from '../../user-point/user-point.service';
 import { Party_User } from '../../party-user/party-user.entity';
 import { PlanCreateDto, PlanSoftDeleteDto } from '../plan.dto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 
 describe('PlanService', () => {
   let planService: PlanService;
   let partyUserService: Party_UserService;
   let userPointService: User_PointService;
   let mockPlanRepository: Partial<Record<keyof Repository<Plan>, jest.Mock>>;
+
+  const manager = {
+    save: jest.fn(),
+    increment: jest.fn(),
+    softDelete: jest.fn(),
+  };
+
+  const queryRunner = {
+    connect: jest.fn(),
+    startTransaction: jest.fn(),
+    commitTransaction: jest.fn(),
+    rollbackTransaction: jest.fn(),
+    release: jest.fn(),
+    manager: manager,
+  };
 
   beforeEach(async () => {
     mockPlanRepository = {
@@ -26,6 +41,7 @@ describe('PlanService', () => {
       softDelete: jest.fn(),
     };
 
+    const mockDataSource = { createQueryRunner: jest.fn().mockReturnValue(queryRunner) };
     const mockPartyUserService = { findAllWithUserID: jest.fn(), findAllWithPartyID: jest.fn() };
     const mockUserPointService = { checkPoint: jest.fn() };
 
@@ -33,6 +49,7 @@ describe('PlanService', () => {
       providers: [
         PlanService,
         { provide: getRepositoryToken(Plan), useValue: mockPlanRepository },
+        { provide: DataSource, useValue: mockDataSource },
         { provide: Party_UserService, useValue: mockPartyUserService },
         { provide: User_PointService, useValue: mockUserPointService },
       ],
@@ -86,6 +103,7 @@ describe('PlanService', () => {
     partyUsers: [],
     friends: [],
     userPoints: [],
+    userLocations: [],
   };
   const mockPartyUser: Party_User = {
     id: 'PartyUser01',
@@ -222,19 +240,31 @@ describe('PlanService', () => {
   });
 
   describe('softDelete', () => {
-    it('약속을 소프트 삭제한다.', async () => {
-      const inputPlanSoftDeleteDto: PlanSoftDeleteDto = { planID: 'Plan01' };
+    const inputPlanSoftDeleteDto: PlanSoftDeleteDto = { planID: 'Plan01' };
+    it('plan을 소프트 삭제한다.', async () => {
+      const expectedSoftDelete: UpdateResult = { generatedMaps: [], affected: 1, raw: [] };
 
-      const expectedSoftDelete: DeleteResult = { raw: [], affected: 1 };
+      jest.spyOn(manager, 'softDelete').mockResolvedValue(expectedSoftDelete);
 
-      jest.spyOn(mockPlanRepository, 'softDelete').mockResolvedValue(expectedSoftDelete);
-
-      const result = await planService.softDelete({ planSoftDeleteDto: inputPlanSoftDeleteDto });
+      const result: boolean = await planService.softDelete({
+        planSoftDeleteDto: inputPlanSoftDeleteDto,
+      });
 
       expect(result).toBe(true);
-      expect(mockPlanRepository.softDelete).toHaveBeenCalledWith({
-        id: inputPlanSoftDeleteDto.planID,
+      expect(queryRunner.commitTransaction).toHaveBeenCalled();
+    });
+
+    it('plan 소프트 삭제에 실패하면 롤백한다.', async () => {
+      jest.spyOn(manager, 'softDelete').mockImplementationOnce(() => {
+        throw new InternalServerErrorException();
       });
+
+      await expect(
+        planService.softDelete({
+          planSoftDeleteDto: inputPlanSoftDeleteDto,
+        }),
+      ).rejects.toThrow(InternalServerErrorException);
+      expect(queryRunner.rollbackTransaction).toHaveBeenCalled();
     });
   });
 });

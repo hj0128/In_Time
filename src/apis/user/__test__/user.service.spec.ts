@@ -5,20 +5,17 @@ import { UserService } from '../user.service';
 import { User } from '../user.entity';
 import { AuthService } from '../../auth/auth.service';
 import { Party_UserService } from '../../party-user/party-user.service';
-import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import * as nodemailer from 'nodemailer';
 import * as bcrypt from 'bcrypt';
-import { UserCreateDto, UserSetRedisDto } from '../user.dto';
+import { UserCreateDto, UserDeleteDto } from '../user.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 import { IncomingHttpHeaders } from 'http';
-import { RedisInfo } from '../user.interface';
 
 describe('UserService', () => {
   let userService: UserService;
   let mockUserRepository: Partial<Record<keyof Repository<User>, jest.Mock>>;
   let authService: AuthService;
   let partyUserService: Party_UserService;
-  let cacheManager: any;
 
   const manager = {
     softDelete: jest.fn(),
@@ -38,6 +35,7 @@ describe('UserService', () => {
       findOne: jest.fn(),
       find: jest.fn(),
       save: jest.fn(),
+      delete: jest.fn(),
     };
 
     const mockAuthService = { logout: jest.fn() };
@@ -45,7 +43,6 @@ describe('UserService', () => {
     const mockPartyUserService = { checkPartyMembers: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
-      imports: [CacheModule.register()],
       providers: [
         UserService,
         { provide: getRepositoryToken(User), useValue: mockUserRepository },
@@ -58,7 +55,6 @@ describe('UserService', () => {
     userService = module.get<UserService>(UserService);
     authService = module.get<AuthService>(AuthService);
     partyUserService = module.get<Party_UserService>(Party_UserService);
-    cacheManager = module.get<any>(CACHE_MANAGER);
   });
 
   const mockUser: User = {
@@ -73,6 +69,7 @@ describe('UserService', () => {
     partyUsers: [],
     friends: [],
     userPoints: [],
+    userLocations: [],
   };
 
   describe('findOneWithUserId', () => {
@@ -170,13 +167,6 @@ describe('UserService', () => {
           pass: process.env.NODE_MAIL_GMAIL_PASSWORD,
         },
       });
-      expect(sendMailSpy.mock.calls[0][0]).toMatchObject({
-        auth: { pass: undefined, user: undefined },
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        service: 'gmail',
-      });
     });
   });
 
@@ -267,63 +257,20 @@ describe('UserService', () => {
     });
   });
 
-  describe('setRedis', () => {
-    it('user의 정보를 redis에 저장한다.', async () => {
-      const mockUserSetRedis: UserSetRedisDto = {
-        myLat: 12.203,
-        myLng: 15.205,
-        time: '2023. 11. 30. 오전 11:01:46',
-        isArrive: true,
-      };
+  describe('delete', () => {
+    it('user를 완전히 삭제한다.', async () => {
+      const inputUserDeleteDto: UserDeleteDto = { userID: 'User01' };
 
-      const inputUser: User = mockUser;
-      const inputUserSetRedisDto: UserSetRedisDto = mockUserSetRedis;
+      const expectedDelete: UpdateResult = { generatedMaps: [], affected: 1, raw: [] };
 
-      const expectedUserSetRedisDto: UserSetRedisDto = mockUserSetRedis;
+      jest.spyOn(mockUserRepository, 'delete').mockResolvedValue(expectedDelete);
 
-      jest.spyOn(cacheManager, 'set').mockResolvedValue(expectedUserSetRedisDto);
-
-      const result: UserSetRedisDto = await userService.setRedis({
-        user: inputUser,
-        userSetRedisDto: inputUserSetRedisDto,
+      const result: boolean = await userService.delete({
+        userDeleteDto: inputUserDeleteDto,
       });
 
-      expect(result).toEqual(expectedUserSetRedisDto);
-      expect(cacheManager.set).toHaveBeenCalledWith(`${inputUser.name}`, inputUserSetRedisDto, {
-        ttl: 7200,
-      });
-    });
-  });
-
-  describe('getRedis', () => {
-    it('redis에서 user의 정보를 가져온다.', async () => {
-      const mockRedisInfo: RedisInfo = {
-        userName: '철수',
-        myLat: 12.203,
-        myLng: 15.205,
-        time: '2023. 11. 30. 오전 11:01:46',
-        isArrive: true,
-      };
-      const mockUserSetRedis: UserSetRedisDto = {
-        myLat: 12.203,
-        myLng: 15.205,
-        time: '2023. 11. 30. 오전 11:01:46',
-        isArrive: true,
-      };
-
-      const inputUsersName: string = '철수';
-
-      const expectedGet: UserSetRedisDto = mockUserSetRedis;
-      const expectedGetRedis: RedisInfo[] = [mockRedisInfo];
-
-      jest.spyOn(cacheManager, 'get').mockResolvedValue(expectedGet);
-
-      const result: RedisInfo[] = await userService.getRedis({
-        usersName: [inputUsersName],
-      });
-
-      expect(result).toEqual(expectedGetRedis);
-      expect(cacheManager.get).toHaveBeenCalledWith(inputUsersName);
+      expect(result).toBe(true);
+      expect(queryRunner.commitTransaction).toHaveBeenCalled();
     });
   });
 });

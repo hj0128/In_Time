@@ -5,7 +5,7 @@ import { Plan } from './plan.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '../user/user.module';
 import { Party_UserModule } from '../party-user/party-user.module';
-import { User_PointModule } from '../user_point/user-point.module';
+import { User_PointModule } from '../user-point/user-point.module';
 
 @Module({
   imports: [

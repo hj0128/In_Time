@@ -1,9 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import {
-  SwaggerModule,
-  DocumentBuilder,
-  SwaggerCustomOptions,
-} from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger';
 
 const swaggerCustomOptions: SwaggerCustomOptions = {
   swaggerOptions: {

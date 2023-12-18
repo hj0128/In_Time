@@ -67,6 +67,7 @@ describe('Party_UserService', () => {
     partyUsers: [],
     friends: [],
     userPoints: [],
+    userLocations: [],
   };
   const mockPartyUser: Party_User = {
     id: 'PartyUser01',

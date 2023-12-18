@@ -17,31 +17,23 @@ import {
   IUserServiceFindOneWithEmail,
   IUserServiceFindOneWithName,
   IUserServiceFindOneWithUserID,
-  IUserServiceGetRedis,
   IUserServiceSendEmail,
-  IUserServiceSetRedis,
   IUserServiceSoftDelete,
-  RedisInfo,
 } from './user.interface';
 import * as bcrypt from 'bcrypt';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
-import { UserSetRedisDto } from './user.dto';
 import * as nodemailer from 'nodemailer';
 import { AuthService } from '../auth/auth.service';
 import { Friend } from '../friend/friend.entity';
 import { Party_UserService } from '../party-user/party-user.service';
 import { Party_User } from '../party-user/party-user.entity';
-import { User_Point } from '../user_point/user-point.entity';
+import { User_Point } from '../user-point/user-point.entity';
+import { User_Location } from '../user-location/user-location.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>, //
-
-    @Inject(CACHE_MANAGER)
-    private readonly cacheManager: Cache,
 
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
@@ -142,6 +134,7 @@ export class UserService {
       await queryRunner.manager.softDelete(Friend, { user: { id: userID } });
       await queryRunner.manager.softDelete(Friend, { toUserID: userID });
       await queryRunner.manager.softDelete(Party_User, { user: { id: userID } });
+      await queryRunner.manager.softDelete(User_Location, { user: { id: userID } });
 
       const result = await queryRunner.manager.softDelete(User, { id: userID });
 
@@ -162,22 +155,5 @@ export class UserService {
     const result = await this.userRepository.delete({ id: userDeleteDto.userID });
 
     return result.affected ? true : false;
-  }
-
-  async setRedis({ user, userSetRedisDto }: IUserServiceSetRedis): Promise<UserSetRedisDto> {
-    return this.cacheManager.set(`${user.name}`, userSetRedisDto, { ttl: 7200 });
-  }
-
-  async getRedis({ usersName }: IUserServiceGetRedis): Promise<RedisInfo[]> {
-    if (!usersName) return [];
-
-    const usersLocation = await Promise.all(
-      usersName.map(async (userName) => {
-        const value = await this.cacheManager.get(userName);
-        return { userName, ...(value as RedisInfo) };
-      }),
-    );
-
-    return usersLocation;
   }
 }

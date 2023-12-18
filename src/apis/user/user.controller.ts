@@ -2,11 +2,10 @@ import { Body, Controller, Delete, Get, Post, Query, Req, UseGuards } from '@nes
 import { UserService } from './user.service';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { User } from './user.entity';
-import { UserCreateDto, UserDeleteDto, UserSetRedisDto } from './user.dto';
+import { UserCreateDto, UserDeleteDto } from './user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { JwtReqUser } from 'src/commons/interface/req.interface';
-import { RedisInfo } from './user.interface';
 
 @ApiTags('User')
 @Controller('/user')
@@ -84,30 +83,5 @@ export class UserController {
     @Body() userDeleteDto: UserDeleteDto, //
   ): Promise<boolean> {
     return this.userService.delete({ userDeleteDto });
-  }
-
-  @ApiOperation({
-    summary: 'Redis에 user 등록하기',
-    description: 'Redis에 user의 실시간 위치를 저장한다.',
-  })
-  @UseGuards(AuthGuard('access'))
-  @Post('/userSetRedis')
-  userSetRedis(
-    @Req() req: Request & JwtReqUser,
-    @Body() userSetRedisDto: UserSetRedisDto, //
-  ): Promise<UserSetRedisDto> {
-    return this.userService.setRedis({ user: req.user, userSetRedisDto });
-  }
-
-  @ApiOperation({
-    summary: 'Redis에서 user들 가져오기',
-    description: 'Redis에서 userName과 일치하는 값을 가져온다.',
-  })
-  @UseGuards(AuthGuard('access'))
-  @Get('/userGetRedis')
-  userGetRedis(
-    @Query('usersName') usersName: string[], //
-  ): Promise<RedisInfo[]> {
-    return this.userService.getRedis({ usersName });
   }
 }

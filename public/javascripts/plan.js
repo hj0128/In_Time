@@ -26,7 +26,6 @@ const mapOptions = {
 const map = new kakao.maps.Map(mapContainer, mapOptions);
 
 
-// 파티 정보 세팅하기
 const setPartyInfo = async ({ partyID }) => {
   try {
     const party = await axios.get('/party/partyFindOneWithPartyID', {
@@ -57,7 +56,6 @@ const setPartyInfo = async ({ partyID }) => {
 };
 
 
-// 플랜 정보 세팅하기 (타이틀)
 const setPlanInfo = ({ planName, placeName, date, fine }) => {
   document.querySelector('#plan_name').innerText = planName;
   document.querySelector('#place_name').innerText = placeName;
@@ -66,7 +64,6 @@ const setPlanInfo = ({ planName, placeName, date, fine }) => {
 };
 
 
-// 도착지 정보 세팅하기 (마커)
 const setPlaceMarker = ({ placeAddress, placeLat, placeLng }) => {
   const placeLatLng = new kakao.maps.LatLng(placeLat, placeLng);
 
@@ -106,7 +103,6 @@ const setPlaceMarker = ({ placeAddress, placeLat, placeLng }) => {
 };
 
 
-// 멤버들 아이콘 세팅하기
 const setUsersIcon = ({ usersName, usersImage }) => {
   for (let i in usersName) {
     // 멤버들 아이콘 표시
@@ -144,39 +140,34 @@ const setArrive = ({ userName }) => {
 };
 
 
-// 멤버들 위치 업데이트
 const getUserLocation = async ({ usersName, usersImage }) => {
-  const res = await axios.get('/user/userGetRedis', {
-    params: { usersName },
+  const res = await axios.get('/userLocation/userLocationFindWithUsersName', {
+    params: { usersName, planID },
   });
   const usersLocation = res.data;
-  // [ {userName: 철수, myLat: 35, myLng: 123, time, isArrive}, {userName: 행주, myLat: 35, myLng: 123}]
 
   for (let i in usersLocation) {
     const target = usersLocation[i];
-    const latlng = new kakao.maps.LatLng(target.myLat, target.myLng);
+    const latlng = new kakao.maps.LatLng(target.lat, target.lng);
 
-    // 도착했으면 표시
     if (target.isArrive) {
-      setArrive({ userName: target.userName });
+      setArrive({ userName: target.name });
     }
 
-    // 멤버들 마커 표시
-    const marker = new kakao.maps.CustomOverlay({
+    new kakao.maps.CustomOverlay({
       map,
       position: latlng,
       content: `<img class="user_marker" src="${usersImage[i]}">`,
     });
 
-    const userIconText = document.querySelector(`.${target.userName}_text`);
-    if (target.myLat && target.myLng) {
+    const userIconText = document.querySelector(`.${target.name}_text`);
+    if (target.lat && target.lng) {
       userIconText.innerText = `${target.time}`;
     }
 
-    // 아이콘 클릭 시 해당 유저의 위치로 이동
-    const userIcon = document.querySelector(`.${target.userName}_img`);
+    const userIcon = document.querySelector(`.${target.name}_img`);
     userIcon.addEventListener('click', () => {
-      if (target.myLat && target.myLng) {
+      if (target.lat && target.lng) {
         map.panTo(latlng);
       }
     });
@@ -184,22 +175,18 @@ const getUserLocation = async ({ usersName, usersImage }) => {
 };
 
 
-// 시간이 종료됐을 때 벌금 내기 (이미 냈는지 확인 후)
 const userFine = async ({ usersName, partyID }) => {
   try {
     const plan = await axios.get('/plan/planFindOneWithPlanID', { params: { planID } });
     if (plan.data.isEnd) return;
 
-    const res = await axios.get('/user/userGetRedis', {
-      params: { usersName },
+    const res = await axios.get('/userLocation/userLocationFindWithUsersName', {
+      params: { usersName, planID },
     });
     const users = res.data;
 
-    const tardyUser = users.filter((user) => !user.isArrive).map((user) => user.userName);
+    const tardyUser = users.filter((user) => !user.isArrive).map((user) => user.name);
 
-    // 플랜 업데이트
-    // 파티 업데이트
-    // 유저 업데이트
     await axios.post('/party/partyUpdateAndUserAndPlan', {
       planID,
       partyID,
@@ -215,21 +202,20 @@ const userFine = async ({ usersName, partyID }) => {
 };
 
 
-// 내 위치에서 목적지까지의 거리 구하기
-const distanceLocation = ({ placeLat, placeLng, myLat, myLng }) => {
+const distanceLocation = ({ placeLat, placeLng, lat, lng }) => {
   const earthRadius = 6371000;
 
-  const _myLat = Number(myLat) * (Math.PI / 180);
-  const _myLng = Number(myLng) * (Math.PI / 180);
+  const _lat = Number(lat) * (Math.PI / 180);
+  const _lng = Number(lng) * (Math.PI / 180);
   const _placeLat = Number(placeLat) * (Math.PI / 180);
   const _placeLng = Number(placeLng) * (Math.PI / 180);
 
-  const dLat = _placeLat - _myLat;
-  const dLon = _placeLng - _myLng;
+  const dLat = _placeLat - _lat;
+  const dLon = _placeLng - _lng;
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(_myLat) * Math.cos(_placeLat) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos(_lat) * Math.cos(_placeLat) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
@@ -237,31 +223,36 @@ const distanceLocation = ({ placeLat, placeLng, myLat, myLng }) => {
 };
 
 
-// 내 위치 저장하기
-const setUsersLocation = async ({ usersName, partyID, endTimeDiff, placeLat, placeLng, intervalID }) => {
+const setUsersLocation = async ({
+  usersName,
+  partyID,
+  planID,
+  endTimeDiff,
+  placeLat,
+  placeLng,
+  intervalID,
+}) => {
   if (navigator.geolocation) {
     const options = {
-      enableHighAccuracy: true, // 높은 정확도
-      timeout: 10000, // 10초내에 위치 정보 못가져오면 에러 발생
-      maximumAge: 0, // 항상 새로운 위치 정보 요청
-      distanceFilter: 50, // 50m 이상 이동 시에만 위치 정보 업데이트
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+      distanceFilter: 50,
     };
 
-    // 주기적으로 내 위치 업데이트하기
     const watchID = navigator.geolocation.watchPosition(
       async (position) => {
         setTimeout(async () => {
           navigator.geolocation.clearWatch(watchID);
           clearInterval(intervalID);
 
-          // 누가 지각했는지 보고 지각한 사람 돈 뺏기
           await userFine({ usersName, partyID });
 
           alert('약속 시간이 종료되었습니다.');
         }, endTimeDiff);
 
-        const myLat = position.coords.latitude;
-        const myLng = position.coords.longitude;
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
 
         const date = new Date(position.timestamp);
         const hours = String(date.getHours()).padStart(2, '0');
@@ -269,17 +260,26 @@ const setUsersLocation = async ({ usersName, partyID, endTimeDiff, placeLat, pla
         const seconds = String(date.getSeconds()).padStart(2, '0');
         const time = `${hours}:${minutes}:${seconds}`;
 
-        // 현재 내 위치와 목적지 위치 거리 구하기
-        const distance = distanceLocation({ placeLat, placeLng, myLat, myLng });
+        const distance = distanceLocation({ placeLat, placeLng, lat, lng });
 
-        // 내 위치 업데이트
-        // 도착지 50m 안에 들어오면 도착했다는 표시하기
-        if (distance <= 50) { // 50m 안이면 목적지 도착, 위치 저장 멈추기
+        if (distance <= 50) {
           navigator.geolocation.clearWatch(watchID);
-          await axios.post('/user/userSetRedis', { myLat, myLng, time, isArrive: true });
+          await axios.post('/userLocation/userLocationCreate', {
+            lat,
+            lng,
+            time,
+            isArrive: true,
+            planID,
+          });
           alert('목적지에 도착하였습니다.');
-        } else { // 50m 밖이면 계속 위치 저장하기
-          await axios.post('/user/userSetRedis', { myLat, myLng, time, isArrive: false });
+        } else {
+          await axios.post('/userLocation/userLocationCreate', {
+            lat,
+            lng,
+            time,
+            isArrive: false,
+            planID,
+          });
         }
       },
       (error) => {
@@ -352,7 +352,6 @@ const setChat = ({ partyID }) => {
     if (messageInfo.value.trim() !== '') {
       socket.emit('chatMessage', { message: messageInfo.value, room: partyID });
 
-      // 메시지 전송 후 입력 필드 비우기
       messageInfo.value = '';
     }
   };
@@ -366,22 +365,16 @@ const setChat = ({ partyID }) => {
 }
 
 
-// 페이지에 필요한 모든 정보를 가져옴
 const getPlan = async () => {
   try {
-    // 플랜 정보 가져오기
     const plan = await axios.get('/plan/planFindOneWithPlanID', { params: { planID } });
     const { planName, placeName, placeAddress, placeLat, placeLng, date, fine, party } = plan.data;
     const partyID = party.id;
 
-    // 플랜에 속한 멤버 정보 가져오기
     const partyUser = await axios.get('/partyUser/partyUserFindAllWithPartyID', {
       params: { partyID },
     });
 
-    // 멤버들 이름과 이미지가 담긴 배열
-    // [철수, 행주]
-    // [철수사진, 행주사진]
     const usersName = [];
     const usersImage = [];
     partyUser.data.forEach((el) => {
@@ -389,37 +382,37 @@ const getPlan = async () => {
       usersImage.push(el.user.profileUrl);
     });
 
-    // 파티 정보 세팅하기 (맨 위 타이틀)
     setPartyInfo({ partyID });
 
-    // 플랜 정보 세팅하기 (맨 위 타이틀)
     setPlanInfo({ planName, placeName, date, fine });
 
-    // 도착지 마커 세팅하기
     setPlaceMarker({ placeAddress, placeLat, placeLng });
 
-    // 멤버들 아이콘 세팅하기
     setUsersIcon({ usersName, usersImage });
 
-    // 채팅 가져오기
     setChat({ partyID });
 
-    // 약속 시간까지의 시간차 구하기
-    const currentDate = new Date().getTime(); // 현재시간 2023 09:48
-    const targetDate = new Date(date).getTime(); // 약속시간 2023 10:13
-    const targetMinus30ms = new Date(targetDate - 30 * 60 * 1000).getTime(); // 약속시간 30분 전 2023 09:43
-    const startTimeDiff = targetMinus30ms - currentDate; // 플러스: 30분 전 안된거, 마이너스: 30분 전 지난거(즉시 실행)
-    const endTimeDiff = targetDate - currentDate; // 종료 시간까지 남은 시간
+    const currentDate = new Date().getTime();
+    const targetDate = new Date(date).getTime();
+    const targetMinus30ms = new Date(targetDate - 30 * 60 * 1000).getTime();
+    const startTimeDiff = targetMinus30ms - currentDate;
+    const endTimeDiff = targetDate - currentDate;
 
     setTimeout(async () => {
-      // 멤버들 위치 업데이트
       await getUserLocation({ usersName, usersImage });
       const intervalID = setInterval(async () => {
         await getUserLocation({ usersName, usersImage });
       }, 3000);
 
-      // 내 위치 저장하기
-      await setUsersLocation({ usersName, partyID, endTimeDiff, placeLat, placeLng, intervalID });
+      await setUsersLocation({
+        usersName,
+        partyID,
+        planID,
+        endTimeDiff,
+        placeLat,
+        placeLng,
+        intervalID,
+      });
     }, startTimeDiff);
   } catch (error) {
     if (error.message === '토큰 만료') {

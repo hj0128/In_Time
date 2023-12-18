@@ -81,7 +81,7 @@ describe('AuthController (e2e)', () => {
   describe('Auth e2e test', () => {
     it('/auth/authSendToken (Post)', async () => {
       const inputAuthSendTokenDto: AuthSendTokenDto = {
-        email: 'guswn2332@gmail.com',
+        email: mockJwtReqUser.email,
         tokenNumber: '000000',
       };
 

@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DataSource, Repository, UpdateResult } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PARTY_POINT_STATUS, Party_Point } from '../party-point.entity';
 import { Party_PointService } from '../party-point.service';
 import { User } from '../../user/user.entity';
 import { Party } from '../../party/party.entity';
-import { USER_POINT_STATUS, User_Point } from '../../user_point/user-point.entity';
 import { PartyPointUserSendDto } from '../party-point.dto';
 import { UnprocessableEntityException } from '@nestjs/common';
 
@@ -61,6 +60,7 @@ describe('Party_PointService', () => {
     partyUsers: [],
     friends: [],
     userPoints: [],
+    userLocations: [],
   };
   const mockParty: Party = {
     id: 'Party01',
@@ -81,15 +81,6 @@ describe('Party_PointService', () => {
     createdAt: new Date(),
     deletedAt: null,
     party: mockParty,
-  };
-  const mockUserPoint: User_Point = {
-    id: 'UserPoint01',
-    impUid: 'imp_01',
-    amount: 0,
-    status: USER_POINT_STATUS.FINE_SEND,
-    createdAt: new Date(),
-    deletedAt: null,
-    user: mockUser,
   };
 
   describe('findWithPartyID', () => {

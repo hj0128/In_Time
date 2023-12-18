@@ -23,9 +23,10 @@ import { PlanService } from '../plan/plan.service';
 import { Plan } from '../plan/plan.entity';
 import { Chat } from '../chat/chat.entity';
 import { Party_User } from '../party-user/party-user.entity';
-import { User_PointService } from '../user_point/user-point.service';
-import { Party_Point } from '../party_point/party-point.entity';
+import { User_PointService } from '../user-point/user-point.service';
+import { Party_Point } from '../party-point/party-point.entity';
 import { Marker } from '../marker/marker.entity';
+import { User_Location } from '../user-location/user-location.entity';
 
 @Injectable()
 export class PartyService {
@@ -116,13 +117,11 @@ export class PartyService {
     await queryRunner.startTransaction('SERIALIZABLE');
 
     try {
-      // 플랜에 약속시간 종료됨 확인
       await queryRunner.manager.save(Plan, {
         id: planID,
         isEnd: true,
       });
 
-      // 파티의 포인트 업데이트
       await queryRunner.manager.increment(
         Party,
         { id: plan.party.id },
@@ -130,7 +129,6 @@ export class PartyService {
         plan.fine * users.length,
       );
 
-      // 유저 포인트 테이블 업데이트
       await Promise.all(
         users.map(async (user) => {
           await this.userPointService.fine({
@@ -165,25 +163,19 @@ export class PartyService {
     await queryRunner.startTransaction('READ COMMITTED');
 
     try {
-      await queryRunner.manager.softDelete(Chat, {
-        party: { id: party.id },
-      });
+      const plan = await queryRunner.manager.findOne(Plan, { where: { party: { id: party.id } } });
 
-      await queryRunner.manager.softDelete(Plan, {
-        party: { id: party.id },
-      });
+      await queryRunner.manager.softDelete(Chat, { party: { id: party.id } });
 
-      await queryRunner.manager.softDelete(Party_User, {
-        party: { id: party.id },
-      });
+      await queryRunner.manager.softDelete(Plan, { party: { id: party.id } });
 
-      await queryRunner.manager.softDelete(Party_Point, {
-        party: { id: party.id },
-      });
+      await queryRunner.manager.softDelete(User_Location, { planID: plan.id });
 
-      await queryRunner.manager.softDelete(Marker, {
-        party: { id: party.id },
-      });
+      await queryRunner.manager.softDelete(Party_User, { party: { id: party.id } });
+
+      await queryRunner.manager.softDelete(Party_Point, { party: { id: party.id } });
+
+      await queryRunner.manager.softDelete(Marker, { party: { id: party.id } });
 
       const partyResult = await queryRunner.manager.softDelete(Party, {
         id: partySoftDeleteDto.partyID,

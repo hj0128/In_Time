@@ -8,7 +8,7 @@ import {
 } from './party-point.interface';
 import { Party } from '../party/party.entity';
 import { User } from '../user/user.entity';
-import { USER_POINT_STATUS, User_Point } from '../user_point/user-point.entity';
+import { USER_POINT_STATUS, User_Point } from '../user-point/user-point.entity';
 
 @Injectable()
 export class Party_PointService {

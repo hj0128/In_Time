@@ -1,5 +1,4 @@
-import { JwtReqUser } from 'src/commons/interface/req.interface';
-import { UserCreateDto, UserDeleteDto, UserSetRedisDto } from './user.dto';
+import { UserCreateDto, UserDeleteDto } from './user.dto';
 import { Request } from 'express';
 
 export interface IUserServiceFindOneWithUserID {
@@ -34,21 +33,4 @@ export interface IUserServiceSoftDelete {
 
 export interface IUserServiceDelete {
   userDeleteDto: UserDeleteDto;
-}
-
-export interface IUserServiceSetRedis {
-  user: JwtReqUser['user'];
-  userSetRedisDto: UserSetRedisDto;
-}
-
-export interface IUserServiceGetRedis {
-  usersName: string[];
-}
-
-export interface RedisInfo {
-  userName: string;
-  myLat?: number;
-  myLng?: number;
-  time?: string;
-  isArrive?: boolean;
 }

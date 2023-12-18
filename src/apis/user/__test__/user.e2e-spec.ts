@@ -7,7 +7,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { JwtReqUser } from '../../../commons/interface/req.interface';
 import { AuthLoginDto } from '../../auth/auth.dto';
-import { UserCreateDto, UserDeleteDto, UserSetRedisDto } from '../user.dto';
+import { UserCreateDto, UserDeleteDto } from '../user.dto';
 
 describe('UserController (e2e)', () => {
   let app: NestExpressApplication;
@@ -129,52 +129,6 @@ describe('UserController (e2e)', () => {
       expect(response.body).toHaveProperty('badgeUrl');
       expect(response.body).toHaveProperty('deletedAt');
       expect(response.body.email).toBe(inputEmail);
-    });
-
-    it('/user/userSetRedis (Post)', async () => {
-      const inputUserSetRedisDto: UserSetRedisDto = {
-        myLat: 12.203,
-        myLng: 15.205,
-        time: '2023. 11. 30. 오전 11:01:46',
-        isArrive: false,
-      };
-
-      await request(app.getHttpServer())
-        .post('/user/userSetRedis')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('Cookie', `refreshToken=${refreshToken}`)
-        .send(inputUserSetRedisDto)
-        .expect(201);
-    });
-
-    it('/user/userGetRedis (Get)', async () => {
-      const inputUsersName = ['N', '유리'];
-
-      const expectedUserSetRedis: UserSetRedisDto = {
-        myLat: 12.203,
-        myLng: 15.205,
-        time: '2023. 11. 30. 오전 11:01:46',
-        isArrive: false,
-      };
-
-      const response = await request(app.getHttpServer())
-        .get('/user/userGetRedis')
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('Cookie', `refreshToken=${refreshToken}`)
-        .query({ usersName: inputUsersName })
-        .expect(200);
-
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body[0]).toHaveProperty('userName');
-      expect(response.body[0]).toHaveProperty('myLat');
-      expect(response.body[0]).toHaveProperty('myLng');
-      expect(response.body[0]).toHaveProperty('time');
-      expect(response.body[0]).toHaveProperty('isArrive');
-      expect(response.body[0].userName).toBe(inputUsersName[0]);
-      expect(response.body[0].myLat).toBe(expectedUserSetRedis.myLat);
-      expect(response.body[0].myLng).toBe(expectedUserSetRedis.myLng);
-      expect(response.body[0].time).toBe(expectedUserSetRedis.time);
-      expect(response.body[0].isArrive).toBe(expectedUserSetRedis.isArrive);
     });
 
     it('/user/userSoftDelete (Delete)', async () => {

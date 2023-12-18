@@ -67,7 +67,6 @@ const sendTokenToUser = async () => {
   });
 
   alert('입력하신 이메일로 인증번호를 전송했습니다.');
-  console.log(tokenNumber); // 배포 전 지우기
 
   tokenCheck.disabled = false;
   tokenCheck.style = 'color: #222; cursor: pointer;';
@@ -215,7 +214,7 @@ const signUpSubmit = async () => {
       window.location.href = '/signIn';
     } catch (error) {
       if (error.response.status === 400) {
-        alert('회원 가입 중 오류가 발생했습니다. \n입력하신 정보를 다시 확인해 주세요.')
+        alert('회원 가입 중 오류가 발생했습니다. \n입력하신 정보를 다시 확인해 주세요.');
       } else if (error.response.status === 409) {
         alert('이메일 또는 별명이 중복되어 사용이 불가합니다.');
       } else {

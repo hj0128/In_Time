@@ -12,7 +12,6 @@ import * as nodemailer from 'nodemailer';
 import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import * as jwt from 'jsonwebtoken';
 import { IncomingHttpHeaders } from 'http';
-import { UserSetRedisDto } from 'src/apis/user/user.dto';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -58,6 +57,7 @@ describe('AuthService', () => {
     partyUsers: [],
     friends: [],
     userPoints: [],
+    userLocations: [],
   };
   const mockRes: Response = {
     cookie: jest.fn(),
@@ -84,13 +84,6 @@ describe('AuthService', () => {
           user: process.env.NODE_MAIL_GMAIL_EMAIL,
           pass: process.env.NODE_MAIL_GMAIL_PASSWORD,
         },
-      });
-      expect(sendMailSpy.mock.calls[0][0]).toMatchObject({
-        auth: { pass: undefined, user: undefined },
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        service: 'gmail',
       });
     });
   });
@@ -233,23 +226,15 @@ describe('AuthService', () => {
 
   describe('logout', () => {
     it('유효한 토큰을 제공하면 로그아웃에 성공하고 메시지를 반환한다.', async () => {
-      const mockUserSetRedis: UserSetRedisDto = {
-        myLat: 12.203,
-        myLng: 15.205,
-        time: '2023. 11. 30. 오전 11:01:46',
-        isArrive: true,
-      };
-
       const inputHeaders: IncomingHttpHeaders = {
         authorization: 'Bearer validAccessToken',
         cookie: 'refreshToken=validRefreshToken',
       };
 
-      const expectedUserSetRedisDto: UserSetRedisDto = mockUserSetRedis;
-
       jest.spyOn(jwt, 'verify').mockResolvedValue({} as never);
       jest.spyOn(authService, 'tokenEXP').mockResolvedValue([1, 2] as never);
-      jest.spyOn(cacheManager, 'set').mockResolvedValue(expectedUserSetRedisDto);
+      jest.spyOn(cacheManager, 'set').mockResolvedValue('accessToken');
+      jest.spyOn(cacheManager, 'set').mockResolvedValue('refreshToken');
 
       const result: string = await authService.logout({
         headers: inputHeaders,
@@ -261,8 +246,8 @@ describe('AuthService', () => {
 
   describe('tokenEXP', () => {
     it('토큰의 만료 시간을 배열로 반환한다.', async () => {
-      const accessDecoded = { exp: Math.floor(new Date().getTime() / 1000) + 3600 }; // Expire after 1 hour
-      const refreshDecoded = { exp: Math.floor(new Date().getTime() / 1000) + 86400 }; // Expire after 1 day
+      const accessDecoded = { exp: Math.floor(new Date().getTime() / 1000) + 3600 };
+      const refreshDecoded = { exp: Math.floor(new Date().getTime() / 1000) + 86400 };
 
       jest.spyOn(jwtService, 'decode').mockReturnValueOnce(accessDecoded as any);
       jest.spyOn(jwtService, 'decode').mockReturnValueOnce(refreshDecoded as any);

@@ -4,7 +4,7 @@ import { Min } from 'class-validator';
 import { Party_User } from '../party-user/party-user.entity';
 import { Chat } from '../chat/chat.entity';
 import { Marker } from '../marker/marker.entity';
-import { Party_Point } from '../party_point/party-point.entity';
+import { Party_Point } from '../party-point/party-point.entity';
 
 @Entity()
 export class Party {

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plan } from './plan.entity';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import {
   IPlanServiceCheckEnd,
   IPlanServiceCreate,
@@ -11,7 +11,8 @@ import {
   IPlanServiceSoftDelete,
 } from './plan.interface';
 import { Party_UserService } from '../party-user/party-user.service';
-import { User_PointService } from '../user_point/user-point.service';
+import { User_PointService } from '../user-point/user-point.service';
+import { User_Location } from '../user-location/user-location.entity';
 
 @Injectable()
 export class PlanService {
@@ -21,6 +22,7 @@ export class PlanService {
 
     private readonly partyUserService: Party_UserService,
     private readonly userPointService: User_PointService,
+    private readonly dataSource: DataSource,
   ) {}
 
   findOneWithPlanID({ planID }: IPlanServiceFindOneWithPlanID): Promise<Plan> {
@@ -80,9 +82,23 @@ export class PlanService {
   }
 
   async softDelete({ planSoftDeleteDto }: IPlanServiceSoftDelete): Promise<boolean> {
-    const result = await this.planRepository.softDelete({ id: planSoftDeleteDto.planID });
-    if (!result) throw new InternalServerErrorException('삭제에 실패하였습니다.');
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ COMMITTED');
 
-    return result.affected ? true : false;
+    try {
+      await queryRunner.manager.softDelete(User_Location, { planID: planSoftDeleteDto.planID });
+
+      const result = await queryRunner.manager.softDelete(Plan, { id: planSoftDeleteDto.planID });
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+
+      return result.affected ? true : false;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      throw error;
+    }
   }
 }

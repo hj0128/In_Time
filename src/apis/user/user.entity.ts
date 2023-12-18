@@ -1,7 +1,8 @@
 import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Friend } from '../friend/friend.entity';
 import { Party_User } from '../party-user/party-user.entity';
-import { User_Point } from '../user_point/user-point.entity';
+import { User_Point } from '../user-point/user-point.entity';
+import { User_Location } from '../user-location/user-location.entity';
 
 @Entity()
 export class User {
@@ -37,4 +38,7 @@ export class User {
 
   @OneToMany(() => User_Point, (userPoints) => userPoints.user, { cascade: true })
   userPoints: User_Point[];
+
+  @OneToMany(() => User_Location, (userLocations) => userLocations.user, { cascade: true })
+  userLocations: User_Location[];
 }

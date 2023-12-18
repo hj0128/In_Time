@@ -22,7 +22,7 @@ import { User } from '../user/user.entity';
 import { IamPortService } from '../iam-port/iam-port.service';
 import { UserService } from '../user/user.service';
 import { Party } from '../party/party.entity';
-import { PARTY_POINT_STATUS, Party_Point } from '../party_point/party-point.entity';
+import { PARTY_POINT_STATUS, Party_Point } from '../party-point/party-point.entity';
 
 @Injectable()
 export class User_PointService {

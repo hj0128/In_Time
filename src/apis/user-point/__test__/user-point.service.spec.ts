@@ -6,8 +6,6 @@ import { DataSource, InsertResult, Repository, UpdateResult } from 'typeorm';
 import { IamPortService } from '../../iam-port/iam-port.service';
 import { UserService } from '../../user/user.service';
 import { User } from '../../user/user.entity';
-import { Party } from '../../party/party.entity';
-import { PARTY_POINT_STATUS, Party_Point } from '../../party_point/party-point.entity';
 import { JwtReqUser } from 'src/commons/interface/req.interface';
 import { PointFillDto, PointSendDto } from '../user-point.dto';
 import { InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
@@ -77,26 +75,7 @@ describe('User_PointService', () => {
     partyUsers: [],
     friends: [],
     userPoints: [],
-  };
-  const mockParty: Party = {
-    id: 'Party01',
-    name: '파티명',
-    point: 1000,
-    deletedAt: null,
-    chats: [],
-    markers: [],
-    partyPoints: [],
-    partyUsers: [],
-    plans: [],
-  };
-  const mockPartyPoint: Party_Point = {
-    id: 'PartyPoint01',
-    userName: '철수',
-    amount: 100,
-    status: PARTY_POINT_STATUS.USER_SEND,
-    createdAt: new Date(),
-    deletedAt: null,
-    party: mockParty,
+    userLocations: [],
   };
   const mockUserPoint: User_Point = {
     id: 'UserPoint01',

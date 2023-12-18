@@ -50,6 +50,7 @@ describe('User_PointController', () => {
     userPoints: [],
     partyUsers: [],
     friends: [],
+    userLocations: [],
   };
   const mockUserPoint: User_Point = {
     id: 'UserPoint01',

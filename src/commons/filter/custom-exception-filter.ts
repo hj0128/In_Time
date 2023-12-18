@@ -21,9 +21,6 @@ export class CustomExceptionFilter implements ExceptionFilter {
       error.message = exception.response?.data?.message || 'Axios Internal Server Error';
       error.status = exception.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
     }
-    console.log('======exception=====');
-    console.log(exception);
-    console.log('======exception====='); // 프로덕션 환경에서 지우기
 
     response.status(error.status).json({
       message: error.message,

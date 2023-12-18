@@ -34,7 +34,12 @@ const search = async () => {
     if (error.message === '토큰 만료') {
       alert('로그인 후 이용해 주세요.');
       window.location.href = '/signIn';
-    } else if (error.response.status === 404 || error.response.status === 400 || error.response.status === 409 || error.response.status === 410) {
+    } else if (
+      error.response.status === 404 ||
+      error.response.status === 400 ||
+      error.response.status === 409 ||
+      error.response.status === 410
+    ) {
       alert(error.response.data.message);
     } else {
       alert('친구 요청을 보내던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
@@ -108,7 +113,7 @@ const unFriend = async (fromUserID) => {
       alert('친구 관계를 끊던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
     }
   }
-}
+};
 
 const getFriendList = async () => {
   try {

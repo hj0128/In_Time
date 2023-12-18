@@ -39,7 +39,7 @@ const placeSubmit = async (name, address, lat, lng) => {
   if (!isSubmit) return;
 
   try {
-    const marker = await axios.post('/marker/markerCreate', {
+    await axios.post('/marker/markerCreate', {
       name,
       address,
       lat,
@@ -300,7 +300,7 @@ const getPartyPoint = async ({ partyID }) => {
     points.data.sort((a, b) => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
-    console.log(points)
+
     const partyPointList = document.querySelector('#party_point_list');
 
     for (let i = 0; i < points.data.length; i++) {

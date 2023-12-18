@@ -13,11 +13,12 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { FileModule } from './apis/file/file.module';
-import { User_PointModule } from './apis/user_point/user-point.module';
+import { User_PointModule } from './apis/user-point/user-point.module';
 import { ChatModule } from './apis/chat/chat.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MarkerModule } from './apis/marker/marker.module';
-import { Party_PointModule } from './apis/party_point/party-point.module';
+import { Party_PointModule } from './apis/party-point/party-point.module';
+import { User_LocationModule } from './apis/user-location/user-location.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { Party_PointModule } from './apis/party_point/party-point.module';
     FriendModule,
     MarkerModule,
     UserModule,
+    User_LocationModule,
     User_PointModule,
     Party_PointModule,
     PartyModule,
@@ -42,7 +44,7 @@ import { Party_PointModule } from './apis/party_point/party-point.module';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_DATABASE,
       entities: [__dirname + '/apis/**/*.entity.*'],
-      synchronize: true, // 개발 중에만 사용, 프로덕션에서는 비활성화
+      synchronize: false,
       logging: false,
     }),
     CacheModule.register<RedisClientOptions>({
