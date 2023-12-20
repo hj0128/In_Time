@@ -97,12 +97,12 @@ export class AuthService {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'none', // 배포 전 한 번 더 보기
-      domain: '.localhost',
+      sameSite: 'none',
+      domain: 'hyeonju.shop',
       path: '/',
       expires: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
     });
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', 'https://hyeonju.shop:3000');
   }
 
   getAccessToken({ user }: IAuthServiceGetAccessToken): string {
@@ -120,13 +120,14 @@ export class AuthService {
     let user = await this.userService.findOneWithEmail({
       email: req.user.email,
     });
-    if (user.deletedAt) throw new GoneException('탈퇴한 사용자입니다.');
 
     if (!user) {
       user = await this.userService.create({
         userCreateDto: { userEmail: req.user.email, ...req.user },
       });
     }
+
+    if (user.deletedAt) throw new GoneException('탈퇴한 사용자입니다.');
 
     this.setRefreshToken({ user, res });
   }

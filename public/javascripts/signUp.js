@@ -127,6 +127,8 @@ const signUpSubmit = async () => {
   const errorName = document.querySelector('#error_name');
   const errorPassword = document.querySelector('#error_password');
   const errorRePassword = document.querySelector('#error_rePassword');
+  const emailRegex = /[^a-zA-Z0-9가-힣@.]/g;
+  const nameRegex = /[^a-zA-Z0-9가-힣]/g;
 
   let isValid = true;
 
@@ -135,6 +137,9 @@ const signUpSubmit = async () => {
     isValid = false;
   } else if (!email.value.includes('@')) {
     errorEmail.innerText = '이메일 형식이 올바르지 않습니다.';
+    isValid = false;
+  } else if (emailRegex.test(email.value)) {
+    errorEmail.innerText = '특수문자는 사용할 수 없습니다.';
     isValid = false;
   } else {
     const isEmail = await axios.get('/user/userFindOneWithEmail', {
@@ -150,6 +155,9 @@ const signUpSubmit = async () => {
 
   if (!name.value) {
     errorName.innerText = '별명이 올바르지 않습니다.';
+    isValid = false;
+  } else if (nameRegex.test(name.value)) {
+    errorName.innerText = '특수문자는 사용할 수 없습니다.';
     isValid = false;
   } else {
     const isName = await axios.get('/user/userFindOneWithName', {

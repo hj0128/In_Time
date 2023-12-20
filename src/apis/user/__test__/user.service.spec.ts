@@ -143,16 +143,18 @@ describe('UserService', () => {
   });
 
   describe('sendEmail', () => {
-    it('email과 일치하는 user를 반환한다.', async () => {
+    it('userEmail로 회원가입 축하 이메일을 보낸다.', async () => {
       const sendMailSpy = jest.spyOn(nodemailer, 'createTransport').mockReturnValue({
         sendMail: jest.fn().mockResolvedValue({}),
       } as any);
 
-      const inputName: string = '철수';
-      const inputUserEmail: string = 'a@a.com';
+      const inputName: string = mockUser.name;
+      const inputEmail: string = mockUser.email;
+      const inputUserEmail: string = 'b@b.com';
 
       const result: void = await userService.sendEmail({
         name: inputName,
+        email: inputEmail,
         userEmail: inputUserEmail,
       });
 

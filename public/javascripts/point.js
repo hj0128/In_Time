@@ -55,7 +55,6 @@ const paymentClickHandler = async (pay) => {
         pay_method: 'card',
         name: `${point.value}원 충전`,
         amount: point.value,
-        m_redirect_url: 'http://localhost:3000/mypage',
       },
       async (rsp) => {
         if (rsp.success) {

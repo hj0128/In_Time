@@ -164,12 +164,11 @@ export class PartyService {
 
     try {
       const plan = await queryRunner.manager.findOne(Plan, { where: { party: { id: party.id } } });
+      if (plan) await queryRunner.manager.softDelete(User_Location, { planID: plan.id });
 
       await queryRunner.manager.softDelete(Chat, { party: { id: party.id } });
 
       await queryRunner.manager.softDelete(Plan, { party: { id: party.id } });
-
-      await queryRunner.manager.softDelete(User_Location, { planID: plan.id });
 
       await queryRunner.manager.softDelete(Party_User, { party: { id: party.id } });
 

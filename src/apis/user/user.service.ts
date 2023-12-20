@@ -62,7 +62,7 @@ export class UserService {
     return users[0];
   }
 
-  async sendEmail({ name, userEmail }: IUserServiceSendEmail): Promise<void> {
+  async sendEmail({ name, email, userEmail }: IUserServiceSendEmail): Promise<void> {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       host: 'smtp.gmail.com',
@@ -77,8 +77,8 @@ export class UserService {
     const html = `
       <div style="max-width: 600px; margin: 0 auto; background-color: #f4f4f4; padding: 20px; border-radius: 10px;">
         <h1 style="color: #333;">In_Time 회원가입을 축하합니다!</h1>
-        <p style="color: #555; font-size: 16px;">안녕하세요 ${name}님!</p>
-        <p style="color: #555; font-size: 16px;">In_Time에 가입해 주셔서 감사합니다.</p>
+        <p style="color: #555; font-size: 16px;">안녕하세요 ${name}님 In_Time에 가입해 주셔서 감사합니다.</p>
+        <p style="color: #555; font-size: 16px;">${name}님의 이메일은 ${email}입니다.</p>
         <p style="color: #555; font-size: 16px;">이제 In_Time의 다양한 서비스를 자유롭게 이용하실 수 있습니다.</p>
         <p style="color: #555; font-size: 16px;">추가적인 정보나 도움이 필요하시면 언제든지 문의해 주세요.</p>
         <p style="color: #555; font-size: 16px;">감사합니다!<br><br>In_Time 팀 드림</p>    
@@ -94,10 +94,20 @@ export class UserService {
   }
 
   async create({ userCreateDto }: IUserServiceCreate): Promise<User> {
-    const { name, email, password, profileUrl, userEmail } = userCreateDto;
+    const { email, name, password, profileUrl, userEmail } = userCreateDto;
 
-    const duplicateNameUser = await this.findOneWithName({ name });
-    const duplicateEmailUser = await this.findOneWithEmail({ email });
+    const emailRegex = /[^a-zA-Z0-9가-힣@.]/g;
+    const nameRegex = /[^a-zA-Z0-9가-힣]/g;
+    const _email = email.replace(emailRegex, '');
+    let _name = name.replace(nameRegex, '');
+
+    if (!_name) {
+      const randomNumber = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+      _name = `name${randomNumber}`;
+    }
+
+    const duplicateNameUser = await this.findOneWithName({ name: _name });
+    const duplicateEmailUser = await this.findOneWithEmail({ email: _email });
     if (duplicateNameUser || duplicateEmailUser) {
       throw new ConflictException('이메일 또는 별명이 중복되어 사용이 불가합니다.');
     }
@@ -105,15 +115,15 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const create = await this.userRepository.save({
-      name,
-      email,
+      name: _name,
+      email: _email,
       password: hashedPassword,
       profileUrl,
     });
 
     if (!create) throw new InternalServerErrorException('회원 생성에 실패하였습니다.');
 
-    await this.sendEmail({ name, userEmail });
+    await this.sendEmail({ name: _name, email: _email, userEmail });
 
     return create;
   }

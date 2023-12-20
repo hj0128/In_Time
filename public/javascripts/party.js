@@ -467,7 +467,7 @@ socket.on('chatMessage', ({ message, userName }) => {
 const messageSubmitHandler = () => {
   const accessToken = axios.defaults.headers.common['Authorization'].split('Bearer ')[1];
 
-  socket = io('http://localhost:3000', {
+  socket = io('https://hyeonju.shop', {
     query: { token: accessToken },
   });
 

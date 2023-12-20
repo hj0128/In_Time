@@ -6,7 +6,7 @@ export class JwtNaverStrategy extends PassportStrategy(Strategy, 'naver') {
     super({
       clientID: process.env.NAVER_CLIENT_ID,
       clientSecret: process.env.NAVER_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3000/auth/naver',
+      callbackURL: 'http://hyeonju.shop/auth/naver',
       scope: ['nickname', 'email', 'profile_image'],
     });
   }
@@ -15,7 +15,7 @@ export class JwtNaverStrategy extends PassportStrategy(Strategy, 'naver') {
     return {
       name: profile.nickname,
       email: profile.email,
-      password: '네이버비밀번호',
+      password: process.env.SOCIAL_PASSWORD,
       profileUrl: profile.profileImage,
     };
   }

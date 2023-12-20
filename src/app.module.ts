@@ -45,6 +45,7 @@ import { User_LocationModule } from './apis/user-location/user-location.module';
       database: process.env.DATABASE_DATABASE,
       entities: [__dirname + '/apis/**/*.entity.*'],
       synchronize: false,
+      migrationsRun: false,
       logging: false,
     }),
     CacheModule.register<RedisClientOptions>({

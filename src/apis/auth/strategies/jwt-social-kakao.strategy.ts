@@ -6,7 +6,7 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     super({
       clientID: process.env.KAKAO_CLIENT_ID,
       clientSecret: process.env.KAKAO_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3000/auth/kakao',
+      callbackURL: 'http://hyeonju.shop/auth/kakao',
       scope: ['profile_nickname', 'account_email', 'profile_image'],
     });
   }
@@ -15,7 +15,7 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     return {
       name: profile._json.properties.nickname,
       email: profile._json.kakao_account.email,
-      password: '카카오비밀번호',
+      password: process.env.SOCIAL_PASSWORD,
       profileUrl: profile._json.properties.profile_image,
     };
   }

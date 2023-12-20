@@ -6,7 +6,7 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3000/auth/google',
+      callbackURL: 'http://hyeonju.shop/auth/google',
       scope: ['email', 'profile'],
     });
   }
@@ -15,7 +15,7 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
     return {
       name: profile.displayName,
       email: profile.emails[0].value,
-      password: '구글비밀번호',
+      password: process.env.SOCIAL_PASSWORD,
       profileUrl: profile.photos[0].value,
     };
   }

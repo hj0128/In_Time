@@ -140,7 +140,10 @@ const setArrive = ({ userName }) => {
 };
 
 
+const usersMarker = [];
 const getUserLocation = async ({ usersName, usersImage }) => {
+  usersMarker.forEach((marker) => marker.setMap(null));
+
   const res = await axios.get('/userLocation/userLocationFindWithUsersName', {
     params: { usersName, planID },
   });
@@ -154,11 +157,12 @@ const getUserLocation = async ({ usersName, usersImage }) => {
       setArrive({ userName: target.name });
     }
 
-    new kakao.maps.CustomOverlay({
+    const marker = new kakao.maps.CustomOverlay({
       map,
       position: latlng,
       content: `<img class="user_marker" src="${usersImage[i]}">`,
     });
+    usersMarker.push(marker);
 
     const userIconText = document.querySelector(`.${target.name}_text`);
     if (target.lat && target.lng) {
@@ -345,7 +349,7 @@ const setChat = ({ partyID }) => {
   const messageSubmitHandler = () => {
     const accessToken = axios.defaults.headers.common['Authorization'].split('Bearer ')[1];
 
-    socket = io('http://localhost:3000', {
+    socket = io('https://hyeonju.shop', {
       query: { token: accessToken },
     });
 
@@ -424,34 +428,3 @@ const getPlan = async () => {
   }
 };
 getPlan();
-
-
-const pointSend = document.querySelector('#point_send');
-const pointSendClickHandler = async () => {
-  try {
-    const amount = prompt('보낼 금액을 입력해 주세요.', '5000');
-    if (amount === null) return;
-    if (amount <= 0) {
-      alert('1원 이상부터 보낼 수 있습니다.');
-      return;
-    }
-
-    await axios.post('/point/pointPartyPointToUser', {
-      partyID,
-      amount: Number(amount),
-    });
-
-    alert(`${amount}원을 보냈습니다.`);
-    window.location.href = `/party?id=${partyID}`;
-  } catch (error) {
-    if (error.message === '토큰 만료') {
-      alert('로그인 후 이용해 주세요.');
-      window.location.href = '/signIn';
-    } else if (error.response.status === 422) {
-      alert(error.response.data.message);
-    } else {
-      alert('포인트를 내보내던 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.');
-    }
-  }
-};
-pointSend.addEventListener('click', pointSendClickHandler);

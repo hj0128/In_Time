@@ -19,6 +19,7 @@ export interface IUserServiceFindOneWithEmail {
 
 export interface IUserServiceSendEmail {
   name: string;
+  email: string;
   userEmail: string;
 }
 
