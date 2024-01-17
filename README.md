@@ -21,7 +21,7 @@ NestJS 10.0.0&emsp;Express 4.18.2&emsp;NodeJS 20.9.0&emsp;TypeScript 5.1.3&emsp;
 
 TypeORM&emsp;Jest&emsp;Jsonwebtoken&emsp;Passport&emsp;Socket.io&emsp;Axios&emsp;Swagger-UI
 
-Nodemailer&emsp;Docker-compose&emsp;Git&emsp;GitHub&emsp;Google-Cloud-Platform&emsp;Google-Cloud-Storage
+Nodemailer&emsp;Docker-compose&emsp;Git&emsp;GitHub&emsp;Google-Cloud-Platform
 
 </br>
 
