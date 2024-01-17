@@ -8,7 +8,7 @@ In Time은 서로의 위치를 공유하여 정해진 약속 시간 내에 약�
 
 약속을 지키지 않는 사람들에게서 지각비를 거두어, 시간을 낭비하게 되는 사람들에게 작은 보상을 줄 수 있습니다.
 
-- 제작 기간: 2023년 11월 3일 ~ 2023년 12월 20일
+- 제작 기간: 2023년 11월 3일 ~ 2023년 12월 20일 ( 안드로이드 앱 제작 중 )
 - 참여 인원: 개인 프로젝트
 - 데모 사이트: https://hyeonju.shop
 - API DOCS: https://hyeonju.shop/api-docs
@@ -17,11 +17,11 @@ In Time은 서로의 위치를 공유하여 정해진 약속 시간 내에 약�
 
 ## 기술 스택
 
-NestJS 10.0.0&emsp;Express 4.18.2&emsp;NodeJS 20.9.0&emsp;TypeScript 5.1.3&emsp;TypeORM 0.3.17
+NestJS 10.0.0&emsp;Express 4.18.2&emsp;NodeJS 20.9.0&emsp;TypeScript 5.1.3&emsp;MySQL2 3.6.2&emsp;Redis 4.6.11
 
-MySQL2 3.6.2&emsp;Redis 4.6.11&emsp;Docker-compose 1.29.2
+TypeORM&emsp;Jest&emsp;Jsonwebtoken&emsp;Passport&emsp;Socket.io&emsp;Axios&emsp;Swagger-UI
 
-Socket.io&emsp;Jsonwebtoken&emsp;Nodemailer&emsp;Axios&emsp;Jest&emsp;Git&emsp;GCP
+Nodemailer&emsp;Docker-compose&emsp;Git&emsp;GitHub&emsp;Google-Cloud-Platform&emsp;Google-Cloud-Storage
 
 </br>
 
@@ -60,6 +60,20 @@ JWT 토큰을 Access Token으로 하는 인증 인가 서비스를 구현하였�
 </details>
 
 <details>
+<summary>geolocation을 이용한 실시간 위치 가져오기</summary>
+<div>
+
+geolocation을 이용하여 사용자의 실시간 위치를 가져옵니다.
+
+사용자의 위치가 목적지 50m 이내라면, 위치 정보 수집을 중단하고 목적지에 도착했음을 저장합니다.
+
+반면 사용자의 위치가 목적지 50m 밖이라면, 목적지에 아직 도착하지 못했음을 저장합니다.
+
+![실시간위치](https://github.com/hj0128/in_time/assets/112938143/532f84ba-8f59-42ff-9af0-d79513a9c805)
+</div>
+</details>
+
+<details>
 <summary>트랜잭션을 활용한 포인트 처리</summary>
 <div>
 
@@ -86,9 +100,24 @@ JWT 토큰을 Access Token으로 하는 인증 인가 서비스를 구현하였�
 <details>
 <summary>소셜 로그인</summary>
 <div>
-// 소셜 로그인 동영상 수정
 
-![소셜로그인](https://github.com/hj0128/in_time/assets/112938143/0202fa34-3a18-4fca-bbcd-9e19f72947e8)
+![소셜로그인](https://github.com/hj0128/in_time/assets/112938143/413de3b0-9d6d-4f5f-a0f3-c0b6e9c0459b)
+</div>
+</details>
+
+<details>
+<summary>실시간 위치</summary>
+<div>
+
+![약속-실시간위치](https://github.com/hj0128/in_time/assets/112938143/4af988b3-6c69-4932-aa6c-758a793089e6)
+</div>
+</details>
+
+<details>
+<summary>벌금 걷기</summary>
+<div>
+
+![약속-시간종료](https://github.com/hj0128/in_time/assets/112938143/a4afe444-f78a-47fd-8142-921a257d0f58)
 </div>
 </details>
 
