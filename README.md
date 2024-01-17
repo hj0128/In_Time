@@ -17,11 +17,9 @@ In Time은 서로의 위치를 공유하여 정해진 약속 시간 내에 약�
 
 ## 기술 스택
 
-NestJS 10.0.0&emsp;Express 4.18.2&emsp;NodeJS 20.9.0&emsp;TypeScript 5.1.3&emsp;MySQL2 3.6.2&emsp;Redis 4.6.11
+NestJS 10&emsp;NodeJS 20&emsp;Express&emsp;TypeScript&emsp;TypeORM&emsp;MySQL2&emsp;Redis&emsp;Docker-compose&emsp;
 
-TypeORM&emsp;Jest&emsp;Jsonwebtoken&emsp;Passport&emsp;Socket.io&emsp;Axios&emsp;Swagger-UI
-
-Nodemailer&emsp;Docker-compose&emsp;Git&emsp;GitHub&emsp;Google-Cloud-Platform
+Jest&emsp;Jsonwebtoken&emsp;Passport&emsp;Socket.io&emsp;Axios&emsp;Swagger-UI&emsp;Nodemailer&emsp;Git&emsp;GitHub&emsp;GCP
 
 </br>
 
